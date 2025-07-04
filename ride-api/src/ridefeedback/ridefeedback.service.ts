@@ -1,26 +1,35 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRidefeedbackDto } from './dto/create-ridefeedback.dto';
 import { UpdateRidefeedbackDto } from './dto/update-ridefeedback.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Ridefeedback } from './entities/ridefeedback.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class RidefeedbackService {
-  create(createRidefeedbackDto: CreateRidefeedbackDto) {
-    return 'This action adds a new ridefeedback';
+  constructor(
+    @InjectRepository(Ridefeedback)
+    private readonly ridefeedbackRepo: Repository<Ridefeedback>,
+  ) {}
+  async create(createRidefeedbackDto: CreateRidefeedbackDto) {
+    const ridefeed = this.ridefeedbackRepo.create(createRidefeedbackDto);
+    return await this.ridefeedbackRepo.save(ridefeed);
   }
 
-  findAll() {
-    return `This action returns all ridefeedback`;
+  async findAll() {
+    return await this.ridefeedbackRepo.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} ridefeedback`;
+  async findOne(id: string) {
+    return await this.ridefeedbackRepo.findOne({ where: { id } });
   }
 
-  update(id: number, updateRidefeedbackDto: UpdateRidefeedbackDto) {
-    return `This action updates a #${id} ridefeedback`;
+  async update(id: string, updateRidefeedbackDto: UpdateRidefeedbackDto) {
+    await this.ridefeedbackRepo.update(id, updateRidefeedbackDto);
+    return this.findOne(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} ridefeedback`;
+  async remove(id: string) {
+    return await this.ridefeedbackRepo.delete(id);
   }
 }

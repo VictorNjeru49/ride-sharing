@@ -14,8 +14,8 @@ export class WalletsService {
     return await this.walletRepo.save(wallet);
   }
 
-  findAll() {
-    return `This action returns all wallets`;
+  async findAll() {
+    return await this.walletRepo.find();
   }
 
   async findOne(id: string): Promise<Wallet | null> {
@@ -35,7 +35,7 @@ export class WalletsService {
     return updatedWallet;
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} wallet`;
+  async remove(id: string) {
+    return await this.walletRepo.delete(id);
   }
 }

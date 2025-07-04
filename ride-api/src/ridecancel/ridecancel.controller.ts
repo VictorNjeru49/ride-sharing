@@ -27,7 +27,7 @@ export class RidecancelController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.ridecancelService.findOne(+id);
+    return this.ridecancelService.findOne(id);
   }
 
   @Patch(':id')
@@ -35,11 +35,11 @@ export class RidecancelController {
     @Param('id') id: string,
     @Body() updateRidecancelDto: UpdateRidecancelDto,
   ) {
-    return this.ridecancelService.update(+id, updateRidecancelDto);
+    return this.ridecancelService.update(id, updateRidecancelDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.ridecancelService.remove(+id);
+    return this.ridecancelService.remove(id);
   }
 }

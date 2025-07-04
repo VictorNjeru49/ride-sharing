@@ -34,29 +34,39 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 100 })
+  @Column({ length: 100, nullable: true })
   firstName: string;
 
-  @Column({ length: 100 })
+  @Column({ length: 100, nullable: true })
   lastName: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: true })
   email: string;
 
-  @Column({ unique: true })
-  phone: string;
+  @Column({ type: 'bigint', nullable: true })
+  phone: bigint;
 
-  @Column()
+  @Column({ nullable: true })
   password: string;
 
   @Column({ type: 'enum', enum: UserRole, default: UserRole.RIDER })
   role: UserRole;
 
-  @Column()
+  @Column({ nullable: true })
   hashedRefreshToken: string;
 
   @Column({ default: false })
   isVerified: boolean;
+
+  // 🔒 Social Login Fields
+  @Column({ nullable: true })
+  provider: string; // e.g., "google", "facebook"
+
+  @Column({ nullable: true })
+  providerId: string; // e.g., Google/Facebook unique ID
+
+  @Column({ nullable: true })
+  profilePicture: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   walletBalance: number;
@@ -67,44 +77,102 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToOne(() => Riderprofile, (rp) => rp.user, { cascade: true })
+  @OneToOne(() => Riderprofile, (rp) => rp.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   riderProfile: Riderprofile;
 
-  @OneToOne(() => Driverprofile, (dp) => dp.user, { cascade: true })
+  @OneToOne(() => Driverprofile, (dp) => dp.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   driverProfile: Driverprofile;
 
-  @OneToMany(() => Riderequest, (rr) => rr.rider)
+  @OneToMany(() => Riderequest, (rr) => rr.rider, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   rideRequests: Riderequest[];
 
-  @OneToMany(() => Ride, (ride) => ride.driver)
+  @OneToMany(() => Ride, (ride) => ride.driver, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   ridesOffered: Ride[];
 
-  @OneToMany(() => Ride, (ride) => ride.rider) ridesTaken: Ride[];
+  @OneToMany(() => Ride, (ride) => ride.rider, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  ridesTaken: Ride[];
 
-  @OneToMany(() => Payment, (p) => p.user) payments: Payment[];
+  @OneToMany(() => Payment, (p) => p.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  payments: Payment[];
 
-  @OneToMany(() => Rating, (r) => r.rater) ratingsGiven: Rating[];
+  @OneToMany(() => Rating, (r) => r.rater, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  ratingsGiven: Rating[];
 
-  @OneToMany(() => Rating, (r) => r.ratee) ratingsReceived: Rating[];
+  @OneToMany(() => Rating, (r) => r.ratee, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  ratingsReceived: Rating[];
 
-  @OneToMany(() => Wallet, (wt) => wt.user)
+  @OneToMany(() => Wallet, (wt) => wt.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   walletTransactions: Wallet[];
 
-  @OneToMany(() => Ridefeedback, (f) => f.user) rideFeedbacks: Ridefeedback[];
+  @OneToMany(() => Ridefeedback, (f) => f.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  rideFeedbacks: Ridefeedback[];
 
-  @OneToMany(() => Supportticket, (t) => t.user)
+  @OneToMany(() => Supportticket, (t) => t.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   supportTickets: Supportticket[];
 
-  @OneToMany(() => Notification, (n) => n.user) notifications: Notification[];
+  @OneToMany(() => Notification, (n) => n.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  notifications: Notification[];
 
-  @OneToMany(() => Device, (d) => d.user) devices: Device[];
+  @OneToMany(() => Device, (d) => d.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  devices: Device[];
 
-  @OneToMany(() => Userpromousage, (u) => u.user) promoUsages: Userpromousage[];
+  @OneToMany(() => Userpromousage, (u) => u.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  promoUsages: Userpromousage[];
 
-  @OneToOne(() => Admin, (a) => a.user, { cascade: true }) adminProfile: Admin;
+  @OneToOne(() => Admin, (a) => a.user, { cascade: true, onDelete: 'CASCADE' })
+  adminProfile: Admin;
 
-  @OneToMany(() => Promocode, (pc) => pc.code)
+  @OneToMany(() => Promocode, (pc) => pc.code, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   createdPromoCodes: Promocode[];
-  @OneToMany(() => Driverlocation, (driverLocation) => driverLocation.driver)
+
+  @OneToMany(() => Driverlocation, (driverLocation) => driverLocation.driver, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   driverLocations: Driverlocation[];
 }

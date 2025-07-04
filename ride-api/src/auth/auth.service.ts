@@ -12,9 +12,8 @@ import * as bcrypt from 'bcrypt';
 import { CreateAuthDto } from './dto';
 
 export interface JwtPayload {
-  sub: number;
+  sub: string;
   email: string;
-  phone: string;
   iat?: number;
   exp?: number;
 }
@@ -26,15 +25,10 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  private async getToken(
-    userId: string,
-    email: string,
-    role: string,
-    phone: string,
-  ) {
+  private async getToken(userId: string, email: string, role: string) {
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(
-        { sub: userId, email: email, role: role, phone: phone },
+        { sub: userId, email: email, role: role },
         {
           secret: this.configService.getOrThrow<string>('ACCESS_TOKEN_SECRET'),
           expiresIn: this.configService.getOrThrow<string>(
@@ -58,6 +52,50 @@ export class AuthService {
     ]);
 
     return { accessToken: at, refreshToken: rt };
+  }
+
+  async socialLogin(socialData: {
+    provider: string;
+    providerId: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    picture?: string;
+  }) {
+    let user = await this.userRepo.findOne({
+      where: { email: socialData.email },
+    });
+
+    // If user doesn't exist, create one
+    if (!user) {
+      user = this.userRepo.create({
+        email: socialData.email,
+        firstName: socialData.firstName,
+        lastName: socialData.lastName,
+        profilePicture: socialData.picture,
+        provider: socialData.provider,
+        providerId: socialData.providerId,
+        password: '',
+      });
+      user = await this.userRepo.save(user);
+    }
+    const { accessToken, refreshToken } = await this.getToken(
+      user.id,
+      user.email,
+      user.role,
+    );
+    await this.saveRefreshToken(user.id, refreshToken);
+
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+      },
+      tokens: {
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      },
+    };
   }
 
   private async hashData(data: string): Promise<string> {
@@ -92,7 +130,6 @@ export class AuthService {
     const { accessToken, refreshToken } = await this.getToken(
       foundUser.id,
       foundUser.email,
-      foundUser.phone,
       foundUser.role,
     );
     await this.saveRefreshToken(foundUser.id, refreshToken);
@@ -134,7 +171,6 @@ export class AuthService {
       foundUser.id,
       foundUser.email,
       foundUser.role,
-      foundUser.phone,
     );
     const hashedToken = await bcrypt.hash(newRefreshToken, 10);
     await this.saveRefreshToken(foundUser.id, hashedToken);
@@ -144,7 +180,7 @@ export class AuthService {
         id: foundUser.id,
         role: foundUser.role,
         email: foundUser.email,
-        phone: foundUser.phone,
+        phone: foundUser?.phone,
       },
       tokens: {
         accessToken: accessToken,

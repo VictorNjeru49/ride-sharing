@@ -1,26 +1,36 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDeviceDto } from './dto/create-device.dto';
 import { UpdateDeviceDto } from './dto/update-device.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Device } from './entities/device.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class DeviceService {
-  create(createDeviceDto: CreateDeviceDto) {
-    return 'This action adds a new device';
+  constructor(
+    @InjectRepository(Device)
+    private readonly deviceRepo: Repository<Device>,
+  ) {}
+
+  async create(createDeviceDto: CreateDeviceDto) {
+    const device = this.deviceRepo.create(createDeviceDto);
+    return await this.deviceRepo.save(device);
   }
 
-  findAll() {
-    return `This action returns all device`;
+  async findAll() {
+    return await this.deviceRepo.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} device`;
+  async findOne(id: string) {
+    return await this.deviceRepo.findOne({ where: { id } });
   }
 
-  update(id: number, updateDeviceDto: UpdateDeviceDto) {
-    return `This action updates a #${id} device`;
+  async update(id: string, updateDeviceDto: UpdateDeviceDto) {
+    await this.deviceRepo.update(id, updateDeviceDto);
+    return this.findOne(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} device`;
+  async remove(id: string) {
+    return await this.deviceRepo.delete(id);
   }
 }

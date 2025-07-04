@@ -1,8 +1,8 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { LocationsModule } from './locations/locations.module';
 import { WalletsModule } from './wallets/wallets.module';
@@ -23,6 +23,10 @@ import { PromocodeModule } from './promocode/promocode.module';
 import { UserpromousageModule } from './userpromousage/userpromousage.module';
 import { DeviceModule } from './device/device.module';
 import { AdminModule } from './admin/admin.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AtGuard } from './auth/guards';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { LoggerMiddleware } from './logger.middleware';
 
 @Module({
   imports: [
@@ -51,8 +55,33 @@ import { AdminModule } from './admin/admin.module';
     UserpromousageModule,
     DeviceModule,
     AdminModule,
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => [
+        {
+          ttl: config.getOrThrow('THROTTLE_TTL'),
+          limit: config.getOrThrow('THROTTLE_LIMIT'),
+          ignoreUserAgents: [/^curl\//, /^PostmanRuntime\//],
+        },
+      ],
+    }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AtGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('{*splat}');
+  }
+}

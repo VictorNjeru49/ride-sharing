@@ -45,13 +45,10 @@ export class UsersService {
       );
       users = await this.userRepo.find({
         where: [{ firstName: search }, { lastName: search }, { email: search }],
-        relations: ['orders', 'returns', 'payment', 'transactions'],
       });
     } else {
       console.log(`This action returns all users`);
-      users = await this.userRepo.find({
-        relations: ['orders', 'returns', 'payment', 'transactions'],
-      });
+      users = await this.userRepo.find({});
     }
 
     return users;

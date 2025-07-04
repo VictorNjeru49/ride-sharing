@@ -27,7 +27,7 @@ export class PromocodeController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.promocodeService.findOne(+id);
+    return this.promocodeService.findOne(id);
   }
 
   @Patch(':id')
@@ -35,11 +35,11 @@ export class PromocodeController {
     @Param('id') id: string,
     @Body() updatePromocodeDto: UpdatePromocodeDto,
   ) {
-    return this.promocodeService.update(+id, updatePromocodeDto);
+    return this.promocodeService.update(id, updatePromocodeDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.promocodeService.remove(+id);
+    return this.promocodeService.remove(id);
   }
 }

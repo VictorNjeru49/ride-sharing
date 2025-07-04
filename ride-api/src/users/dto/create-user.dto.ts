@@ -1,8 +1,9 @@
 import {
+  IsBoolean,
   IsEmail,
   IsEnum,
   IsNotEmpty,
-  IsPhoneNumber,
+  IsOptional,
   IsString,
   MinLength,
 } from 'class-validator';
@@ -27,18 +28,26 @@ export class CreateUserDto {
   @IsEmail()
   email: string;
 
-  @ApiProperty({ description: 'Phone Number', example: '+2547123456789' })
-  @IsPhoneNumber()
-  @MinLength(15)
-  phone: string;
+  @ApiProperty({ description: 'Phone Number', example: '2547123456789' })
+  phone: bigint;
 
   @ApiProperty({ description: 'User password', example: 'securePassword123' })
   @IsString()
   @MinLength(15)
   password: string;
 
-  @ApiProperty({ description: 'User role', example: 'RIDER' })
+  @ApiProperty({
+    description: 'User role',
+    example: 'RIDER',
+    default: UserRole.RIDER,
+  })
+  @IsOptional()
   @IsString()
   @IsEnum(UserRole)
-  userType: UserRole;
+  role?: UserRole;
+
+  @IsOptional()
+  @ApiProperty()
+  @IsBoolean()
+  isVerified?: boolean;
 }

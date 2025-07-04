@@ -27,7 +27,7 @@ export class DriverprofileController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.driverprofileService.findOne(+id);
+    return this.driverprofileService.findOne(id);
   }
 
   @Patch(':id')
@@ -35,11 +35,11 @@ export class DriverprofileController {
     @Param('id') id: string,
     @Body() updateDriverprofileDto: UpdateDriverprofileDto,
   ) {
-    return this.driverprofileService.update(+id, updateDriverprofileDto);
+    return this.driverprofileService.update(id, updateDriverprofileDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.driverprofileService.remove(+id);
+    return this.driverprofileService.remove(id);
   }
 }

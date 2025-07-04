@@ -14,6 +14,8 @@ export class Vehicle {
   id: string;
   @OneToOne(() => Driverprofile, (dp) => dp.vehicle) driver: Driverprofile;
   @Column()
+  vehicleImage: string;
+  @Column()
   make: string;
 
   @Column()

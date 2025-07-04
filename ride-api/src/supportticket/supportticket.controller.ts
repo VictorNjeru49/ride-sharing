@@ -27,7 +27,7 @@ export class SupportticketController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.supportticketService.findOne(+id);
+    return this.supportticketService.findOne(id);
   }
 
   @Patch(':id')
@@ -35,11 +35,11 @@ export class SupportticketController {
     @Param('id') id: string,
     @Body() updateSupportticketDto: UpdateSupportticketDto,
   ) {
-    return this.supportticketService.update(+id, updateSupportticketDto);
+    return this.supportticketService.update(id, updateSupportticketDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.supportticketService.remove(+id);
+    return this.supportticketService.remove(id);
   }
 }

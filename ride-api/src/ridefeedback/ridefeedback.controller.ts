@@ -27,7 +27,7 @@ export class RidefeedbackController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.ridefeedbackService.findOne(+id);
+    return this.ridefeedbackService.findOne(id);
   }
 
   @Patch(':id')
@@ -35,11 +35,11 @@ export class RidefeedbackController {
     @Param('id') id: string,
     @Body() updateRidefeedbackDto: UpdateRidefeedbackDto,
   ) {
-    return this.ridefeedbackService.update(+id, updateRidefeedbackDto);
+    return this.ridefeedbackService.update(id, updateRidefeedbackDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.ridefeedbackService.remove(+id);
+    return this.ridefeedbackService.remove(id);
   }
 }

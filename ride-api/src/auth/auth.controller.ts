@@ -10,6 +10,7 @@ import {
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto';
 import { ApiTags } from '@nestjs/swagger';
+import { Public } from './decorators/public.decorator';
 
 interface RequestWithUser extends Request {
   user: {
@@ -22,17 +23,17 @@ interface RequestWithUser extends Request {
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
+  @Public()
   @Post('login')
   SignIn(@Body() createAuthDto: CreateAuthDto) {
     return this.authService.logIn(createAuthDto);
   }
-
+  @Public()
   @Get('logout/:id')
   SignOut(@Param('id') id: string) {
     return this.authService.logOut(id);
   }
-
+  @Public()
   @Get('refresh')
   refreshToken(@Param('id') id: string, @Req() req: RequestWithUser) {
     const user = req.user;

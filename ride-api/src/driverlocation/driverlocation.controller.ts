@@ -27,7 +27,7 @@ export class DriverlocationController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.driverlocationService.findOne(+id);
+    return this.driverlocationService.findOne(id);
   }
 
   @Patch(':id')
@@ -35,11 +35,11 @@ export class DriverlocationController {
     @Param('id') id: string,
     @Body() updateDriverlocationDto: UpdateDriverlocationDto,
   ) {
-    return this.driverlocationService.update(+id, updateDriverlocationDto);
+    return this.driverlocationService.update(id, updateDriverlocationDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.driverlocationService.remove(+id);
+    return this.driverlocationService.remove(id);
   }
 }

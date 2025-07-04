@@ -20,7 +20,7 @@ export class Admin {
   @Column()
   role: superRole;
 
-  @Column()
+  @Column('text', { nullable: true, array: true })
   permission: string[];
 
   @ManyToOne(() => User, (user) => user.adminProfile, { onDelete: 'CASCADE' })

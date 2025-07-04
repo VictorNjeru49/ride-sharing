@@ -27,7 +27,7 @@ export class UserpromousageController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.userpromousageService.findOne(+id);
+    return this.userpromousageService.findOne(id);
   }
 
   @Patch(':id')
@@ -35,11 +35,11 @@ export class UserpromousageController {
     @Param('id') id: string,
     @Body() updateUserpromousageDto: UpdateUserpromousageDto,
   ) {
-    return this.userpromousageService.update(+id, updateUserpromousageDto);
+    return this.userpromousageService.update(id, updateUserpromousageDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.userpromousageService.remove(+id);
+    return this.userpromousageService.remove(id);
   }
 }

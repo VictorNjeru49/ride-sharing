@@ -27,7 +27,7 @@ export class RiderprofileController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.riderprofileService.findOne(+id);
+    return this.riderprofileService.findOne(id);
   }
 
   @Patch(':id')
@@ -35,11 +35,11 @@ export class RiderprofileController {
     @Param('id') id: string,
     @Body() updateRiderprofileDto: UpdateRiderprofileDto,
   ) {
-    return this.riderprofileService.update(+id, updateRiderprofileDto);
+    return this.riderprofileService.update(id, updateRiderprofileDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.riderprofileService.remove(+id);
+    return this.riderprofileService.remove(id);
   }
 }

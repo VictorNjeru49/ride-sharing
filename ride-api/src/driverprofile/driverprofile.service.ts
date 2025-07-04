@@ -1,26 +1,36 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDriverprofileDto } from './dto/create-driverprofile.dto';
 import { UpdateDriverprofileDto } from './dto/update-driverprofile.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Driverprofile } from './entities/driverprofile.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class DriverprofileService {
-  create(createDriverprofileDto: CreateDriverprofileDto) {
-    return 'This action adds a new driverprofile';
+  constructor(
+    @InjectRepository(Driverprofile)
+    private readonly driverprofileRepo: Repository<Driverprofile>,
+  ) {}
+
+  async create(createDriverprofileDto: CreateDriverprofileDto) {
+    const driverprofile = this.driverprofileRepo.create(createDriverprofileDto);
+    return await this.driverprofileRepo.save(driverprofile);
   }
 
-  findAll() {
-    return `This action returns all driverprofile`;
+  async findAll() {
+    return await this.driverprofileRepo.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} driverprofile`;
+  async findOne(id: string) {
+    return await this.driverprofileRepo.findOne({ where: { id } });
   }
 
-  update(id: number, updateDriverprofileDto: UpdateDriverprofileDto) {
-    return `This action updates a #${id} driverprofile`;
+  async update(id: string, updateDriverprofileDto: UpdateDriverprofileDto) {
+    await this.driverprofileRepo.update(id, updateDriverprofileDto);
+    return this.findOne(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} driverprofile`;
+  async remove(id: string) {
+    return await this.driverprofileRepo.delete(id);
   }
 }

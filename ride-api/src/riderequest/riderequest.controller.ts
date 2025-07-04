@@ -27,7 +27,7 @@ export class RiderequestController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.riderequestService.findOne(+id);
+    return this.riderequestService.findOne(id);
   }
 
   @Patch(':id')
@@ -35,11 +35,11 @@ export class RiderequestController {
     @Param('id') id: string,
     @Body() updateRiderequestDto: UpdateRiderequestDto,
   ) {
-    return this.riderequestService.update(+id, updateRiderequestDto);
+    return this.riderequestService.update(id, updateRiderequestDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.riderequestService.remove(+id);
+    return this.riderequestService.remove(id);
   }
 }

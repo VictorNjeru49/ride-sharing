@@ -1,1 +1,30 @@
 @url = http://localhost:8000/api
+
+###
+GET {{url}}/users
+
+#######
+POST {{url}}/users
+Content-Type: application/json
+
+ {
+"firstName": "sarah",
+"lastName": "Doe",
+"email": "sarahDoe@gmail.com",
+"phone": 27123456789,
+"password": "passwordsecuure223"
+ }
+
+
+######
+POST {{url}}/auth/login
+Content-Type: application/json 
+
+{
+"email": "JohnDoe@gmail.com",
+"password": "passwordsecuure223"
+}
+
+##3 rider
+valentine@gmail.com
+valentine123OMolo
