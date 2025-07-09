@@ -1,5 +1,19 @@
-import { createVehicles, deleteVehicles, getVehicles, updateUser, updateVehicles } from '@/api/UserApi'
-import { Button } from '@/components/ui/button'
+import React, { useState, useMemo } from 'react'
+import FilterComponent from '@/components/FilterComponent'
+import { createFileRoute, Outlet, useRouter } from '@tanstack/react-router'
+import { useCrudOperations } from '@/hooks/crudops'
+import type { Vehicle } from '@/types/alltypes'
+import {
+  getVehicles,
+  createVehicles,
+  updateVehicles,
+  deleteVehicles,
+} from '@/api/UserApi'
+import { toast, Toaster } from 'sonner'
+import Box from '@mui/material/Box'
+import Stepper from '@mui/material/Stepper'
+import Step from '@mui/material/Step'
+import StepLabel from '@mui/material/StepLabel'
 import {
   Card,
   CardContent,
@@ -7,69 +21,17 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { useCrudOperations } from '@/hooks/crudops'
-import type { Vehicle } from '@/types/alltypes'
-import { useQueryClient } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
-import { toast, Toaster } from 'sonner'
+import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute('/Vehicles/')({
   component: RouteComponent,
 })
-type Vehicles = {
-  id: number
-  vehicleImage: string
-  make: string
-  model: string
-  plateNumber: string
-  color: string
-  capacity: number
-  year: number
-  vehicleType: string
-}
-
-// Sample enhanced vehicle data array
-const vehicles: Vehicles[] = [
-  {
-    id: 1,
-    vehicleImage:
-      'https://media.dealervenom.com/jellies/Toyota/Corolla%20Hatchback/C456983_040_Front.png?auto=compress%2Cformat',
-    make: 'Toyota',
-    model: 'Corolla',
-    plateNumber: 'ABC-1234',
-    color: 'White',
-    capacity: 5,
-    year: 2020,
-    vehicleType: 'Sedan',
-  },
-  {
-    id: 2,
-    vehicleImage:
-      'https://di-uploads-pod21.dealerinspire.com/hendrickhondacharleston/uploads/2024/08/mlp-img-top-2025-civic-hybrid.png',
-    make: 'Honda',
-    model: 'Civic',
-    plateNumber: 'DEF-5678',
-    color: 'Black',
-    capacity: 5,
-    year: 2019,
-    vehicleType: 'Sedan',
-  },
-  {
-    id: 3,
-    vehicleImage:
-      'https://d2qldpouxvc097.cloudfront.net/image-by-path?bucket=a5-gallery-serverless-prod-chromebucket-1iz9ffi08lwxm&key=439073%2Ffront34%2Flg%2Fa0222d',
-    make: 'Ford',
-    model: 'Mustang',
-    plateNumber: 'GHI-9012',
-    color: 'Red',
-    capacity: 4,
-    year: 2021,
-    vehicleType: 'Coupe',
-  },
-]
 
 function RouteComponent() {
-  const queryClient = useQueryClient()
+  const router = useRouter()
+  const [searchText, setSearchText] = useState('')
+  const [filterBy, setFilterBy] = useState('all')
+
   const { query } = useCrudOperations<
     Vehicle,
     Partial<Omit<Vehicle, 'id'>>,
@@ -78,7 +40,7 @@ function RouteComponent() {
   >(
     {
       all: ['vehicle'],
-      details: (id: string) => ['users', id],
+      details: (id: string) => ['vehicles', id],
     },
     {
       fetchFn: () => getVehicles(),
@@ -88,53 +50,131 @@ function RouteComponent() {
     },
   )
 
- const allVehicle = query.data ?? [];
+  const allVehicles = query.data ?? []
 
-  function handleBookNow(vehicle: Vehicles) {
+  // Filter vehicles based on searchText and filterBy
+  const filteredVehicles = useMemo(() => {
+    if (!searchText.trim()) return allVehicles
+
+    const lowerSearch = searchText.toLowerCase()
+
+    return allVehicles.filter((vehicle) => {
+      if (filterBy === 'all') {
+        // Search in all relevant fields
+        return (
+          vehicle.make.toLowerCase().includes(lowerSearch) ||
+          vehicle.model.toLowerCase().includes(lowerSearch) ||
+          vehicle.color.toLowerCase().includes(lowerSearch) ||
+          vehicle.plateNumber.toLowerCase().includes(lowerSearch) ||
+          vehicle.capacity.toString().includes(lowerSearch) ||
+          vehicle.year.toString().includes(lowerSearch) ||
+          vehicle.vehicleType.toLowerCase().includes(lowerSearch)
+        )
+      } else {
+        // Search in specific field only
+        switch (filterBy) {
+          case 'make':
+            return vehicle.make.toLowerCase().includes(lowerSearch)
+          case 'model':
+            return vehicle.model.toLowerCase().includes(lowerSearch)
+          case 'color':
+            return vehicle.color.toLowerCase().includes(lowerSearch)
+          case 'plate number':
+            return vehicle.plateNumber.toLowerCase().includes(lowerSearch)
+          case 'capacity':
+            return vehicle.capacity.toString().includes(lowerSearch)
+          case 'year':
+            return vehicle.year.toString().includes(lowerSearch)
+          case 'type':
+            return vehicle.vehicleType.toLowerCase().includes(lowerSearch)
+          default:
+            return false
+        }
+      }
+    })
+  }, [allVehicles, searchText, filterBy])
+
+  const steps = [
+    'Select a car to book for you ride',
+    'Confirm your Location',
+    'Confirm your payment',
+    'Wait for a reply and pickup',
+  ]
+
+  function handleBookNow(vehicle: Vehicle) {
     toast.success(
       `Booking requested for ${vehicle.make} ${vehicle.model} (${vehicle.plateNumber})`,
     )
-    // Replace alert with real booking logic or navigation
+    router.navigate({
+      to: '/Vehicles/$VehiclesId',
+      params: { VehiclesId: vehicle.id },
+    })
   }
+
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center items-start p-8">
-      <Toaster />
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-7xl w-full">
-        {vehicles.map((vehicle) => (
-          <Card key={vehicle.id} className="border border-gray-200">
-            <img
-              src={vehicle.vehicleImage}
-              alt={`${vehicle.make} ${vehicle.model}`}
-              className="rounded-t-lg w-full h-48 object-cover"
-            />
-            <CardHeader>
-              <CardTitle>
-                {vehicle.make} {vehicle.model}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>
-                <strong>Plate Number:</strong> {vehicle.plateNumber}
-              </p>
-              <p>
-                <strong>Color:</strong> {vehicle.color}
-              </p>
-              <p>
-                <strong>Capacity:</strong> {vehicle.capacity} persons
-              </p>
-              <p>
-                <strong>Year:</strong> {vehicle.year}
-              </p>
-              <p>
-                <strong>Type:</strong> {vehicle.vehicleType}
-              </p>
-            </CardContent>
-            <CardFooter>
-              <Button onClick={() => handleBookNow(vehicle)}>Book Now</Button>
-            </CardFooter>
-          </Card>
-        ))}
+    <>
+      <Box sx={{ width: '100%', mt: 1 }}>
+        <Stepper activeStep={0} alternativeLabel>
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+      </Box>
+      <FilterComponent
+        searchText={searchText}
+        filterBy={filterBy}
+        setSearchText={setSearchText}
+        setFilterBy={setFilterBy}
+      />
+
+      <div className="min-h-screen bg-gray-100 flex justify-center items-start p-8 border">
+        <Toaster />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-7xl w-full border">
+          {filteredVehicles.map((vehicle) => (
+            <Card key={vehicle.id} className="border border-gray-200">
+              <img
+                src={vehicle.vehicleImage}
+                alt={`${vehicle.make} ${vehicle.model}`}
+                className="rounded-t-lg w-full h-48 object-cover"
+              />
+              <CardHeader>
+                <CardTitle>
+                  {vehicle.make} {vehicle.model}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p>
+                  <strong>Plate Number:</strong> {vehicle.plateNumber}
+                </p>
+                <p>
+                  <strong>Color:</strong> {vehicle.color}
+                </p>
+                <p>
+                  <strong>Capacity:</strong> {vehicle.capacity} persons
+                </p>
+                <p>
+                  <strong>Year:</strong> {vehicle.year}
+                </p>
+                <p>
+                  <strong>Type:</strong> {vehicle.vehicleType}
+                </p>
+              </CardContent>
+              <CardFooter>
+                <Button
+                  onClick={() => handleBookNow(vehicle)}
+                  disabled={!vehicle.available}
+                  variant={vehicle.available ? 'default' : 'outline'}
+                  title={vehicle.available ? 'Book Now' : 'Unavailable'}
+                >
+                  Book Now
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   )
 }

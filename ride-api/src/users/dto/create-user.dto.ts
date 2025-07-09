@@ -29,7 +29,7 @@ export class CreateUserDto {
   email: string;
 
   @ApiProperty({ description: 'Phone Number', example: '2547123456789' })
-  phone: bigint;
+  phone: string;
 
   @ApiProperty({ description: 'User password', example: 'securePassword123' })
   @IsString()

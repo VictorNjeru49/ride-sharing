@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Car, CarTaxiFrontIcon, Moon, Sun } from 'lucide-react'
+import { CarTaxiFrontIcon, Moon, Sun } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -27,13 +27,25 @@ export default function Header() {
 
           {/* Center: Navigation */}
           <nav className="hidden md:flex space-x-6 font-medium text-gray-700">
-            <Link to="/" className="hover:text-blue-600">
+            <Link
+              to="/"
+              className="hover:text-blue-600"
+              activeProps={{ className: 'text-blue-600 font-bold' }}
+            >
               Home
             </Link>
-            <Link to="/Vehicles" className="hover:text-blue-600">
+            <Link
+              to="/Vehicles"
+              className="hover:text-blue-600"
+              activeProps={{ className: 'text-blue-600 font-bold' }}
+            >
               Book Now
             </Link>
-            <Link to="/dashboard" className="hover:text-blue-600">
+            <Link
+              to="/dashboard"
+              className="hover:text-blue-600"
+              activeProps={{ className: 'text-blue-600 font-bold' }}
+            >
               Dashboard
             </Link>
           </nav>

@@ -17,10 +17,10 @@ export class Riderprofile {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 50 })
+  @Column({ length: 50, nullable: true })
   preferredPaymentMethod: string;
 
-  @Column({ type: 'float', default: 5.0 })
+  @Column({ type: 'float', default: 5.0, nullable: true })
   rating: number;
 
   @CreateDateColumn()
@@ -29,10 +29,14 @@ export class Riderprofile {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToOne(() => User, (user) => user.riderProfile, { onDelete: 'CASCADE' })
+  @OneToOne(() => User, (user) => user.riderProfile, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
   @JoinColumn({ name: 'userId' })
   user: User;
 
   @OneToMany(() => Riderequest, (rr) => rr.rider) rideRequests: Riderequest[];
+
   @OneToMany(() => Ride, (r) => r.rider) ridesTaken: Ride[];
 }

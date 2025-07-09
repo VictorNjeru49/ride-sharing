@@ -1,53 +1,52 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card'
-import { Users, Car, DollarSign, User, Edit2, Trash2, Plus } from 'lucide-react'
-import { ScrollArea } from '@/components/ui/scroll-area'
+import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card' // Keep your existing Card components
 import { useQueryClient } from '@tanstack/react-query'
 import { useCrudOperations } from '@/hooks/crudops'
 import type { Vehicle } from '@/types/alltypes'
-import { CompactTable } from '@table-library/react-table-library/compact'
-import { useTheme } from '@table-library/react-table-library/theme'
-import { getTheme } from '@table-library/react-table-library/baseline'
 import {
   createVehicles,
   deleteVehicles,
   getVehicles,
   updateVehicles,
 } from '@/api/UserApi'
-import { Button } from '@/components/ui/button'
+import { toast, Toaster } from 'sonner'
+
+// MUI imports
 import {
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableContainer,
+  Paper,
+  TablePagination,
+  Button,
   Dialog,
-  DialogContent,
-  DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog'
-;import { toast, Toaster } from 'sonner'
-({ queryKey: ['vehicle'] })
+  DialogContent,
+  DialogActions,
+  TextField,
+  Drawer,
+  Typography,
+  IconButton,
+  FormControlLabel,
+  Checkbox,
+} from '@mui/material'
+
+import {
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Add as AddIcon,
+  Close as CloseIcon,
+} from '@mui/icons-material'
 
 export const Route = createFileRoute('/dashboard/vehicle')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const theme = useTheme([
-    getTheme(),
-    {
-      HeaderRow: `
-            background-color: #eaf5fd;
-          `,
-      Row: `
-            &:nth-of-type(odd) {
-              background-color: #d2e9fb;
-            }
-    
-            &:nth-of-type(even) {
-              background-color: #eaf5fd;
-            }
-          `,
-    },
-  ])
   const queryClient = useQueryClient()
   const {
     create,
@@ -72,6 +71,25 @@ function RouteComponent() {
     },
   )
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(0) // zero-based page index for MUI TablePagination
+  const itemsPerPage = 5
+
+  // Vehicles data
+  const allData = query.data ?? []
+
+  // Reset to first page if data changes
+  useEffect(() => {
+    setCurrentPage(0)
+  }, [allData])
+
+  // Paginated slice
+  const paginatedData = useMemo(() => {
+    const startIdx = currentPage * itemsPerPage
+    return allData.slice(startIdx, startIdx + itemsPerPage)
+  }, [allData, currentPage])
+
+  // Dialog states
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null)
   const [formData, setFormData] = useState<Partial<Omit<Vehicle, 'id'>>>({
@@ -84,6 +102,10 @@ function RouteComponent() {
     year: 0,
     vehicleType: '',
   })
+
+  // Delete drawer states
+  const [isDeleteDrawerOpen, setIsDeleteDrawerOpen] = useState(false)
+  const [vehicleToDelete, setVehicleToDelete] = useState<string | null>(null)
 
   // Open dialog for create or edit
   function openDialog(vehicle?: Vehicle) {
@@ -111,7 +133,6 @@ function RouteComponent() {
     setEditingVehicle(null)
   }
 
-  // Handle form input changes
   function onChange(field: keyof typeof formData, value: any) {
     setFormData((prev) => ({
       ...prev,
@@ -123,7 +144,9 @@ function RouteComponent() {
     try {
       if (editingVehicle) {
         await update.mutateAsync({ id: editingVehicle.id, payload: formData })
-        toast.success(`Vehicle with ${editingVehicle.id} update successfully`)
+        toast.success(
+          `Vehicle with ID ${editingVehicle.id} updated successfully`,
+        )
       } else {
         await create.mutateAsync(formData)
         toast.success('Vehicle created successfully')
@@ -132,111 +155,55 @@ function RouteComponent() {
       closeDialog()
     } catch (error) {
       console.error('Error creating/updating vehicle:', error)
+      toast.error('Failed to save vehicle')
     }
   }
 
-  async function handleDelete(id: string) {
-    if (confirm('Are you sure you want to delete this vehicle?')) {
-      try {
-        await deleteVehicle.mutateAsync(id)
-        await queryClient.invalidateQueries({ queryKey: ['vehicle'] })
-      } catch (error) {
-        console.error('Error deleting vehicle:', error)
-      }
+  async function confirmDelete() {
+    if (!vehicleToDelete) return
+
+    try {
+      await deleteVehicle.mutateAsync(vehicleToDelete)
+      await queryClient.invalidateQueries({ queryKey: ['vehicle'] })
+      toast.success('Vehicle deleted successfully')
+    } catch (error) {
+      console.error('Error deleting vehicle:', error)
+      toast.error('Failed to delete vehicle')
+    } finally {
+      setIsDeleteDrawerOpen(false)
+      setVehicleToDelete(null)
     }
   }
 
-  // Define columns for react-table
-  const COLUMNS = [
-    {
-      label: 'ID',
-      renderCell: (item: Vehicle) => item.id,
-    },
-    {
-      label: 'Image',
-      renderCell: (item: Vehicle) => (
-        <img
-          src={item.vehicleImage}
-          alt={`${item.make} ${item.model}`}
-          className="w-20 h-12 object-cover rounded"
-          title={`${item.make} ${item.model}`}
-        />
-      ),
-    },
-    {
-      label: 'Make',
-      renderCell: (item: Vehicle) => (
-        <div className="max-w-xs truncate" title={item.make}>
-          {item.make}
-        </div>
-      ),
-    },
-    {
-      label: 'Model',
-      renderCell: (item: Vehicle) => (
-        <div className="max-w-xs truncate" title={item.model}>
-          {item.model}
-        </div>
-      ),
-    },
-    {
-      label: 'Plate Number',
-      renderCell: (item: Vehicle) => item.plateNumber,
-    },
-    {
-      label: 'Color',
-      renderCell: (item: Vehicle) => item.color,
-    },
-    {
-      label: 'Capacity',
-      renderCell: (item: Vehicle) => item.capacity,
-    },
-    {
-      label: 'Year',
-      renderCell: (item: Vehicle) => item.year,
-    },
-    {
-      label: 'Vehicle Type',
-      renderCell: (item: Vehicle) => item.vehicleType,
-    },
-    {
-      label: 'Actions',
-      renderCell: (item: Vehicle) => (
-        <div className="flex space-x-2">
-          <button
-            onClick={() => openDialog(item)}
-            className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => handleDelete(item.id)}
-            disabled={deleteVehicle.isPending}
-            className={`px-2 py-1 text-white rounded ${
-              deleteVehicle.isPending
-                ? 'bg-gray-400'
-                : 'bg-red-500 hover:bg-red-600'
-            }`}
-          >
-            {deleteVehicle.isPending ? 'Deleting...' : 'Delete'}
-          </button>
-        </div>
-      ),
-    },
-  ]
+  function handleDelete(id: string) {
+    setVehicleToDelete(id)
+    setIsDeleteDrawerOpen(true)
+  }
 
-  const data = useMemo(() => ({ nodes: query.data ?? [] }), [query.data])
-
+  // Pagination change handler
+  const handleChangePage = (_event: unknown, newPage: number) => {
+    setCurrentPage(newPage)
+  }
 
   return (
     <>
+      <Toaster />
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Toaster/>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Active Users</CardTitle>
+            {/* You can replace with MUI icons or keep your icons */}
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">12,847</p>
+            <p className="text-sm text-red-500">↓ 2% from last month</p>
+          </CardContent>
+        </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Active Drivers</CardTitle>
-            <Users className="w-5 h-5 text-blue-500" />
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">2,847</p>
@@ -246,7 +213,6 @@ function RouteComponent() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Total Trips</CardTitle>
-            <Car className="w-5 h-5 text-green-600" />
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">18,542</p>
@@ -256,151 +222,236 @@ function RouteComponent() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Revenue</CardTitle>
-            <DollarSign className="w-5 h-5 text-yellow-500" />
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold">$284,750</p>
             <p className="text-sm text-green-600">↑ 15% from last month</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Active Users</CardTitle>
-            <User className="w-5 h-5 text-purple-500" />
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">12,847</p>
-            <p className="text-sm text-red-500">↓ 2% from last month</p>
-          </CardContent>
-        </Card>
       </div>
 
-      {/* Vehicle Table and Controls */}
+      {/* Controls */}
       <div className="mb-4 flex justify-end">
-        <Button onClick={() => openDialog()}>
-          <Plus className="w-4 h-4 mr-2" />
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={() => openDialog()}
+        >
           Create Vehicle
         </Button>
       </div>
 
-      <div className="overflow-x-auto rounded border border-gray-200">
-        <CompactTable columns={COLUMNS} data={data} theme={theme} />
-      </div>
+      {/* Vehicle Table */}
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>Image</TableCell>
+              <TableCell>Make</TableCell>
+              <TableCell>Model</TableCell>
+              <TableCell>Plate Number</TableCell>
+              <TableCell>Color</TableCell>
+              <TableCell>Capacity</TableCell>
+              <TableCell>Year</TableCell>
+              <TableCell>Vehicle Type</TableCell>
+              <TableCell align="center">Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {paginatedData.map((vehicle) => (
+              <TableRow key={vehicle.id}>
+                <TableCell>{vehicle.id}</TableCell>
+                <TableCell>
+                  <img
+                    src={vehicle.vehicleImage}
+                    alt={`${vehicle.make} ${vehicle.model}`}
+                    style={{
+                      width: 80,
+                      height: 48,
+                      objectFit: 'cover',
+                      borderRadius: 4,
+                    }}
+                    title={`${vehicle.make} ${vehicle.model}`}
+                  />
+                </TableCell>
+                <TableCell>{vehicle.make}</TableCell>
+                <TableCell>{vehicle.model}</TableCell>
+                <TableCell>{vehicle.plateNumber}</TableCell>
+                <TableCell>{vehicle.color}</TableCell>
+                <TableCell>{vehicle.capacity}</TableCell>
+                <TableCell>{vehicle.year}</TableCell>
+                <TableCell>{vehicle.vehicleType}</TableCell>
+                <TableCell align="center">
+                  <IconButton
+                    color="primary"
+                    onClick={() => openDialog(vehicle)}
+                    aria-label="edit"
+                    size="small"
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    color="error"
+                    onClick={() => handleDelete(vehicle.id)}
+                    aria-label="delete"
+                    size="small"
+                    disabled={deleteVehicle.isPending}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+            {paginatedData.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={10} align="center">
+                  No vehicles found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+
+        <TablePagination
+          component="div"
+          count={allData.length}
+          page={currentPage}
+          onPageChange={handleChangePage}
+          rowsPerPage={itemsPerPage}
+          rowsPerPageOptions={[itemsPerPage]}
+        />
+      </TableContainer>
 
       {/* Create/Edit Vehicle Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-lg w-full max-w-md rounded-lg border border-gray-200 bg-white p-6 shadow-lg animate-in zoom-in-90">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-semibold">
-              {editingVehicle ? 'Edit Vehicle' : 'Create Vehicle'}
-            </DialogTitle>
-          </DialogHeader>
-          <ScrollArea className="h-[500px] w-full p-4">
+      <Dialog open={isDialogOpen} onClose={closeDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          {editingVehicle ? 'Edit Vehicle' : 'Create Vehicle'}
+        </DialogTitle>
+        <DialogContent dividers>
+          <form noValidate autoComplete="off">
+            <TextField
+              label="Vehicle Image URL"
+              fullWidth
+              margin="normal"
+              value={formData.vehicleImage || ''}
+              onChange={(e) => onChange('vehicleImage', e.target.value)}
+            />
+            <TextField
+              label="Make"
+              fullWidth
+              margin="normal"
+              value={formData.make || ''}
+              onChange={(e) => onChange('make', e.target.value)}
+            />
+            <TextField
+              label="Model"
+              fullWidth
+              margin="normal"
+              value={formData.model || ''}
+              onChange={(e) => onChange('model', e.target.value)}
+            />
+            <TextField
+              label="Plate Number"
+              fullWidth
+              margin="normal"
+              value={formData.plateNumber || ''}
+              onChange={(e) => onChange('plateNumber', e.target.value)}
+            />
+            <TextField
+              label="Color"
+              fullWidth
+              margin="normal"
+              value={formData.color || ''}
+              onChange={(e) => onChange('color', e.target.value)}
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={!!formData.available}
+                  onChange={(e) => onChange('available', e.target.checked)}
+                  color="primary"
+                />
+              }
+              label="Available"
+            />
+            <TextField
+              label="Capacity"
+              type="number"
+              fullWidth
+              margin="normal"
+              value={formData.capacity || 0}
+              onChange={(e) => onChange('capacity', Number(e.target.value))}
+              inputProps={{ min: 1 }}
+            />
+            <TextField
+              label="Year"
+              type="number"
+              fullWidth
+              margin="normal"
+              value={formData.year || 0}
+              onChange={(e) => onChange('year', Number(e.target.value))}
+              inputProps={{ min: 1900, max: new Date().getFullYear() }}
+            />
+            <TextField
+              label="Vehicle Type"
+              fullWidth
+              margin="normal"
+              value={formData.vehicleType || ''}
+              onChange={(e) => onChange('vehicleType', e.target.value)}
+            />
+          </form>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDialog} variant="outlined">
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} variant="contained" color="primary">
+            {editingVehicle ? 'Update' : 'Create'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-          <div className="grid grid-cols-1 gap-4 py-4 text-black">
-            <label className="flex flex-col space-y-1">
-              <span className="text-sm font-medium text-gray-700">
-                Vehicle Image URL
-              </span>
-              <input
-                type="text"
-                value={formData.vehicleImage || ''}
-                onChange={(e) => onChange('vehicleImage', e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                className="rounded-md border border-gray-300 px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </label>
-            <label className="flex flex-col space-y-1">
-              <span className="text-sm font-medium text-gray-700">Make</span>
-              <input
-                type="text"
-                value={formData.make || ''}
-                onChange={(e) => onChange('make', e.target.value)}
-                placeholder="Toyota"
-                className="rounded-md border border-gray-300 px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </label>
-            <label className="flex flex-col space-y-1">
-              <span className="text-sm font-medium text-gray-700">Model</span>
-              <input
-                type="text"
-                value={formData.model || ''}
-                onChange={(e) => onChange('model', e.target.value)}
-                placeholder="Corolla"
-                className="rounded-md border border-gray-300 px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </label>
-            <label className="flex flex-col space-y-1">
-              <span className="text-sm font-medium text-gray-700">
-                Plate Number
-              </span>
-              <input
-                type="text"
-                value={formData.plateNumber || ''}
-                onChange={(e) => onChange('plateNumber', e.target.value)}
-                placeholder="ABC-1234"
-                className="rounded-md border border-gray-300 px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </label>
-            <label className="flex flex-col space-y-1">
-              <span className="text-sm font-medium text-gray-700">Color</span>
-              <input
-                type="text"
-                value={formData.color || ''}
-                onChange={(e) => onChange('color', e.target.value)}
-                placeholder="White"
-                className="rounded-md border border-gray-300 px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </label>
-            <label className="flex flex-col space-y-1">
-              <span className="text-sm font-medium text-gray-700">
-                Capacity
-              </span>
-              <input
-                type="number"
-                value={formData.capacity || 0}
-                onChange={(e) => onChange('capacity', Number(e.target.value))}
-                min={1}
-                placeholder="5"
-                className="rounded-md border border-gray-300 px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </label>
-            <label className="flex flex-col space-y-1">
-              <span className="text-sm font-medium text-gray-700">Year</span>
-              <input
-                type="number"
-                value={formData.year || 0}
-                onChange={(e) => onChange('year', Number(e.target.value))}
-                min={1900}
-                max={new Date().getFullYear()}
-                placeholder="2020"
-                className="rounded-md border border-gray-300 px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </label>
-            <label className="flex flex-col space-y-1">
-              <span className="text-sm font-medium text-gray-700">
-                Vehicle Type
-              </span>
-              <input
-                type="text"
-                value={formData.vehicleType || ''}
-                onChange={(e) => onChange('vehicleType', e.target.value)}
-                placeholder="Sedan"
-                className="rounded-md border border-gray-300 px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </label>
-          </div>
-          </ScrollArea>
-          <DialogFooter className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={closeDialog}>
+      {/* Delete Confirmation Drawer */}
+      <Drawer
+        anchor="right"
+        open={isDeleteDrawerOpen}
+        onClose={() => setIsDeleteDrawerOpen(false)}
+      >
+        <div style={{ width: 300, padding: 16 }}>
+          <Typography variant="h6" gutterBottom>
+            Are you absolutely sure?
+          </Typography>
+          <Typography variant="body2" gutterBottom>
+            This action cannot be undone.
+          </Typography>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 8,
+              marginTop: 24,
+            }}
+          >
+            <Button
+              variant="contained"
+              color="error"
+              onClick={confirmDelete}
+              disabled={deleteVehicle.isPending}
+            >
+              Submit
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => setIsDeleteDrawerOpen(false)}
+              disabled={deleteVehicle.isPending}
+            >
               Cancel
             </Button>
-            <Button onClick={handleSubmit}>
-              {editingVehicle ? 'Update' : 'Create'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </div>
+        </div>
+      </Drawer>
     </>
   )
 }

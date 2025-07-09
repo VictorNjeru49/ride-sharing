@@ -1,7 +1,11 @@
 @url = http://localhost:8000/api
 
 ###
-GET {{url}}/users
+GET {{url}}/users/69f1bad5-d5d1-4651-905f-31737ad4ca3b
+
+
+#####
+GET {{url}}/payments
 
 #######
 POST {{url}}/users
@@ -28,3 +32,11 @@ Content-Type: application/json
 ##3 rider
 valentine@gmail.com
 valentine123OMolo
+
+###
+PATCH {{url}}/users/69f1bad5-d5d1-4651-905f-31737ad4ca3b
+Content-Type: application/json
+
+{
+ "phone": "2345678765932"
+}

@@ -48,7 +48,24 @@ export class UsersService {
       });
     } else {
       console.log(`This action returns all users`);
-      users = await this.userRepo.find({});
+      users = await this.userRepo.find({
+        relations: [
+          'adminProfile',
+          'riderProfile',
+          'driverProfile',
+          'payments',
+          'ratingsGiven',
+          'ratingsReceived',
+          'walletTransactions',
+          'rideFeedbacks',
+          'supportTickets',
+          'notifications',
+          'devices',
+          'promoUsages',
+          'createdPromoCodes',
+          'driverLocations',
+        ],
+      });
     }
 
     return users;

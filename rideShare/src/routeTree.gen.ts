@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UserRouteImport } from './routes/user'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DriverRouteImport } from './routes/driver'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -20,15 +21,13 @@ import { Route as UserIndexRouteImport } from './routes/user/index'
 import { Route as DriverIndexRouteImport } from './routes/driver/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as VehiclesIndexRouteImport } from './routes/Vehicles/index'
-import { Route as DemoTanstackQueryRouteImport } from './routes/demo.tanstack-query'
-import { Route as DemoTableRouteImport } from './routes/demo.table'
-import { Route as DemoStoreRouteImport } from './routes/demo.store'
 import { Route as DashboardVehicleRouteImport } from './routes/dashboard/vehicle'
+import { Route as DashboardUsersRouteImport } from './routes/dashboard/users'
+import { Route as DashboardPromocodeRouteImport } from './routes/dashboard/promocode'
 import { Route as DashboardPaymentsRouteImport } from './routes/dashboard/payments'
-import { Route as DashboardPassangersRouteImport } from './routes/dashboard/passangers'
-import { Route as DashboardDriverRouteImport } from './routes/dashboard/driver'
-import { Route as DemoFormSimpleRouteImport } from './routes/demo.form.simple'
-import { Route as DemoFormAddressRouteImport } from './routes/demo.form.address'
+import { Route as DashboardAnalyticsRouteImport } from './routes/dashboard/analytics'
+import { Route as DashboardAdminprofileRouteImport } from './routes/dashboard/adminprofile'
+import { Route as VehiclesVehiclesIdRouteImport } from './routes/Vehicles/$VehiclesId'
 
 const UserRoute = UserRouteImport.update({
   id: '/user',
@@ -38,6 +37,11 @@ const UserRoute = UserRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentsRoute = PaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -85,24 +89,19 @@ const VehiclesIndexRoute = VehiclesIndexRouteImport.update({
   path: '/',
   getParentRoute: () => VehiclesRoute,
 } as any)
-const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
-  id: '/demo/tanstack-query',
-  path: '/demo/tanstack-query',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoTableRoute = DemoTableRouteImport.update({
-  id: '/demo/table',
-  path: '/demo/table',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoStoreRoute = DemoStoreRouteImport.update({
-  id: '/demo/store',
-  path: '/demo/store',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DashboardVehicleRoute = DashboardVehicleRouteImport.update({
   id: '/vehicle',
   path: '/vehicle',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardUsersRoute = DashboardUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardPromocodeRoute = DashboardPromocodeRouteImport.update({
+  id: '/promocode',
+  path: '/promocode',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardPaymentsRoute = DashboardPaymentsRouteImport.update({
@@ -110,25 +109,20 @@ const DashboardPaymentsRoute = DashboardPaymentsRouteImport.update({
   path: '/payments',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardPassangersRoute = DashboardPassangersRouteImport.update({
-  id: '/passangers',
-  path: '/passangers',
+const DashboardAnalyticsRoute = DashboardAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardDriverRoute = DashboardDriverRouteImport.update({
-  id: '/driver',
-  path: '/driver',
+const DashboardAdminprofileRoute = DashboardAdminprofileRouteImport.update({
+  id: '/adminprofile',
+  path: '/adminprofile',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DemoFormSimpleRoute = DemoFormSimpleRouteImport.update({
-  id: '/demo/form/simple',
-  path: '/demo/form/simple',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoFormAddressRoute = DemoFormAddressRouteImport.update({
-  id: '/demo/form/address',
-  path: '/demo/form/address',
-  getParentRoute: () => rootRouteImport,
+const VehiclesVehiclesIdRoute = VehiclesVehiclesIdRouteImport.update({
+  id: '/$VehiclesId',
+  path: '/$VehiclesId',
+  getParentRoute: () => VehiclesRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -137,39 +131,37 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteWithChildren
   '/driver': typeof DriverRouteWithChildren
   '/login': typeof LoginRoute
+  '/payments': typeof PaymentsRoute
   '/register': typeof RegisterRoute
   '/user': typeof UserRouteWithChildren
-  '/dashboard/driver': typeof DashboardDriverRoute
-  '/dashboard/passangers': typeof DashboardPassangersRoute
+  '/Vehicles/$VehiclesId': typeof VehiclesVehiclesIdRoute
+  '/dashboard/adminprofile': typeof DashboardAdminprofileRoute
+  '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/payments': typeof DashboardPaymentsRoute
+  '/dashboard/promocode': typeof DashboardPromocodeRoute
+  '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard/vehicle': typeof DashboardVehicleRoute
-  '/demo/store': typeof DemoStoreRoute
-  '/demo/table': typeof DemoTableRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/Vehicles/': typeof VehiclesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/driver/': typeof DriverIndexRoute
   '/user/': typeof UserIndexRoute
-  '/demo/form/address': typeof DemoFormAddressRoute
-  '/demo/form/simple': typeof DemoFormSimpleRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/payments': typeof PaymentsRoute
   '/register': typeof RegisterRoute
-  '/dashboard/driver': typeof DashboardDriverRoute
-  '/dashboard/passangers': typeof DashboardPassangersRoute
+  '/Vehicles/$VehiclesId': typeof VehiclesVehiclesIdRoute
+  '/dashboard/adminprofile': typeof DashboardAdminprofileRoute
+  '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/payments': typeof DashboardPaymentsRoute
+  '/dashboard/promocode': typeof DashboardPromocodeRoute
+  '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard/vehicle': typeof DashboardVehicleRoute
-  '/demo/store': typeof DemoStoreRoute
-  '/demo/table': typeof DemoTableRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/Vehicles': typeof VehiclesIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/driver': typeof DriverIndexRoute
   '/user': typeof UserIndexRoute
-  '/demo/form/address': typeof DemoFormAddressRoute
-  '/demo/form/simple': typeof DemoFormSimpleRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -178,21 +170,20 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteWithChildren
   '/driver': typeof DriverRouteWithChildren
   '/login': typeof LoginRoute
+  '/payments': typeof PaymentsRoute
   '/register': typeof RegisterRoute
   '/user': typeof UserRouteWithChildren
-  '/dashboard/driver': typeof DashboardDriverRoute
-  '/dashboard/passangers': typeof DashboardPassangersRoute
+  '/Vehicles/$VehiclesId': typeof VehiclesVehiclesIdRoute
+  '/dashboard/adminprofile': typeof DashboardAdminprofileRoute
+  '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/payments': typeof DashboardPaymentsRoute
+  '/dashboard/promocode': typeof DashboardPromocodeRoute
+  '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard/vehicle': typeof DashboardVehicleRoute
-  '/demo/store': typeof DemoStoreRoute
-  '/demo/table': typeof DemoTableRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/Vehicles/': typeof VehiclesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/driver/': typeof DriverIndexRoute
   '/user/': typeof UserIndexRoute
-  '/demo/form/address': typeof DemoFormAddressRoute
-  '/demo/form/simple': typeof DemoFormSimpleRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -202,39 +193,37 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/driver'
     | '/login'
+    | '/payments'
     | '/register'
     | '/user'
-    | '/dashboard/driver'
-    | '/dashboard/passangers'
+    | '/Vehicles/$VehiclesId'
+    | '/dashboard/adminprofile'
+    | '/dashboard/analytics'
     | '/dashboard/payments'
+    | '/dashboard/promocode'
+    | '/dashboard/users'
     | '/dashboard/vehicle'
-    | '/demo/store'
-    | '/demo/table'
-    | '/demo/tanstack-query'
     | '/Vehicles/'
     | '/dashboard/'
     | '/driver/'
     | '/user/'
-    | '/demo/form/address'
-    | '/demo/form/simple'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
+    | '/payments'
     | '/register'
-    | '/dashboard/driver'
-    | '/dashboard/passangers'
+    | '/Vehicles/$VehiclesId'
+    | '/dashboard/adminprofile'
+    | '/dashboard/analytics'
     | '/dashboard/payments'
+    | '/dashboard/promocode'
+    | '/dashboard/users'
     | '/dashboard/vehicle'
-    | '/demo/store'
-    | '/demo/table'
-    | '/demo/tanstack-query'
     | '/Vehicles'
     | '/dashboard'
     | '/driver'
     | '/user'
-    | '/demo/form/address'
-    | '/demo/form/simple'
   id:
     | '__root__'
     | '/'
@@ -242,21 +231,20 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/driver'
     | '/login'
+    | '/payments'
     | '/register'
     | '/user'
-    | '/dashboard/driver'
-    | '/dashboard/passangers'
+    | '/Vehicles/$VehiclesId'
+    | '/dashboard/adminprofile'
+    | '/dashboard/analytics'
     | '/dashboard/payments'
+    | '/dashboard/promocode'
+    | '/dashboard/users'
     | '/dashboard/vehicle'
-    | '/demo/store'
-    | '/demo/table'
-    | '/demo/tanstack-query'
     | '/Vehicles/'
     | '/dashboard/'
     | '/driver/'
     | '/user/'
-    | '/demo/form/address'
-    | '/demo/form/simple'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -265,13 +253,9 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRouteWithChildren
   DriverRoute: typeof DriverRouteWithChildren
   LoginRoute: typeof LoginRoute
+  PaymentsRoute: typeof PaymentsRoute
   RegisterRoute: typeof RegisterRoute
   UserRoute: typeof UserRouteWithChildren
-  DemoStoreRoute: typeof DemoStoreRoute
-  DemoTableRoute: typeof DemoTableRoute
-  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
-  DemoFormAddressRoute: typeof DemoFormAddressRoute
-  DemoFormSimpleRoute: typeof DemoFormSimpleRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -288,6 +272,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payments': {
+      id: '/payments'
+      path: '/payments'
+      fullPath: '/payments'
+      preLoaderRoute: typeof PaymentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -353,32 +344,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VehiclesIndexRouteImport
       parentRoute: typeof VehiclesRoute
     }
-    '/demo/tanstack-query': {
-      id: '/demo/tanstack-query'
-      path: '/demo/tanstack-query'
-      fullPath: '/demo/tanstack-query'
-      preLoaderRoute: typeof DemoTanstackQueryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/table': {
-      id: '/demo/table'
-      path: '/demo/table'
-      fullPath: '/demo/table'
-      preLoaderRoute: typeof DemoTableRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/store': {
-      id: '/demo/store'
-      path: '/demo/store'
-      fullPath: '/demo/store'
-      preLoaderRoute: typeof DemoStoreRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/dashboard/vehicle': {
       id: '/dashboard/vehicle'
       path: '/vehicle'
       fullPath: '/dashboard/vehicle'
       preLoaderRoute: typeof DashboardVehicleRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/users': {
+      id: '/dashboard/users'
+      path: '/users'
+      fullPath: '/dashboard/users'
+      preLoaderRoute: typeof DashboardUsersRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/promocode': {
+      id: '/dashboard/promocode'
+      path: '/promocode'
+      fullPath: '/dashboard/promocode'
+      preLoaderRoute: typeof DashboardPromocodeRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/payments': {
@@ -388,42 +372,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardPaymentsRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/dashboard/passangers': {
-      id: '/dashboard/passangers'
-      path: '/passangers'
-      fullPath: '/dashboard/passangers'
-      preLoaderRoute: typeof DashboardPassangersRouteImport
+    '/dashboard/analytics': {
+      id: '/dashboard/analytics'
+      path: '/analytics'
+      fullPath: '/dashboard/analytics'
+      preLoaderRoute: typeof DashboardAnalyticsRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/dashboard/driver': {
-      id: '/dashboard/driver'
-      path: '/driver'
-      fullPath: '/dashboard/driver'
-      preLoaderRoute: typeof DashboardDriverRouteImport
+    '/dashboard/adminprofile': {
+      id: '/dashboard/adminprofile'
+      path: '/adminprofile'
+      fullPath: '/dashboard/adminprofile'
+      preLoaderRoute: typeof DashboardAdminprofileRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/demo/form/simple': {
-      id: '/demo/form/simple'
-      path: '/demo/form/simple'
-      fullPath: '/demo/form/simple'
-      preLoaderRoute: typeof DemoFormSimpleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/form/address': {
-      id: '/demo/form/address'
-      path: '/demo/form/address'
-      fullPath: '/demo/form/address'
-      preLoaderRoute: typeof DemoFormAddressRouteImport
-      parentRoute: typeof rootRouteImport
+    '/Vehicles/$VehiclesId': {
+      id: '/Vehicles/$VehiclesId'
+      path: '/$VehiclesId'
+      fullPath: '/Vehicles/$VehiclesId'
+      preLoaderRoute: typeof VehiclesVehiclesIdRouteImport
+      parentRoute: typeof VehiclesRoute
     }
   }
 }
 
 interface VehiclesRouteChildren {
+  VehiclesVehiclesIdRoute: typeof VehiclesVehiclesIdRoute
   VehiclesIndexRoute: typeof VehiclesIndexRoute
 }
 
 const VehiclesRouteChildren: VehiclesRouteChildren = {
+  VehiclesVehiclesIdRoute: VehiclesVehiclesIdRoute,
   VehiclesIndexRoute: VehiclesIndexRoute,
 }
 
@@ -432,17 +411,21 @@ const VehiclesRouteWithChildren = VehiclesRoute._addFileChildren(
 )
 
 interface DashboardRouteChildren {
-  DashboardDriverRoute: typeof DashboardDriverRoute
-  DashboardPassangersRoute: typeof DashboardPassangersRoute
+  DashboardAdminprofileRoute: typeof DashboardAdminprofileRoute
+  DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
   DashboardPaymentsRoute: typeof DashboardPaymentsRoute
+  DashboardPromocodeRoute: typeof DashboardPromocodeRoute
+  DashboardUsersRoute: typeof DashboardUsersRoute
   DashboardVehicleRoute: typeof DashboardVehicleRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
-  DashboardDriverRoute: DashboardDriverRoute,
-  DashboardPassangersRoute: DashboardPassangersRoute,
+  DashboardAdminprofileRoute: DashboardAdminprofileRoute,
+  DashboardAnalyticsRoute: DashboardAnalyticsRoute,
   DashboardPaymentsRoute: DashboardPaymentsRoute,
+  DashboardPromocodeRoute: DashboardPromocodeRoute,
+  DashboardUsersRoute: DashboardUsersRoute,
   DashboardVehicleRoute: DashboardVehicleRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
@@ -478,13 +461,9 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRouteWithChildren,
   DriverRoute: DriverRouteWithChildren,
   LoginRoute: LoginRoute,
+  PaymentsRoute: PaymentsRoute,
   RegisterRoute: RegisterRoute,
   UserRoute: UserRouteWithChildren,
-  DemoStoreRoute: DemoStoreRoute,
-  DemoTableRoute: DemoTableRoute,
-  DemoTanstackQueryRoute: DemoTanstackQueryRoute,
-  DemoFormAddressRoute: DemoFormAddressRoute,
-  DemoFormSimpleRoute: DemoFormSimpleRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

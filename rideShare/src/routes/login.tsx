@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useSearch } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { z } from 'zod'
 import {
@@ -16,6 +16,7 @@ import { useRouter } from '@tanstack/react-router'
 import { toast, Toaster } from 'sonner'
 import { useForm } from '@tanstack/react-form'
 import { UserRole } from '@/types/alltypes'
+import { authActions } from '@/app/store'
 
 export const Route = createFileRoute('/login')({
   component: RouteComponent,
@@ -40,6 +41,7 @@ function RouteComponent() {
   const login = useLogin()
   const router = useRouter()
 
+
   const form = useForm({
     defaultValues: { email: '', password: '' } as FormData,
     
@@ -56,19 +58,29 @@ function RouteComponent() {
         password: '[HIDDEN]',
       })
       try {
-        const res = await login.mutateAsync(result.data)
-        toast.success('Login successful!')
-        console.log('Login response:', res)
+        const res = await login.mutateAsync({
+          email: result.data.email,
+          password: result.data.password,
+        })
+
+        // ✅ Save user to store
+        authActions.saveUser({
+          isVerified: res.isVerified ?? false,
+          tokens: res.tokens,
+          user: {
+            id: res.user.id,
+            email: res.user.email,
+            role: res.user.role ?? UserRole.RIDER,
+          },
+        })
+
+        toast.success(`Welcome, ${res.user.email}!`)
         form.reset()
 
-        console.log(UserRole)
         const userRole = res.user?.role
 
-        // Handle if userRole is an array or a single value
         const hasRole = (role: UserRole) =>
-          Array.isArray(userRole)
-            ? userRole.includes(role)
-            : userRole === role
+          Array.isArray(userRole) ? userRole.includes(role) : userRole === role
 
         if (hasRole(UserRole.ADMIN)) {
           router.navigate({ to: '/dashboard' })
@@ -77,12 +89,9 @@ function RouteComponent() {
         } else if (hasRole(UserRole.DRIVER)) {
           router.navigate({ to: '/driver' })
         } else {
-          console.warn('Unknown user role:', userRole)
           toast.error('User role not found. Please contact support.')
           router.navigate({ to: '/' })
         }
-        
-        
       } catch (error) {
         let errorMessage = 'Login failed. Please try again.'
 

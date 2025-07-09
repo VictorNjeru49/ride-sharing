@@ -1,8 +1,11 @@
 import { Userpromousage } from 'src/userpromousage/entities/userpromousage.entity';
+import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -36,4 +39,10 @@ export class Promocode {
 
   @OneToMany(() => Userpromousage, (usage) => usage.promoCode)
   usages: Userpromousage[];
+  @ManyToOne(() => User, (user) => user.createdPromoCodes, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'createdById' }) // optional but explicit
+  createdBy: User;
 }

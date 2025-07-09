@@ -12,13 +12,12 @@ import { Notification } from 'src/notification/entities/notification.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
 import { Promocode } from 'src/promocode/entities/promocode.entity';
 import { Rating } from 'src/ratings/entities/rating.entity';
-import { Ride } from 'src/ride/entities/ride.entity';
 import { Ridefeedback } from 'src/ridefeedback/entities/ridefeedback.entity';
-import { Riderequest } from 'src/riderequest/entities/riderequest.entity';
 import { Riderprofile } from 'src/riderprofile/entities/riderprofile.entity';
 import { Supportticket } from 'src/supportticket/entities/supportticket.entity';
 import { Userpromousage } from 'src/userpromousage/entities/userpromousage.entity';
 import { Wallet } from 'src/wallets/entities/wallet.entity';
+import { Ride } from 'src/ride/entities/ride.entity';
 
 @Module({
   imports: [
@@ -31,11 +30,10 @@ import { Wallet } from 'src/wallets/entities/wallet.entity';
       Driverprofile,
       Notification,
       Payment,
+      Ride,
       Promocode,
       Rating,
-      Ride,
       Ridefeedback,
-      Riderequest,
       Riderprofile,
       Supportticket,
       Userpromousage,

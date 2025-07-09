@@ -24,7 +24,7 @@ export class Wallet {
   @Column('decimal', { precision: 10, scale: 2 })
   amount: number;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
   @CreateDateColumn()

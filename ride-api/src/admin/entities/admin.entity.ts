@@ -3,7 +3,8 @@ import {
   Column,
   Entity,
   JoinColumn,
-  ManyToOne,
+  OneToOne,
+  // OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -12,10 +13,13 @@ export enum superRole {
   SUPERVISOR = 'supervisor',
   SUPERADMIN = 'superadmin',
 }
+
 @Entity()
 export class Admin {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+  @Column({ nullable: true })
+  userId: string;
 
   @Column()
   role: superRole;
@@ -23,7 +27,9 @@ export class Admin {
   @Column('text', { nullable: true, array: true })
   permission: string[];
 
-  @ManyToOne(() => User, (user) => user.adminProfile, { onDelete: 'CASCADE' })
+  @OneToOne(() => User, (user) => user.adminProfile, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'userId' })
   user: User;
 }

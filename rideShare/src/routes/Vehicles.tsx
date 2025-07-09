@@ -6,6 +6,8 @@ export const Route = createFileRoute('/Vehicles')({
 
 function RouteComponent() {
   return (
-    <Outlet/>
+    <>
+      <Outlet />
+    </>
   )
 }

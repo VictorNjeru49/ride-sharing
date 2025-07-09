@@ -8,14 +8,30 @@ export class Riderequest {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Riderprofile, (rp) => rp.rideRequests) rider: Riderprofile;
+  @ManyToOne(() => Riderprofile, (rp) => rp.rideRequests, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
+  rider: Riderprofile;
+
   @ManyToOne(() => Driverprofile, (dp) => dp.assignedRequests, {
     nullable: true,
+    onDelete: 'SET NULL',
   })
   assignedDriver: Driverprofile;
-  @ManyToOne(() => Location, (l) => l.requestsPickup) pickupLocation: Location;
-  @ManyToOne(() => Location, (l) => l.requestsDropoff)
+
+  @ManyToOne(() => Location, (l) => l.requestsPickup, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
+  pickupLocation: Location;
+
+  @ManyToOne(() => Location, (l) => l.requestsDropoff, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   dropoffLocation: Location;
+
   @Column()
   status: string;
 

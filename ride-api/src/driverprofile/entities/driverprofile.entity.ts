@@ -16,20 +16,50 @@ import {
 
 @Entity()
 export class Driverprofile {
-  @PrimaryGeneratedColumn('uuid') id: string;
-  @OneToOne(() => User, (u) => u.driverProfile) @JoinColumn() user: User;
-  @Column() licenseNumber: string;
-  @Column('decimal', { precision: 2, scale: 1, default: 0 }) rating: number;
-  @Column({ default: false }) isAvailable: boolean;
-  @CreateDateColumn() createdAt: Date;
-  @UpdateDateColumn() updatedAt: Date;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @OneToOne(() => Vehicle, (v) => v.driver, { cascade: true })
+  @OneToOne(() => User, (user) => user.driverProfile, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @Column({ length: 50 })
+  licenseNumber: string;
+
+  @Column('decimal', { precision: 2, scale: 1, default: 0 })
+  rating: number;
+
+  @Column({ default: false })
+  isAvailable: boolean;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @OneToOne(() => Vehicle, (vehicle) => vehicle.driver, {
+    cascade: true,
+    eager: true,
+  })
   @JoinColumn()
   vehicle: Vehicle;
-  @OneToMany(() => Ride, (r) => r.driver) ridesOffered: Ride[];
-  @OneToMany(() => Riderequest, (rr) => rr.assignedDriver)
+
+  @OneToMany(() => Ride, (ride) => ride.driver, { cascade: true })
+  ridesOffered: Ride[];
+
+  @OneToMany(() => Ride, (ride) => ride.rider, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  ridesTaken: Ride[];
+
+  @OneToMany(() => Riderequest, (rr) => rr.assignedDriver, { cascade: true })
   assignedRequests: Riderequest[];
-  @OneToMany(() => Driverlocation, (dl) => dl.driver)
+
+  @OneToMany(() => Driverlocation, (dl) => dl.driver, { cascade: true })
   locationHistory: Driverlocation[];
 }

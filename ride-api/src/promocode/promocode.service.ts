@@ -18,7 +18,9 @@ export class PromocodeService {
   }
 
   async findAll() {
-    return await this.promocodeRepo.find();
+    return await this.promocodeRepo.find({
+      relations: ['createdBy', 'usages'],
+    });
   }
 
   async findOne(id: string) {

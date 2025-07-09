@@ -1,6 +1,6 @@
-import type { globalDataType } from '@/types/alltypes'
-import { UserRole } from '../types/alltypes'
+// store.ts
 import { Store } from '@tanstack/store'
+import { UserRole, type globalDataType } from '@/types/alltypes'
 
 const initialStorage: globalDataType = {
   isVerified: false,
@@ -9,48 +9,70 @@ const initialStorage: globalDataType = {
     refreshToken: '',
   },
   user: {
-    email: '',
     id: '',
+    email: '',
     role: UserRole.RIDER,
   },
 }
+
 export const authStore = new Store<globalDataType>(initialStorage)
 
-export const localStorageJson = () => {
-    const localData = localStorage.getItem('auth')
-    let jsonData;
-    if (localData) jsonData = JSON.parse(localData)
-    return jsonData
+const saveToLocalStorage = (data: globalDataType) => {
+  localStorage.setItem('auth', JSON.stringify(data))
+  localStorage.setItem('accessToken', data.tokens.accessToken)
+  localStorage.setItem('refreshToken', data.tokens.refreshToken)
+}
+
+const getAuthFromStorage = (): globalDataType | null => {
+  try {
+    const raw = localStorage.getItem('auth')
+    return raw ? JSON.parse(raw) : null
+  } catch (e) {
+    console.error('Invalid auth JSON in localStorage:', e)
+    return null
+  }
 }
 
 export const authActions = {
-  saveUser: (data: globalDataType) => {
-    authStore.setState({
-      isVerified: true,
-      tokens: data.tokens,
-      user: data.user,
-    })
-    localStorage.setItem('auth', JSON.stringify({ ...data, isVerfied: true }))
+  initializeUser: () => {
+    const stored = getAuthFromStorage()
+    if (stored) authStore.setState(stored)
   },
+
+  saveUser: (data: globalDataType) => {
+    const newState: globalDataType = {
+      isVerified: true,
+      tokens: {
+        accessToken: data.tokens.accessToken,
+        refreshToken: data.tokens.refreshToken,
+      },
+      user: {
+        id: data.user.id,
+        email: data.user.email,
+        role: data.user.role ?? UserRole.RIDER,
+      },
+    }
+    authStore.setState(newState)
+    saveToLocalStorage(newState)
+  },
+
+  saveAccessToken: (accessToken: string) => {
+    const state = authStore.state
+    const updated = {
+      ...state,
+      tokens: {
+        ...state.tokens,
+        accessToken,
+      },
+    }
+    authStore.setState(updated)
+    saveToLocalStorage(updated)
+  },
+
   deleteUser: () => {
     authStore.setState(initialStorage)
     localStorage.removeItem('auth')
-  },
-  intializeUser: () => {
-    const userData = localStorage.getItem('auth')
-    console.log('userData localstorage', userData)
-    if (!userData) return
-    const json_data = JSON.parse(userData)
-    console.log('json data user', json_data)
-    authStore.setState(json_data)
-  },
-  // saving new access token
-  saveAccessToken: (token: string) => {
-    console.log('data from localstorage', localStorageJson)
-    console.log('received token', token)
-    console.log('state before update', authStore.state)
-
-    // authStore.setState(authStore.state);
-    // localStorage.setItem('auth', JSON.stringify(authStore.state));
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
   },
 }

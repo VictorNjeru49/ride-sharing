@@ -19,7 +19,7 @@ export class Notification {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'enum', enum: NotifyStatus })
+  @Column({ type: 'enum', enum: NotifyStatus, default: NotifyStatus.SYSTEM })
   type: NotifyStatus;
 
   @Column()

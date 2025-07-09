@@ -24,7 +24,7 @@ function RouteComponent() {
     <>
      <div className="min-h-screen flex flex-col md:flex-row bg-gray-50">
     {/* Sidebar */}
-    <Layout role={UserRole.ADMIN} />
+    <Layout role={UserRole.ADMIN}/>
 
     {/* Main Content */}
     <main className="flex-1 p-6">

@@ -4,14 +4,15 @@ import { Label } from '@/components/ui/label'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { useCrudOperations } from '@/hooks/crudops'
 import { useQueryClient } from '@tanstack/react-query'
-import type { userTypes } from '@/types/alltypes'
+import { UserRole, type userTypes } from '@/types/alltypes'
 import { createUser, deleteUser, getUsers, updateUser } from '@/api/UserApi'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
-import { toast } from 'sonner'
+import { toast, Toaster } from 'sonner'
 import { useNavigate } from '@tanstack/react-router'
 import { useLogin } from '@/api/LoginApi'
-
+import { useRouter } from '@tanstack/react-router'
+import { authActions } from '@/app/store'
 
 export const Route = createFileRoute('/register')({
   component: RouteComponent,
@@ -55,6 +56,7 @@ const validateField = <T,>(value: T, schema: z.ZodType<T>) => {
 }
 function RouteComponent() {
   const navigate = useNavigate()
+  const router = useRouter()
   const queryClient = useQueryClient()
   const loginMutation = useLogin()
 
@@ -102,26 +104,35 @@ function RouteComponent() {
         queryClient.invalidateQueries({ queryKey: ['users'] })
 
         // Auto-login after registration
-        await loginMutation.mutateAsync({
+        const login = await loginMutation.mutateAsync({
           email: result.data.email,
           password: result.data.password,
         })
 
-        // After login success, get user role and navigate
-        const loggedInUserRole = res.role // or get from login response if different
+        // Save auth info
+        authActions.saveUser({
+          isVerified: login.isVerified ?? false,
+          tokens: login.tokens,
+          user: {
+            id: login.user.id,
+            email: login.user.email,
+            role: login.user.role ?? UserRole.RIDER,
+          },
+        })
 
-        if (loggedInUserRole === 'admin') {
+        // After login success, get user role and navigate
+        const loggedInUserRole = login.user?.role // or get from login response if different
+
+        if (loggedInUserRole === UserRole.ADMIN) {
           navigate({ to: '/dashboard' })
-        } else if (loggedInUserRole === 'rider') {
+        } else if (loggedInUserRole === UserRole.RIDER) {
           navigate({ to: '/user' })
-        } else if (loggedInUserRole === 'driver') {
+        } else if (loggedInUserRole === UserRole.DRIVER) {
           navigate({ to: '/driver' })
         } else {
           toast.warning('Unknown user role:', loggedInUserRole)
           navigate({ to: '/' })
         }
-
-        form.reset()
       } catch (error) {
         toast.error('Error creating user:')
         toast.warning('Failed to create user. Please try again.')
@@ -131,6 +142,7 @@ function RouteComponent() {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50">
+      <Toaster />
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Create an Account</CardTitle>

@@ -1,3 +1,13 @@
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToOne,
+  OneToMany,
+} from 'typeorm';
+
 import { Admin } from 'src/admin/entities/admin.entity';
 import { Device } from 'src/device/entities/device.entity';
 import { Driverlocation } from 'src/driverlocation/entities/driverlocation.entity';
@@ -8,20 +18,10 @@ import { Promocode } from 'src/promocode/entities/promocode.entity';
 import { Rating } from 'src/ratings/entities/rating.entity';
 import { Ride } from 'src/ride/entities/ride.entity';
 import { Ridefeedback } from 'src/ridefeedback/entities/ridefeedback.entity';
-import { Riderequest } from 'src/riderequest/entities/riderequest.entity';
 import { Riderprofile } from 'src/riderprofile/entities/riderprofile.entity';
 import { Supportticket } from 'src/supportticket/entities/supportticket.entity';
 import { Userpromousage } from 'src/userpromousage/entities/userpromousage.entity';
 import { Wallet } from 'src/wallets/entities/wallet.entity';
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  OneToOne,
-  OneToMany,
-} from 'typeorm';
 
 export enum UserRole {
   RIDER = 'rider',
@@ -43,8 +43,8 @@ export class User {
   @Column({ unique: true, nullable: true })
   email: string;
 
-  @Column({ type: 'bigint', nullable: true })
-  phone: bigint;
+  @Column({ type: 'varchar', nullable: true })
+  phone: string;
 
   @Column({ nullable: true })
   password: string;
@@ -58,12 +58,11 @@ export class User {
   @Column({ default: false })
   isVerified: boolean;
 
-  // 🔒 Social Login Fields
   @Column({ nullable: true })
-  provider: string; // e.g., "google", "facebook"
+  provider: string;
 
   @Column({ nullable: true })
-  providerId: string; // e.g., Google/Facebook unique ID
+  providerId: string;
 
   @Column({ nullable: true })
   profilePicture: string;
@@ -77,6 +76,7 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  // One-to-One Relations
   @OneToOne(() => Riderprofile, (rp) => rp.user, {
     cascade: true,
     onDelete: 'CASCADE',
@@ -89,12 +89,13 @@ export class User {
   })
   driverProfile: Driverprofile;
 
-  @OneToMany(() => Riderequest, (rr) => rr.rider, {
+  @OneToOne(() => Admin, (admin) => admin.user, {
     cascade: true,
     onDelete: 'CASCADE',
   })
-  rideRequests: Riderequest[];
+  adminProfile: Admin;
 
+  // One-to-Many Relations
   @OneToMany(() => Ride, (ride) => ride.driver, {
     cascade: true,
     onDelete: 'CASCADE',
@@ -110,6 +111,7 @@ export class User {
   @OneToMany(() => Payment, (p) => p.user, {
     cascade: true,
     onDelete: 'CASCADE',
+    nullable: true,
   })
   payments: Payment[];
 
@@ -161,13 +163,7 @@ export class User {
   })
   promoUsages: Userpromousage[];
 
-  @OneToOne(() => Admin, (a) => a.user, { cascade: true, onDelete: 'CASCADE' })
-  adminProfile: Admin;
-
-  @OneToMany(() => Promocode, (pc) => pc.code, {
-    cascade: true,
-    onDelete: 'CASCADE',
-  })
+  @OneToMany(() => Promocode, (promo) => promo.createdBy)
   createdPromoCodes: Promocode[];
 
   @OneToMany(() => Driverlocation, (driverLocation) => driverLocation.driver, {

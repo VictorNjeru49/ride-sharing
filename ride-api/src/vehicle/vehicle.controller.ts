@@ -26,17 +26,17 @@ export class VehicleController {
   findAll() {
     return this.vehicleService.findAll();
   }
-
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.vehicleService.findOne(id);
   }
-
+  @Public()
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateVehicleDto: UpdateVehicleDto) {
     return this.vehicleService.update(id, updateVehicleDto);
   }
-
+  @Public()
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.vehicleService.remove(id);

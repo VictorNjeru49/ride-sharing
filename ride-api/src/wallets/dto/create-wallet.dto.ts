@@ -14,4 +14,6 @@ export class CreateWalletDto {
   @ApiProperty()
   @IsEnum({ WalletTransactionType })
   type?: WalletTransactionType.CREDIT;
+  @IsString()
+  userId: string;
 }

@@ -1,10 +1,12 @@
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 export enum devicestatus {
@@ -24,10 +26,10 @@ export class Device {
   @Column()
   deviceType: devicestatus;
 
-  @Column()
+  @UpdateDateColumn()
   lastActive: Date;
 
-  @Column()
+  @CreateDateColumn()
   createdAt: Date;
 
   @ManyToOne(() => User, (user) => user.devices, { onDelete: 'CASCADE' })

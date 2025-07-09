@@ -30,8 +30,11 @@ export class Vehicle {
   @Column('int')
   capacity: number;
 
-  @Column('int')
+  @Column()
   year: number;
+
+  @Column({ default: false })
+  available: boolean;
 
   @Column()
   vehicleType: string;

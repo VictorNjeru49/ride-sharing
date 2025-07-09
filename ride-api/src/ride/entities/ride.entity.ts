@@ -43,7 +43,9 @@ export class Ride {
   @CreateDateColumn()
   createdAt: Date;
 
-  @OneToOne(() => Payment, (p) => p.ride, { cascade: true }) payment: Payment;
+  @OneToMany(() => Payment, (p) => p.ride)
+  payments: Payment[];
+
   @OneToMany(() => Rating, (r) => r.ride) ratings: Rating[];
   @OneToOne(() => Ridecancel, (c) => c.ride, { cascade: true })
   cancellation: Ridecancel;
