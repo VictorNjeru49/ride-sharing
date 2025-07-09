@@ -287,6 +287,7 @@ export interface globalDataType {
     email: string
     role: UserRole
   }
+  avatar?: userTypes
 }
 export interface VehicleSpecification {
   engine: string

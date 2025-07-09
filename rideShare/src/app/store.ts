@@ -1,6 +1,6 @@
 // store.ts
 import { Store } from '@tanstack/store'
-import { UserRole, type globalDataType } from '@/types/alltypes'
+import { UserRole, type globalDataType, type userTypes } from '@/types/alltypes'
 
 const initialStorage: globalDataType = {
   isVerified: false,
@@ -12,12 +12,13 @@ const initialStorage: globalDataType = {
     id: '',
     email: '',
     role: UserRole.RIDER,
-  },
+  }
 }
 
 export const authStore = new Store<globalDataType>(initialStorage)
 
 const saveToLocalStorage = (data: globalDataType) => {
+  localStorage.setItem('user', JSON.stringify(data.user))
   localStorage.setItem('auth', JSON.stringify(data))
   localStorage.setItem('accessToken', data.tokens.accessToken)
   localStorage.setItem('refreshToken', data.tokens.refreshToken)
@@ -71,6 +72,7 @@ export const authActions = {
 
   deleteUser: () => {
     authStore.setState(initialStorage)
+    localStorage.removeItem('user')
     localStorage.removeItem('auth')
     localStorage.removeItem('accessToken')
     localStorage.removeItem('refreshToken')

@@ -57,8 +57,10 @@ export class UsersService {
           'ratingsGiven',
           'ratingsReceived',
           'walletTransactions',
+          'ridesOffered',
           'rideFeedbacks',
           'supportTickets',
+          'ridesTaken',
           'notifications',
           'devices',
           'promoUsages',
@@ -72,7 +74,27 @@ export class UsersService {
   }
 
   async findOne(id: string): Promise<User> {
-    const user = await this.userRepo.findOne({ where: { id } });
+    const user = await this.userRepo.findOne({
+      where: { id },
+      relations: [
+        'adminProfile',
+        'riderProfile',
+        'driverProfile',
+        'payments',
+        'ratingsGiven',
+        'ratingsReceived',
+        'walletTransactions',
+        'ridesOffered',
+        'rideFeedbacks',
+        'supportTickets',
+        'ridesTaken',
+        'notifications',
+        'devices',
+        'promoUsages',
+        'createdPromoCodes',
+        'driverLocations',
+      ],
+    });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }

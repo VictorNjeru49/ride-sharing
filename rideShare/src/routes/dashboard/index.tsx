@@ -73,7 +73,7 @@ function RouteComponent() {
     <>
       {/* Main content */}
       <main className="flex-1 p-6">
-        <Toaster/>
+        <Toaster />
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -116,7 +116,7 @@ function RouteComponent() {
             <CardContent>
               <p className="text-2xl font-bold">
                 {/* 2,847 */}
-                {(data.length)}
+                {data.filter((user) => user.role === UserRole.DRIVER).length}
               </p>
               <p className="text-sm text-green-600">↑ 12% from last month</p>
             </CardContent>
@@ -147,7 +147,9 @@ function RouteComponent() {
               <User className="w-5 h-5 text-purple-500" />
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">12,847</p>
+              <p className="text-2xl font-bold">
+                {data.filter((user) => user.role === UserRole.RIDER).length}
+              </p>
               <p className="text-sm text-red-500">↓ 2% from last month</p>
             </CardContent>
           </Card>

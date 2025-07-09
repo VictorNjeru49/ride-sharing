@@ -1,7 +1,7 @@
 @url = http://localhost:8000/api
 
 ###
-GET {{url}}/users/69f1bad5-d5d1-4651-905f-31737ad4ca3b
+GET {{url}}/users/31511632-b063-4e4a-bcad-8a24954d1987
 
 
 #####
@@ -39,4 +39,13 @@ Content-Type: application/json
 
 {
  "phone": "2345678765932"
+}
+
+###
+POST {{url}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "chris.anderson1@example.com",
+    "password": "SecurePassword1234H"
 }

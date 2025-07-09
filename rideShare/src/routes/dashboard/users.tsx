@@ -89,7 +89,7 @@ function Row({
                 <Box mt={1}>
                   <Typography variant="subtitle2">Driver Profile</Typography>
                   <Typography variant="body2">
-                    Vehicle Type: {user.driverProfile.vehicle.make}
+                    Vehicle Type: {user.driverProfile.vehicle?.make}
                   </Typography>
                   <Typography variant="body2">
                     License No: {user.driverProfile.licenseNumber}

@@ -10,15 +10,10 @@ import {
   import { Textarea } from "@/components/ui/textarea"
   import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
   import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-  import { createFileRoute } from "@tanstack/react-router"
-  
-  export const Route = createFileRoute('/dashboard/adminprofile')({
-    component: RouteComponent,
-  })
-  
-  function RouteComponent() {
-    return (
-      <div className="p-6 max-w-4xl mx-auto">
+
+function Profiles() {
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
         <h2 className="text-2xl font-bold">Profile Settings</h2>
         <p className="text-sm text-muted-foreground">
           Manage your account settings and preferences
@@ -117,5 +112,7 @@ import {
           </form>
         </Tabs>
       </div>
-    )
-  }
+  )
+}
+
+export default Profiles

@@ -11,13 +11,20 @@ import {
   ChevronDown,
   ChevronUp,
   LogOut,
+  Star,
+  UserRoundPen,
+  History,
+  ArrowRightLeft,
+  CalendarDays,
+  Truck,
+  PhoneCall,
 } from 'lucide-react'
 import { Link, useRouterState, useNavigate } from '@tanstack/react-router'
 import { UserRole } from '@/types/alltypes'
 import { toast } from 'sonner'
 import { authActions, authStore } from '@/app/store'
 import { useLogout } from '@/api/LoginApi'
-import { PersonPin } from '@mui/icons-material'
+
 
 type NavItemBase = {
   name: string
@@ -66,7 +73,7 @@ function Layout({ role }: { role: UserRole }) {
     })
   }
 
-  // Admin nav with dropdown
+    // Admin nav with dropdown
   const adminNavItems: NavEntry[] = [
     {
       name: 'Dashboard',
@@ -112,13 +119,13 @@ function Layout({ role }: { role: UserRole }) {
     {
       label: 'Settings',
       icon: <Settings className="w-4 h-4" />,
-      children : [
+      children: [
         {
           name: 'Profile',
-          icon: <PersonPin className="w-4 h-4" />,
+          icon: <UserRoundPen className="w-4 h-4" />,
           path: '/dashboard/adminprofile',
-        }
-      ]
+        },
+      ],
     },
   ]
 
@@ -134,14 +141,29 @@ function Layout({ role }: { role: UserRole }) {
       icon: <Car className="w-4 h-4" />,
     },
     {
-      name: 'Payments',
+      name: 'Wallets',
       path: '/user/payments',
       icon: <CreditCard className="w-4 h-4" />,
+    },
+    {
+      name: 'Review',
+      path: '/user/reviews',
+      icon: <Star className="w-4 h-4" />,
+    },
+    {
+      name: 'Ride History',
+      path: '/user/ridehistory',
+      icon: <History className="w-4 h-4" />,
     },
     {
       label: 'Settings',
       icon: <Settings className="w-4 h-4" />,
       children: [
+        {
+          name: 'Profile',
+          icon: <UserRoundPen className="w-4 h-4" />,
+          path: '/user/userprofile',
+        },
         {
           name: 'Logout',
           icon: <LogOut className="w-4 h-4" />,
@@ -151,7 +173,7 @@ function Layout({ role }: { role: UserRole }) {
     },
   ]
 
-  const driverNavItems: NavItemBase[] = [
+  const driverNavItems: NavEntry[] = [
     {
       name: 'Driver Dashboard',
       path: '/driver',
@@ -168,12 +190,44 @@ function Layout({ role }: { role: UserRole }) {
       icon: <DollarSign className="w-4 h-4" />,
     },
     {
-      name: 'Settings',
+      name: 'Ride Requests',
+      path: '/driver/requests',
+      icon: <ArrowRightLeft className="w-4 h-4" />,
+    },
+    {
+      name: 'Schedule',
+      path: '/driver/schedule',
+      icon: <CalendarDays className="w-4 h-4" />,
+    },
+    {
+      name: 'Vehicle Info',
+      path: '/driver/vehicle',
+      icon: <Truck className="w-4 h-4" />,
+    },
+    {
+      label: 'Settings',
       path: '/driver/settings',
       icon: <Settings className="w-4 h-4" />,
+      children: [
+        {
+          name: 'Support',
+          path: '/driver/support',
+          icon: <PhoneCall className="w-4 h-4" />,
+        },
+        {
+          name: 'Profile',
+          path: '/driver/driverprofile',
+          icon: <User className="w-4 h-4" />,
+        },
+        {
+          name: 'Logout',
+          path: '',
+          icon: <LogOut className="w-4 h-4" />,
+        },
+      ],
     },
   ]
-
+  
   let navItems: NavEntry[] = []
   if (role === UserRole.ADMIN) {
     navItems = adminNavItems
@@ -184,11 +238,14 @@ function Layout({ role }: { role: UserRole }) {
   }
 
   return (
-    <aside className="w-64 bg-white shadow-md border-r hidden md:block">
+    <aside className="w-64 bg-white shadow-md border-r hidden md:flex flex-col min-h-screen">
+      {/* Header */}
       <div className="p-4 font-bold text-xl border-b">
         <Link to="/">🚗 RideShare</Link>
       </div>
-      <nav className="flex flex-col p-4 space-y-2 text-sm font-medium">
+
+      {/* Navigation */}
+      <nav className="flex flex-col flex-grow p-4 space-y-2 text-sm font-medium">
         {navItems.map((item) => {
           if ('label' in item) {
             const isOpen = openDropdowns[item.label] ?? false
@@ -226,6 +283,7 @@ function Layout({ role }: { role: UserRole }) {
                           </button>
                         )
                       }
+
                       const isActive = router.location.pathname === sub.path
                       return (
                         <Link
@@ -279,6 +337,26 @@ function Layout({ role }: { role: UserRole }) {
           )
         })}
       </nav>
+
+      {/* Footer */}
+      <div className="p-4 border-t bg-gray-50 flex items-center gap-3">
+        <img
+          src={
+            authStore.state.avatar?.profilePicture ||
+            'https://ui-avatars.com/api/?name=User'
+          }
+          alt="Avatar"
+          className="w-10 h-10 rounded-full object-cover border border-gray-200"
+        />
+        <div className="text-sm leading-tight">
+          <p className="font-medium text-gray-800">
+            {authStore.state.user?.email || 'Unknown'}
+          </p>
+          <p className="text-xs text-gray-500 capitalize">
+            {authStore.state.user?.role || 'N/A'}
+          </p>
+        </div>
+      </div>
     </aside>
   )
 }

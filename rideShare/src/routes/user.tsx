@@ -4,18 +4,18 @@ import { authStore } from '@/app/store';
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/user')({
-   beforeLoad: ({ location }) => {
-      const { isVerified } = authStore.state
-      console.log('isVerfied', isVerified)
-      if (!isVerified) {
-        throw redirect({
-          to: '/login',
-          search: {
-            redirect: location.href,
-          },
-        })
-      }
-    },
+  //  beforeLoad: ({ location }) => {
+  //     const { isVerified } = authStore.state
+  //     console.log('isVerfied', isVerified)
+  //     if (!isVerified) {
+  //       throw redirect({
+  //         to: '/login',
+  //         search: {
+  //           redirect: location.href,
+  //         },
+  //       })
+  //     }
+  //   },
   component: RouteComponent,
 })
 

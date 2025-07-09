@@ -28,7 +28,7 @@ export const useLogin = (): UseMutationResult<
       // Save token in localStorage or context
       localStorage.setItem('user', JSON.stringify(data.user))
       localStorage.setItem('auth', JSON.stringify(data.tokens))
-      localStorage.setItem('accesstoken', data.tokens.accessToken)
+      localStorage.setItem('accessToken', data.tokens.accessToken)
       localStorage.setItem('refreshToken', data.tokens.refreshToken)
     },
     onError: (error: any) => {
