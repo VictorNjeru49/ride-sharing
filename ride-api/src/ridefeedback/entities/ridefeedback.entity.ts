@@ -20,11 +20,17 @@ export class Ridefeedback {
   @CreateDateColumn()
   submittedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.rideFeedbacks, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.rideFeedbacks, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @ManyToOne(() => Ride, (ride) => ride.feedbacks, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Ride, (ride) => ride.feedbacks, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
   @JoinColumn({ name: 'rideId' })
   ride: Ride;
 }

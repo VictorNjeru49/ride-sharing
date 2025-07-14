@@ -21,54 +21,70 @@ import { toast, Toaster } from 'sonner'
 import { authActions, authStore } from '@/app/store'
 import { UserRole, type userTypes } from '@/types/alltypes'
 import { useCrudOperations } from '@/hooks/crudops'
-import { createUser, deleteUser, getUsers, updateUser } from '@/api/UserApi'
+import {
+  createUser,
+  deleteUser,
+  getUserById,
+  getUsers,
+  updateUser,
+} from '@/api/UserApi'
+import { useQuery } from '@tanstack/react-query'
 
 export const Route = createFileRoute('/dashboard/')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const {
-      query,
-      create,
-      update,
-      delete: removeUser,
-    } = useCrudOperations<
-      userTypes,
-      Partial<userTypes>,
-      Partial<userTypes>,
-      string
-    >(
-      { all: ['users'], details: (id) => ['users', id] },
-      {
-        fetchFn: getUsers,
-        createFn: createUser,
-        updateFn: updateUser,
-        deleteFn: deleteUser,
-      },
-    )
-    const data = query.data || []
+  const userId = authStore.state.user?.id
+
+  const { data: user, isLoading } = useQuery({
+    queryKey: ['users', userId],
+    queryFn: () => getUserById(userId!),
+    enabled: !!userId,
+  })
+
+  const displayName = user?.firstName || 'Admin'
+  
+
+  const { query } = useCrudOperations<
+    userTypes,
+    Partial<userTypes>,
+    Partial<userTypes>,
+    string
+  >(
+    { all: ['Allusers', userId], details: (id) => ['users', id] },
+    {
+      fetchFn: getUsers,
+      createFn: createUser,
+      updateFn: updateUser,
+      deleteFn: deleteUser,
+    },
+  )
+
+  const datas = query.data || []
   const logout = useLogout()
   const navigate = useNavigate()
 
   const handleLogout = () => {
-    const userId = authStore.state.user.id
     if (!userId) {
       toast.error('User ID not found.')
       return
     }
-
     logout.mutate(userId, {
       onSuccess: () => {
         authActions.deleteUser()
         toast.success('Logged out successfully!')
         navigate({ to: '/login' })
-    
-        toast.success('Logged out successfully!')
-        navigate({ to: '/login' })
       },
     })
   }
+
+  console.log(`The array data: `, datas)
+  if (isLoading) {
+    return <div>Loading dashboard...</div>
+  }
+  
+  
   return (
     <>
       {/* Main content */}
@@ -79,7 +95,7 @@ function RouteComponent() {
           <div>
             <h1 className="text-2xl font-bold">Dashboard Overview</h1>
             <p className="text-sm text-muted-foreground">
-              Welcome back, manage your rideshare platform
+              Welcome back, {displayName} manage your rideshare platform
             </p>
           </div>
           <div className="flex items-center space-x-4">
@@ -87,8 +103,14 @@ function RouteComponent() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Avatar className="cursor-pointer">
-                  <AvatarImage src="https://i.pravatar.cc/40" />
-                  <AvatarFallback>JA</AvatarFallback>
+                  {user?.profilePicture ? (
+                    <AvatarImage src={user.profilePicture} />
+                  ) : (
+                    <AvatarFallback>
+                      {(user?.firstName?.[0] || 'A') +
+                        (user?.lastName?.[0] || '')}
+                    </AvatarFallback>
+                  )}
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
@@ -116,7 +138,7 @@ function RouteComponent() {
             <CardContent>
               <p className="text-2xl font-bold">
                 {/* 2,847 */}
-                {data.filter((user) => user.role === UserRole.DRIVER).length}
+                {datas.filter((user) => user.role === UserRole.DRIVER).length}
               </p>
               <p className="text-sm text-green-600">↑ 12% from last month</p>
             </CardContent>
@@ -148,7 +170,7 @@ function RouteComponent() {
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">
-                {data.filter((user) => user.role === UserRole.RIDER).length}
+                {datas.filter((user) => user.role === UserRole.RIDER).length}.
               </p>
               <p className="text-sm text-red-500">↓ 2% from last month</p>
             </CardContent>

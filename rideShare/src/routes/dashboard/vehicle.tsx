@@ -64,10 +64,10 @@ function RouteComponent() {
       details: (id: string) => ['vehicles', id],
     },
     {
-      fetchFn: () => getVehicles(),
-      createFn: (vehicleData) => createVehicles(vehicleData),
-      updateFn: (id, vehicleData) => updateVehicles(id, vehicleData),
-      deleteFn: (vehicleId: string) => deleteVehicles(vehicleId),
+      fetchFn: getVehicles,
+      createFn: createVehicles,
+      updateFn: updateVehicles,
+      deleteFn: deleteVehicles,
     },
   )
 
@@ -143,7 +143,22 @@ function RouteComponent() {
   async function handleSubmit() {
     try {
       if (editingVehicle) {
-        await update.mutateAsync({ id: editingVehicle.id, payload: formData })
+        const payload: Partial<Vehicle> = {
+          vehicleImage: formData.vehicleImage,
+          make: formData.make,
+          model: formData.model,
+          plateNumber: formData.plateNumber,
+          color: formData.color,
+          available: formData.available,
+          capacity: formData.capacity,
+          year: formData.year,
+          vehicleType: formData.vehicleType
+        }
+
+        await update.mutateAsync({
+          id: editingVehicle.id,
+          payload,
+        })
         toast.success(
           `Vehicle with ID ${editingVehicle.id} updated successfully`,
         )

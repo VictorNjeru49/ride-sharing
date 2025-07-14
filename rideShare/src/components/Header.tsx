@@ -43,7 +43,7 @@ export default function Header() {
             </Link>
             <Link
               to="/dashboard"
-              className="hover:text-blue-600"
+              className="hover:text-blue-600 hidden"
               activeProps={{ className: 'text-blue-600 font-bold' }}
             >
               Dashboard
@@ -89,6 +89,9 @@ export default function Header() {
           </div>
         </div>
       </header>
+      <div className='absolute right-10 rounded-full -bottom-1/12'>
+    <img src='../../images/chatbot.png' className='w-16'/>
+      </div>
     </>
   )
 }

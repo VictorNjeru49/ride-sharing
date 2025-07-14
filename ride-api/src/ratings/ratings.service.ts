@@ -18,11 +18,16 @@ export class RatingsService {
   }
 
   async findAll() {
-    return await this.ratingRepo.find();
+    return await this.ratingRepo.find({
+      relations: ['ride', 'rater', 'ratee'],
+    });
   }
 
   async findOne(id: string) {
-    return await this.ratingRepo.findOne({ where: { id } });
+    return await this.ratingRepo.findOne({
+      where: { id },
+      relations: ['ride', 'rater', 'ratee'],
+    });
   }
 
   async update(id: string, updateRatingDto: UpdateRatingDto) {

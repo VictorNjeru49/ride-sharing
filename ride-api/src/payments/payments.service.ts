@@ -85,7 +85,10 @@ export class PaymentsService {
   }
 
   async findOne(id: string) {
-    return await this.paymentRepo.findOne({ where: { id } });
+    return await this.paymentRepo.findOne({
+      where: { id },
+      relations: ['user', 'ride'],
+    });
   }
 
   async update(id: string, updatePaymentDto: UpdatePaymentDto) {

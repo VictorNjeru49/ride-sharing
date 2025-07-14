@@ -11,9 +11,10 @@ import {
   import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
   import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
   import { createFileRoute } from "@tanstack/react-router"
+import Profiles from "@/components/Profiles"
   
   export const Route = createFileRoute('/dashboard/adminprofile')({
-    component: RouteComponent,
+    component: Profiles,
   })
   
   function RouteComponent() {

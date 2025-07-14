@@ -18,11 +18,16 @@ export class DeviceService {
   }
 
   async findAll() {
-    return await this.deviceRepo.find();
+    return await this.deviceRepo.find({
+      relations: ['user'],
+    });
   }
 
   async findOne(id: string) {
-    return await this.deviceRepo.findOne({ where: { id } });
+    return await this.deviceRepo.findOne({
+      where: { id },
+      relations: ['user'],
+    });
   }
 
   async update(id: string, updateDeviceDto: UpdateDeviceDto) {

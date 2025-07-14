@@ -18,11 +18,14 @@ export class RidecancelService {
   }
 
   async findAll() {
-    return await this.ridecancelRepo.find();
+    return await this.ridecancelRepo.find({ relations: ['ride', 'user'] });
   }
 
   async findOne(id: string) {
-    return await this.ridecancelRepo.findOne({ where: { id } });
+    return await this.ridecancelRepo.findOne({
+      where: { id },
+      relations: ['ride', 'user'],
+    });
   }
 
   async update(id: string, updateRidecancelDto: UpdateRidecancelDto) {

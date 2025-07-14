@@ -12,6 +12,7 @@ export enum superRole {
   MODERATOR = 'moderator',
   SUPERVISOR = 'supervisor',
   SUPERADMIN = 'superadmin',
+  ADMIN = 'admin',
 }
 
 @Entity()

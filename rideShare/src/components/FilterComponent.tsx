@@ -1,10 +1,20 @@
-type FilterProps = {
+import React from 'react'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+
+interface FilterComponentProps {
   searchText: string
   filterBy: string
-  setSearchText: (text: string) => void
-  setFilterBy: (filter: string) => void
+  setSearchText: (value: string) => void
+  setFilterBy: (value: string) => void
 }
-
 const filterOptions = [
   'All',
   'make',
@@ -16,38 +26,54 @@ const filterOptions = [
   'type',
 ]
 
-function FilterComponent({
+export default function FilterComponent({
   searchText,
   filterBy,
   setSearchText,
   setFilterBy,
-}: FilterProps) {
+}: FilterComponentProps) {
+  // Reset both filters
+  const clearFilters = () => {
+    setSearchText('')
+    setFilterBy('all')
+  }
+
   return (
-    <div className="w-4/5 m-auto">
-      <div>
-        <input
-          type="search"
-          placeholder="Search the car"
-          className="w-full border p-2 rounded"
+    <div className="flex w-full flex-col gap-4 px-6 py-4 md:flex-row md:items-end md:gap-6">
+      {/* Search */}
+      <div className="flex-1">
+        <Input
+          placeholder="Search vehicles…"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
         />
       </div>
-      <div className="w-full flex flex-row gap-3 border bg-amber-50 text-center p-2">
-        {filterOptions.map((option) => (
-          <button
-            key={option}
-            className={`btn btn-primary outline-red-700 cursor-pointer border px-3 ${
-              filterBy.toLowerCase() === option.toLowerCase() ? 'btn-ghost' : ''
-            }`}
-            onClick={() => setFilterBy(option.toLowerCase())}
-          >
-            {option}
-          </button>
-        ))}
+
+      {/* Field selector */}
+      <div className="w-full md:w-52">
+        <Select value={filterBy} onValueChange={setFilterBy}>
+          <SelectTrigger>
+            <SelectValue placeholder="Filter field" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="make">Make</SelectItem>
+            <SelectItem value="model">Model</SelectItem>
+            <SelectItem value="color">Color</SelectItem>
+            <SelectItem value="plate number">Plate No.</SelectItem>
+            <SelectItem value="capacity">Capacity</SelectItem>
+            <SelectItem value="year">Year</SelectItem>
+            <SelectItem value="type">Type</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
+
+      {/* Clear */}
+      {(searchText || filterBy !== 'all') && (
+        <Button variant="ghost" onClick={clearFilters} className="md:ml-auto">
+          Clear
+        </Button>
+      )}
     </div>
   )
 }
-
-export default FilterComponent

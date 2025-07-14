@@ -28,7 +28,10 @@ export class Ridecancel {
   @CreateDateColumn()
   cancelledAt: Date;
 
-  @ManyToOne(() => Ride, (ride) => ride.cancellation, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Ride, (ride) => ride.cancellation, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
   @JoinColumn({ name: 'rideId' })
   ride: Ride;
 

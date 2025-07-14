@@ -86,8 +86,6 @@ export interface userTypes extends GenericsType {
   driverProfile?: DriverProfile
   adminProfile?: Admin
 
-  ridesOffered?: Ride[]
-  ridesTaken?: Ride[]
   payments?: Payment[]
   ratingsGiven?: Rating[]
   ratingsReceived?: Rating[]
@@ -98,62 +96,67 @@ export interface userTypes extends GenericsType {
   devices?: Device[]
   promoUsages?: UserPromoUsage[]
   createdPromoCodes?: PromoCode[]
-  DriverLocations?: DriverLocation[]
+  driverLocations?: DriverLocation[]
 }
 
 export interface Notification extends GenericsType {
   type: NotifyStatus
   message: string
   isRead: boolean
-  createdAt: Date
-  user: userTypes
+  createdAt?: Date
+  user?: userTypes
 }
 export interface Vehicle extends GenericsType {
   vehicleImage: string
   make: string
   model: string
   plateNumber: string
+  rentalrate: number
   color: string
-  available: boolean
   capacity: number
   year: number
+  available: boolean
   vehicleType: string
   createdAt?: Date
   updatedAt?: Date
+  driver?: DriverProfile
 }
 export interface RiderProfile extends GenericsType {
   preferredPaymentMethod?: string
   rating: number
-  createdAt: Date
-  updatedAt: Date
-  user: userTypes
-  rideRequests: Riderequest[]
-  ridesTaken: Ride[]
+  createdAt?: Date
+  updatedAt?: Date
+  user?: userTypes
+  rideRequests?: Riderequest[]
+  ridesTaken?: Ride[]
+  riderHistory?: DriverLocation[]
 }
 export interface DriverProfile extends GenericsType {
-  user: userTypes
+  user?: userTypes
   licenseNumber: string
+  rating: number
   isAvailable: boolean
   createdAt: Date
   updatedAt: Date
   vehicle: Vehicle
-  ridesOffered: Ride[]
-  assignedRequests: Riderequest[]
-  locationHistory: DriverLocation[]
+  ridesOffered?: Ride[]
+  ridesTaken?: Ride[]
+  assignedRequests?: Riderequest[]
+  locationHistory?: DriverLocation[]
 }
 
 export interface Ridecancel extends GenericsType {
-  cancelledBy: RideCancelBy
+  cancelledBy?: RideCancelBy
   reason: string
   cancelledAt: Date
-  ride: Ride
-  user: userTypes
+  ride?: Ride
+  user?: userTypes
 }
 export interface Riderequest extends GenericsType {
-  rider: RiderProfile
-  assignedDriver: DriverProfile
-  pickupLocation: Location
-  dropoffLocation: Location
+  rider?: RiderProfile
+  assignedDriver?: DriverProfile
+  pickupLocation?: Location
+  dropoffLocation?: Location
   status: string
   preferredVehicleType: string
   requestedAt: Date
@@ -193,7 +196,7 @@ export interface Rating extends GenericsType {
   comment: string
   createdAt: Date
 }
-export interface Location extends GenericsType{
+export interface Location extends GenericsType {
   address: string
   latitude: number
   longitude: number
@@ -255,8 +258,9 @@ export interface DriverLocation extends GenericsType {
   preferredVehicleType: string
   requestedAt: Date
   driver: userTypes
+  driverProfile: DriverProfile
 }
-export interface LoginPayload{
+export interface LoginPayload {
   email: string
   phone?: string
   password: string

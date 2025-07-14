@@ -18,11 +18,16 @@ export class NotificationService {
   }
 
   async findAll() {
-    return await this.notificationRepo.find();
+    return await this.notificationRepo.find({
+      relations: ['user'],
+    });
   }
 
   async findOne(id: string) {
-    return await this.notificationRepo.findOne({ where: { id } });
+    return await this.notificationRepo.findOne({
+      where: { id },
+      relations: ['user'],
+    });
   }
 
   async update(id: string, updateNotificationDto: UpdateNotificationDto) {

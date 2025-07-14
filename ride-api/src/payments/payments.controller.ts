@@ -21,6 +21,11 @@ export class PaymentsController {
   create(@Body() createPaymentDto: CreatePaymentDto) {
     return this.paymentsService.create(createPaymentDto);
   }
+  @Public()
+  @Post('confirm')
+  confirmPayment(@Body('paymentIntentId') paymentIntentId: string) {
+    return this.paymentsService.comfirmPayment(paymentIntentId);
+  }
 
   @Public()
   @Get()

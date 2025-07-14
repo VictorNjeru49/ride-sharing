@@ -7,11 +7,18 @@ import { User } from 'src/users/entities/user.entity';
 import { DatabaseModule } from 'src/database/database.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Riderprofile } from './entities/riderprofile.entity';
+import { Driverlocation } from 'src/driverlocation/entities/driverlocation.entity';
 
 @Module({
   imports: [
     DatabaseModule,
-    TypeOrmModule.forFeature([Riderprofile, Ride, User, Riderequest]),
+    TypeOrmModule.forFeature([
+      Riderprofile,
+      Ride,
+      User,
+      Riderequest,
+      Driverlocation,
+    ]),
   ],
   controllers: [RiderprofileController],
   providers: [RiderprofileService],

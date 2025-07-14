@@ -17,7 +17,7 @@ function RouteComponent() {
     enabled: !!userId,
   })
 
-  const requests = user?.driverProfile?.assignedRequests || []
+  const requests = user?.driverProfile?.assignedRequests ?? []
 
   return (
     <section className="p-6 bg-gray-50 min-h-screen space-y-6">
@@ -46,17 +46,18 @@ function RouteComponent() {
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="font-medium text-gray-800">
-                      {req.pickupLocation.address} →{' '}
-                      {req.dropoffLocation.address}
+                      Pickup location unknown → Dropoff location unknown
                     </p>
                     <p className="text-sm text-gray-600">
                       Requested{' '}
-                      {formatDistanceToNow(new Date(req.requestedAt), {
-                        addSuffix: true,
-                      })}
+                      {req.requestedAt
+                        ? formatDistanceToNow(new Date(req.requestedAt), {
+                            addSuffix: true,
+                          })
+                        : 'unknown time'}
                     </p>
                     <p className="text-sm text-gray-600">
-                      Preferred Vehicle: {req.preferredVehicleType}
+                      Preferred Vehicle: {req.preferredVehicleType ?? 'N/A'}
                     </p>
                   </div>
                   <span
@@ -68,7 +69,7 @@ function RouteComponent() {
                           : 'bg-red-100 text-red-700'
                     }`}
                   >
-                    {req.status}
+                    {req.status ?? 'unknown'}
                   </span>
                 </div>
               </li>

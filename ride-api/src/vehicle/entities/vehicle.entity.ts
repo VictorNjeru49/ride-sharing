@@ -12,7 +12,9 @@ import {
 export class Vehicle {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-  @OneToOne(() => Driverprofile, (dp) => dp.vehicle) driver: Driverprofile;
+  @OneToOne(() => Driverprofile, (dp) => dp.vehicle)
+  driver: Driverprofile;
+
   @Column()
   vehicleImage: string;
   @Column()
@@ -23,6 +25,9 @@ export class Vehicle {
 
   @Column()
   plateNumber: string;
+
+  @Column({ nullable: true, type: 'decimal', precision: 10, scale: 2 })
+  rentalrate: number;
 
   @Column()
   color: string;

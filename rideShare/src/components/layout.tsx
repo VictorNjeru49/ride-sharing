@@ -125,6 +125,11 @@ function Layout({ role }: { role: UserRole }) {
           icon: <UserRoundPen className="w-4 h-4" />,
           path: '/dashboard/adminprofile',
         },
+        {
+          name: 'Logout',
+          icon: <LogOut className="w-4 h-4" />,
+          path: '',
+        },
       ],
     },
   ]
@@ -141,8 +146,13 @@ function Layout({ role }: { role: UserRole }) {
       icon: <Car className="w-4 h-4" />,
     },
     {
-      name: 'Wallets',
-      path: '/user/payments',
+      name: 'Book Ride',
+      path: '/Vehicles',
+      icon: <Car className="w-4 h-4" />,
+    },
+    {
+      name: 'Wallet',
+      path: '/user/wallet',
       icon: <CreditCard className="w-4 h-4" />,
     },
     {
@@ -163,6 +173,11 @@ function Layout({ role }: { role: UserRole }) {
           name: 'Profile',
           icon: <UserRoundPen className="w-4 h-4" />,
           path: '/user/userprofile',
+        },
+        {
+          name: 'Support',
+          path: '/user/support',
+          icon: <PhoneCall className="w-4 h-4" />,
         },
         {
           name: 'Logout',

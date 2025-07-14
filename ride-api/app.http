@@ -3,6 +3,28 @@
 ###
 GET {{url}}/users/31511632-b063-4e4a-bcad-8a24954d1987
 
+###
+GET  {{url}}/users/3980d420-6332-49ca-b1fb-48b27921df63
+###
+GET {{url}}/driverprofile/c7c2316c-838c-4b57-b9e1-9967d57880d3
+
+####
+GET {{url}}/vehicle/2303856d-121f-433d-bedb-706d3d675260
+
+
+#####
+PATCH {{url}}/vehicle/913b8fa2-7d90-4a2a-9cbe-2d662335ff7b
+Content-Type: application/json
+
+{
+"vehicleImage": "https://images.pexels.com/photos/116675/pexels-photo-116675.jpeg"
+}
+
+
+
+#####
+GET {{url}}/ride
+
 
 #####
 GET {{url}}/payments
@@ -49,3 +71,47 @@ Content-Type: application/json
     "email": "chris.anderson1@example.com",
     "password": "SecurePassword1234H"
 }
+
+"email": "grace@example.com",
+  "phone": null,
+  "password": "hashedpassword9",
+
+
+######
+GET {{url}}/payments
+
+#####
+### Create a payment
+POST {{url}}/payments
+Content-Type: application/json
+
+{
+  "amount": 50.00,
+  "currency": "usd",
+  "method": "credit_card",
+  "userId": "31511632-b063-4e4a-bcad-8a24954d1987",
+  "rideId": "5a150f68-e7ed-43c2-b0c1-fa6aa644499d"
+}
+
+### Confirm a payment by Stripe Payment Intent ID
+POST {{url}}/payments/confirm
+Content-Type: application/json
+
+{
+  "paymentIntentId": "pi_3RkkiIBhAVCGhfBd0yuqIOMD"
+}
+
+
+### Get payment by ID
+GET {{url}}/payments
+
+### Update payment by ID
+PATCH {{url}}/payments/paymentId
+Content-Type: application/json
+
+{
+  "status": "completed"
+}
+
+### Delete payment by ID
+DELETE {{url}}/payments/paymentId

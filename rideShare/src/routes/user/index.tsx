@@ -1,37 +1,131 @@
-import React from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Star } from 'lucide-react'
+import { authStore } from '@/app/store'
+import { useQuery } from '@tanstack/react-query'
+import { getUserById } from '@/api/UserApi'
+import MapDialog from '@/components/locations'
 
 export const Route = createFileRoute('/user/')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const userId = authStore.state.user?.id
+
+  const [currentLocation, setCurrentLocation] = useState<
+    [number, number] | null
+  >(null)
+  const [pickupLocation, setPickupLocation] = useState<[number, number] | null>(
+    null,
+  )
+  const [destinationLocation, setDestinationLocation] = useState<
+    [number, number] | null
+  >(null)
+  const [loadingLocation, setLoadingLocation] = useState(false)
+  const [open, setOpen] = useState<boolean>(false)
+  const [pickerMode, setPickerMode] = useState<'pickup' | 'destination'>(
+    'pickup',
+  )
+
+  const { data: user, isLoading } = useQuery({
+    queryKey: ['riders', userId],
+    queryFn: () => getUserById(userId!),
+    enabled: !!userId,
+  })
+
+  const fetchCurrentLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      alert('Your browser does not support geolocation.')
+      return
+    }
+    setLoadingLocation(true)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const coords: [number, number] = [
+          pos.coords.latitude,
+          pos.coords.longitude,
+        ]
+        setCurrentLocation(coords)
+        if (!pickupLocation) setPickupLocation(coords)
+        setLoadingLocation(false)
+      },
+      (err) => {
+        console.error(err)
+        setLoadingLocation(false)
+      },
+    )
+  }, [pickupLocation])
+
+  useEffect(() => {
+    fetchCurrentLocation()
+  }, [fetchCurrentLocation])
+
+  if (isLoading) return <div>Loading dashboard...</div>
+
+  const walletBalance = user?.walletBalance ?? 0
+  const userName = user?.firstName ?? 'User'
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="text-2xl font-bold">Dashboard</div>
+      <div className="text-2xl font-bold">{userName} Dashboard</div>
 
-      {/* Book Your Next Ride */}
-      <Card className="bg-gradient-to-r from-blue-500 to-purple-500 p-6 text-white">
-        <div className="text-lg font-semibold mb-4">Book Your Next Ride</div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-          <Input
-            placeholder="Current location"
-            className="bg-white text-black placeholder:text-gray-500"
-          />
-          <Input
-            placeholder="Where to?"
-            className="bg-white text-black placeholder:text-gray-500"
-          />
-          <Button className="bg-white text-blue-600 font-semibold">
-            Find Rides
-          </Button>
-        </div>
-      </Card>
+      {/* Location Picker Dialog */}
+      <MapDialog
+        open={open}
+        onOpenChange={setOpen}
+        mode={pickerMode}
+        setCoords={
+          pickerMode === 'pickup' ? setPickupLocation : setDestinationLocation
+        }
+        currentCoords={
+          pickerMode === 'pickup' ? pickupLocation : destinationLocation
+        }
+      />
+
+      {/* Book Ride Controls */}
+      <div className="flex gap-3">
+        <Button
+          variant={pickerMode === 'pickup' ? 'default' : 'outline'}
+          onClick={() => {
+            setPickerMode('pickup')
+            setOpen(true)
+          }}
+        >
+          Pick Pickup
+        </Button>
+        <Button
+          variant={pickerMode === 'destination' ? 'default' : 'outline'}
+          onClick={() => {
+            setPickerMode('destination')
+            setOpen(true)
+          }}
+        >
+          Pick Destination
+        </Button>
+        <Button onClick={fetchCurrentLocation} disabled={loadingLocation}>
+          {loadingLocation ? 'Locating…' : 'Use My Location'}
+        </Button>
+      </div>
+
+      {/* Selected Location Preview */}
+      <div className="text-sm space-y-1">
+        <p>
+          <strong>Current:</strong>{' '}
+          {currentLocation ? currentLocation.join(', ') : '—'}
+        </p>
+        <p>
+          <strong>Pickup:</strong>{' '}
+          {pickupLocation ? pickupLocation.join(', ') : '—'}
+        </p>
+        <p>
+          <strong>Destination:</strong>{' '}
+          {destinationLocation ? destinationLocation.join(', ') : '—'}
+        </p>
+      </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -44,26 +138,31 @@ function RouteComponent() {
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-sm text-gray-500">Wallet Balance</div>
-            <div className="text-xl font-bold text-green-600">$125.50</div>
+            <div className="text-xl font-bold text-green-600">
+              ${walletBalance.toFixed(2)}
+            </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-sm text-gray-500">Your Rating</div>
             <div className="text-xl font-bold flex justify-center items-center gap-1">
-              4.8 <Star className="w-4 h-4 text-yellow-400" />
+              {user?.riderProfile?.rating ?? '4.8'}{' '}
+              <Star className="w-4 h-4 text-yellow-400" />
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-sm text-gray-500">Monthly Savings</div>
-            <div className="text-xl font-bold text-purple-600">$89.20</div>
+            <div className="text-xl font-bold text-purple-600">
+              ${walletBalance.toFixed(2)}
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Recent Rides & Quick Actions */}
+      {/* Ride History and Actions */}
       <div className="grid md:grid-cols-2 gap-6">
         <Card>
           <CardContent className="p-4">
@@ -101,7 +200,7 @@ function RouteComponent() {
         </Card>
       </div>
 
-      {/* Current Ride Status */}
+      {/* Current Ride Info */}
       <Card>
         <CardContent className="p-4 flex items-center gap-4">
           <img

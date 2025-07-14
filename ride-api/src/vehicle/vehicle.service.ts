@@ -17,11 +17,16 @@ export class VehicleService {
   }
 
   async findAll() {
-    return await this.vehicleRepo.find();
+    return await this.vehicleRepo.find({
+      relations: ['driver'],
+    });
   }
 
   async findOne(id: string) {
-    return await this.vehicleRepo.findOne({ where: { id } });
+    return await this.vehicleRepo.findOne({
+      where: { id },
+      relations: ['driver'],
+    });
   }
 
   async update(id: string, updateVehicleDto: UpdateVehicleDto) {

@@ -18,11 +18,26 @@ export class RiderequestService {
   }
 
   async findAll() {
-    return await this.riderequestRepo.find();
+    return await this.riderequestRepo.find({
+      relations: [
+        'rider',
+        'assignedDriver',
+        'pickupLocation',
+        'dropoffLocation',
+      ],
+    });
   }
 
   async findOne(id: string) {
-    return await this.riderequestRepo.findOne({ where: { id } });
+    return await this.riderequestRepo.findOne({
+      where: { id },
+      relations: [
+        'rider',
+        'assignedDriver',
+        'pickupLocation',
+        'dropoffLocation',
+      ],
+    });
   }
 
   async update(id: string, updateRiderequestDto: UpdateRiderequestDto) {

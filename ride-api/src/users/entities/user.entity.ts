@@ -16,7 +16,6 @@ import { Notification } from 'src/notification/entities/notification.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
 import { Promocode } from 'src/promocode/entities/promocode.entity';
 import { Rating } from 'src/ratings/entities/rating.entity';
-import { Ride } from 'src/ride/entities/ride.entity';
 import { Ridefeedback } from 'src/ridefeedback/entities/ridefeedback.entity';
 import { Riderprofile } from 'src/riderprofile/entities/riderprofile.entity';
 import { Supportticket } from 'src/supportticket/entities/supportticket.entity';
@@ -80,12 +79,14 @@ export class User {
   @OneToOne(() => Riderprofile, (rp) => rp.user, {
     cascade: true,
     onDelete: 'CASCADE',
+    eager: true,
   })
   riderProfile: Riderprofile;
 
   @OneToOne(() => Driverprofile, (dp) => dp.user, {
     cascade: true,
     onDelete: 'CASCADE',
+    eager: true,
   })
   driverProfile: Driverprofile;
 
@@ -95,21 +96,20 @@ export class User {
   })
   adminProfile: Admin;
 
-  // One-to-Many Relations
-  @OneToMany(() => Ride, (ride) => ride.driver, {
-    cascade: true,
-    onDelete: 'CASCADE',
-  })
-  ridesOffered: Ride[];
+  // // One-to-Many Relations
+  // @OneToMany(() => Ride, (ride) => ride.driver, {
+  //   cascade: true,
+  //   onDelete: 'CASCADE',
+  // })
+  // ridesOffered: Ride[];
 
-  @OneToMany(() => Ride, (ride) => ride.rider, {
-    cascade: true,
-    onDelete: 'CASCADE',
-  })
-  ridesTaken: Ride[];
+  // @OneToMany(() => Ride, (ride) => ride.rider, {
+  //   cascade: true,
+  //   onDelete: 'CASCADE',
+  // })
+  // ridesTaken: Ride[];
 
   @OneToMany(() => Payment, (p) => p.user, {
-    cascade: true,
     onDelete: 'CASCADE',
     nullable: true,
   })

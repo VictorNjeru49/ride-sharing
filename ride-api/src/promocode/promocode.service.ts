@@ -24,7 +24,10 @@ export class PromocodeService {
   }
 
   async findOne(id: string) {
-    return await this.promocodeRepo.findOne({ where: { id } });
+    return await this.promocodeRepo.findOne({
+      where: { id },
+      relations: ['createdBy', 'usages'],
+    });
   }
 
   async update(id: string, updatePromocodeDto: UpdatePromocodeDto) {

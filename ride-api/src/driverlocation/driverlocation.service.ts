@@ -20,11 +20,16 @@ export class DriverlocationService {
   }
 
   async findAll() {
-    return await this.driverlocationRepo.find();
+    return await this.driverlocationRepo.find({
+      relations: ['driver', 'driverProfile', 'riderProfile'],
+    });
   }
 
   async findOne(id: string) {
-    return await this.driverlocationRepo.findOne({ where: { id } });
+    return await this.driverlocationRepo.findOne({
+      where: { id },
+      relations: ['driver', 'driverProfile', 'riderProfile'],
+    });
   }
 
   async update(id: string, updateDriverlocationDto: UpdateDriverlocationDto) {

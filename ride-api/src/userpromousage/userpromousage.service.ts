@@ -17,11 +17,14 @@ export class UserpromousageService {
   }
 
   async findAll() {
-    return await this.promousageRepo.find();
+    return await this.promousageRepo.find({ relations: ['user', 'promoCode'] });
   }
 
   async findOne(id: string) {
-    return await this.promousageRepo.findOne({ where: { id } });
+    return await this.promousageRepo.findOne({
+      where: { id },
+      relations: ['user', 'promoCode'],
+    });
   }
 
   async update(id: string, updateUserpromousageDto: UpdateUserpromousageDto) {

@@ -53,7 +53,7 @@ export class RiderprofileService {
   async findOne(id: string) {
     return await this.riderprofileRepo.findOne({
       where: { id },
-      relations: ['user', 'rideRequests', 'ridesTaken'],
+      relations: ['user', 'rideRequests', 'ridesTaken', 'riderHistory'],
     });
   }
 

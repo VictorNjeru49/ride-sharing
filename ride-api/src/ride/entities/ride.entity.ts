@@ -20,11 +20,27 @@ export class Ride {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Riderprofile, (rp) => rp.ridesTaken) rider: Riderprofile;
-  @ManyToOne(() => Driverprofile, (dp) => dp.ridesOffered)
+  @ManyToOne(() => Riderprofile, (rp) => rp.ridesTaken, {
+    nullable: true,
+  })
+  rider: Riderprofile;
+
+  @ManyToOne(() => Driverprofile, (dp) => dp.ridesOffered, {
+    nullable: true,
+  })
   driver: Driverprofile;
-  @ManyToOne(() => Location, (l) => l.ridesPickup) pickupLocation: Location;
-  @ManyToOne(() => Location, (l) => l.ridesDropoff) dropoffLocation: Location;
+  @ManyToOne(() => Location, (l) => l.ridesPickup, {
+    cascade: true,
+    eager: true,
+  })
+  pickupLocation: Location;
+
+  @ManyToOne(() => Location, (l) => l.ridesDropoff, {
+    cascade: true,
+    eager: true,
+  })
+  dropoffLocation: Location;
+
   @Column()
   status: string;
 
@@ -43,11 +59,27 @@ export class Ride {
   @CreateDateColumn()
   createdAt: Date;
 
-  @OneToMany(() => Payment, (p) => p.ride)
+  @OneToMany(() => Payment, (p) => p.ride, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
   payments: Payment[];
 
-  @OneToMany(() => Rating, (r) => r.ride) ratings: Rating[];
-  @OneToOne(() => Ridecancel, (c) => c.ride, { cascade: true })
+  @OneToMany(() => Rating, (r) => r.ride, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
+  ratings: Rating[];
+
+  @OneToOne(() => Ridecancel, (c) => c.ride, {
+    cascade: true,
+    nullable: true,
+  })
   cancellation: Ridecancel;
-  @OneToMany(() => Ridefeedback, (f) => f.ride) feedbacks: Ridefeedback[];
+
+  @OneToMany(() => Ridefeedback, (f) => f.ride, {
+    cascade: true,
+    nullable: true,
+  })
+  feedbacks: Ridefeedback[];
 }

@@ -15,6 +15,10 @@ export class CreateVehicleDto {
   @IsString()
   plateNumber: string;
   @ApiProperty()
+  @IsNumber()
+  rentalrate: number;
+
+  @ApiProperty()
   @IsString()
   color: string;
   @ApiProperty()

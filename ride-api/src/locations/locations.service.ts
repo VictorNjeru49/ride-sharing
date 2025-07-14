@@ -22,13 +22,29 @@ export class LocationsService {
       return this.locationRepo.find({
         where: { address: search },
         order: { address: 'ASC' },
+        relations: [
+          'ridesPickup',
+          'ridesDropoff',
+          'requestsPickup',
+          'requestsDropoff',
+        ],
       });
     }
     return this.locationRepo.find({ order: { address: 'ASC' } });
   }
 
   async findOne(id: string): Promise<Location> {
-    const location = await this.locationRepo.findOne({ where: { id } });
+    const location = await this.locationRepo.findOne({
+      where: {
+        id,
+      },
+      relations: [
+        'ridesPickup',
+        'ridesDropoff',
+        'requestsPickup',
+        'requestsDropoff',
+      ],
+    });
     if (!location) {
       throw new NotFoundException(`Location with ID ${id} not found`);
     }

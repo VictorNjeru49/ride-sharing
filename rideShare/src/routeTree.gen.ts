@@ -21,7 +21,10 @@ import { Route as UserIndexRouteImport } from './routes/user/index'
 import { Route as DriverIndexRouteImport } from './routes/driver/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as VehiclesIndexRouteImport } from './routes/Vehicles/index'
+import { Route as UserWalletRouteImport } from './routes/user/wallet'
 import { Route as UserUserprofileRouteImport } from './routes/user/userprofile'
+import { Route as UserTripsRouteImport } from './routes/user/trips'
+import { Route as UserSupportRouteImport } from './routes/user/support'
 import { Route as UserRidehistoryRouteImport } from './routes/user/ridehistory'
 import { Route as UserReviewsRouteImport } from './routes/user/reviews'
 import { Route as DriverVehicleRouteImport } from './routes/driver/vehicle'
@@ -33,6 +36,7 @@ import { Route as DriverEarningsRouteImport } from './routes/driver/earnings'
 import { Route as DriverDriverprofileRouteImport } from './routes/driver/driverprofile'
 import { Route as DashboardVehicleRouteImport } from './routes/dashboard/vehicle'
 import { Route as DashboardUsersRouteImport } from './routes/dashboard/users'
+import { Route as DashboardTripsRouteImport } from './routes/dashboard/trips'
 import { Route as DashboardPromocodeRouteImport } from './routes/dashboard/promocode'
 import { Route as DashboardPaymentsRouteImport } from './routes/dashboard/payments'
 import { Route as DashboardAnalyticsRouteImport } from './routes/dashboard/analytics'
@@ -99,9 +103,24 @@ const VehiclesIndexRoute = VehiclesIndexRouteImport.update({
   path: '/',
   getParentRoute: () => VehiclesRoute,
 } as any)
+const UserWalletRoute = UserWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => UserRoute,
+} as any)
 const UserUserprofileRoute = UserUserprofileRouteImport.update({
   id: '/userprofile',
   path: '/userprofile',
+  getParentRoute: () => UserRoute,
+} as any)
+const UserTripsRoute = UserTripsRouteImport.update({
+  id: '/trips',
+  path: '/trips',
+  getParentRoute: () => UserRoute,
+} as any)
+const UserSupportRoute = UserSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
   getParentRoute: () => UserRoute,
 } as any)
 const UserRidehistoryRoute = UserRidehistoryRouteImport.update({
@@ -159,6 +178,11 @@ const DashboardUsersRoute = DashboardUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardTripsRoute = DashboardTripsRouteImport.update({
+  id: '/trips',
+  path: '/trips',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardPromocodeRoute = DashboardPromocodeRouteImport.update({
   id: '/promocode',
   path: '/promocode',
@@ -199,6 +223,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/payments': typeof DashboardPaymentsRoute
   '/dashboard/promocode': typeof DashboardPromocodeRoute
+  '/dashboard/trips': typeof DashboardTripsRoute
   '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard/vehicle': typeof DashboardVehicleRoute
   '/driver/driverprofile': typeof DriverDriverprofileRoute
@@ -210,7 +235,10 @@ export interface FileRoutesByFullPath {
   '/driver/vehicle': typeof DriverVehicleRoute
   '/user/reviews': typeof UserReviewsRoute
   '/user/ridehistory': typeof UserRidehistoryRoute
+  '/user/support': typeof UserSupportRoute
+  '/user/trips': typeof UserTripsRoute
   '/user/userprofile': typeof UserUserprofileRoute
+  '/user/wallet': typeof UserWalletRoute
   '/Vehicles/': typeof VehiclesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/driver/': typeof DriverIndexRoute
@@ -226,6 +254,7 @@ export interface FileRoutesByTo {
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/payments': typeof DashboardPaymentsRoute
   '/dashboard/promocode': typeof DashboardPromocodeRoute
+  '/dashboard/trips': typeof DashboardTripsRoute
   '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard/vehicle': typeof DashboardVehicleRoute
   '/driver/driverprofile': typeof DriverDriverprofileRoute
@@ -237,7 +266,10 @@ export interface FileRoutesByTo {
   '/driver/vehicle': typeof DriverVehicleRoute
   '/user/reviews': typeof UserReviewsRoute
   '/user/ridehistory': typeof UserRidehistoryRoute
+  '/user/support': typeof UserSupportRoute
+  '/user/trips': typeof UserTripsRoute
   '/user/userprofile': typeof UserUserprofileRoute
+  '/user/wallet': typeof UserWalletRoute
   '/Vehicles': typeof VehiclesIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/driver': typeof DriverIndexRoute
@@ -258,6 +290,7 @@ export interface FileRoutesById {
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/payments': typeof DashboardPaymentsRoute
   '/dashboard/promocode': typeof DashboardPromocodeRoute
+  '/dashboard/trips': typeof DashboardTripsRoute
   '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard/vehicle': typeof DashboardVehicleRoute
   '/driver/driverprofile': typeof DriverDriverprofileRoute
@@ -269,7 +302,10 @@ export interface FileRoutesById {
   '/driver/vehicle': typeof DriverVehicleRoute
   '/user/reviews': typeof UserReviewsRoute
   '/user/ridehistory': typeof UserRidehistoryRoute
+  '/user/support': typeof UserSupportRoute
+  '/user/trips': typeof UserTripsRoute
   '/user/userprofile': typeof UserUserprofileRoute
+  '/user/wallet': typeof UserWalletRoute
   '/Vehicles/': typeof VehiclesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/driver/': typeof DriverIndexRoute
@@ -291,6 +327,7 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/payments'
     | '/dashboard/promocode'
+    | '/dashboard/trips'
     | '/dashboard/users'
     | '/dashboard/vehicle'
     | '/driver/driverprofile'
@@ -302,7 +339,10 @@ export interface FileRouteTypes {
     | '/driver/vehicle'
     | '/user/reviews'
     | '/user/ridehistory'
+    | '/user/support'
+    | '/user/trips'
     | '/user/userprofile'
+    | '/user/wallet'
     | '/Vehicles/'
     | '/dashboard/'
     | '/driver/'
@@ -318,6 +358,7 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/payments'
     | '/dashboard/promocode'
+    | '/dashboard/trips'
     | '/dashboard/users'
     | '/dashboard/vehicle'
     | '/driver/driverprofile'
@@ -329,7 +370,10 @@ export interface FileRouteTypes {
     | '/driver/vehicle'
     | '/user/reviews'
     | '/user/ridehistory'
+    | '/user/support'
+    | '/user/trips'
     | '/user/userprofile'
+    | '/user/wallet'
     | '/Vehicles'
     | '/dashboard'
     | '/driver'
@@ -349,6 +393,7 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/payments'
     | '/dashboard/promocode'
+    | '/dashboard/trips'
     | '/dashboard/users'
     | '/dashboard/vehicle'
     | '/driver/driverprofile'
@@ -360,7 +405,10 @@ export interface FileRouteTypes {
     | '/driver/vehicle'
     | '/user/reviews'
     | '/user/ridehistory'
+    | '/user/support'
+    | '/user/trips'
     | '/user/userprofile'
+    | '/user/wallet'
     | '/Vehicles/'
     | '/dashboard/'
     | '/driver/'
@@ -464,11 +512,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VehiclesIndexRouteImport
       parentRoute: typeof VehiclesRoute
     }
+    '/user/wallet': {
+      id: '/user/wallet'
+      path: '/wallet'
+      fullPath: '/user/wallet'
+      preLoaderRoute: typeof UserWalletRouteImport
+      parentRoute: typeof UserRoute
+    }
     '/user/userprofile': {
       id: '/user/userprofile'
       path: '/userprofile'
       fullPath: '/user/userprofile'
       preLoaderRoute: typeof UserUserprofileRouteImport
+      parentRoute: typeof UserRoute
+    }
+    '/user/trips': {
+      id: '/user/trips'
+      path: '/trips'
+      fullPath: '/user/trips'
+      preLoaderRoute: typeof UserTripsRouteImport
+      parentRoute: typeof UserRoute
+    }
+    '/user/support': {
+      id: '/user/support'
+      path: '/support'
+      fullPath: '/user/support'
+      preLoaderRoute: typeof UserSupportRouteImport
       parentRoute: typeof UserRoute
     }
     '/user/ridehistory': {
@@ -548,6 +617,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardUsersRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/trips': {
+      id: '/dashboard/trips'
+      path: '/trips'
+      fullPath: '/dashboard/trips'
+      preLoaderRoute: typeof DashboardTripsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/promocode': {
       id: '/dashboard/promocode'
       path: '/promocode'
@@ -605,6 +681,7 @@ interface DashboardRouteChildren {
   DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
   DashboardPaymentsRoute: typeof DashboardPaymentsRoute
   DashboardPromocodeRoute: typeof DashboardPromocodeRoute
+  DashboardTripsRoute: typeof DashboardTripsRoute
   DashboardUsersRoute: typeof DashboardUsersRoute
   DashboardVehicleRoute: typeof DashboardVehicleRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -615,6 +692,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAnalyticsRoute: DashboardAnalyticsRoute,
   DashboardPaymentsRoute: DashboardPaymentsRoute,
   DashboardPromocodeRoute: DashboardPromocodeRoute,
+  DashboardTripsRoute: DashboardTripsRoute,
   DashboardUsersRoute: DashboardUsersRoute,
   DashboardVehicleRoute: DashboardVehicleRoute,
   DashboardIndexRoute: DashboardIndexRoute,
@@ -652,14 +730,20 @@ const DriverRouteWithChildren =
 interface UserRouteChildren {
   UserReviewsRoute: typeof UserReviewsRoute
   UserRidehistoryRoute: typeof UserRidehistoryRoute
+  UserSupportRoute: typeof UserSupportRoute
+  UserTripsRoute: typeof UserTripsRoute
   UserUserprofileRoute: typeof UserUserprofileRoute
+  UserWalletRoute: typeof UserWalletRoute
   UserIndexRoute: typeof UserIndexRoute
 }
 
 const UserRouteChildren: UserRouteChildren = {
   UserReviewsRoute: UserReviewsRoute,
   UserRidehistoryRoute: UserRidehistoryRoute,
+  UserSupportRoute: UserSupportRoute,
+  UserTripsRoute: UserTripsRoute,
   UserUserprofileRoute: UserUserprofileRoute,
+  UserWalletRoute: UserWalletRoute,
   UserIndexRoute: UserIndexRoute,
 }
 

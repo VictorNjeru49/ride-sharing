@@ -32,22 +32,31 @@ export class Payment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Ride, (r) => r.payments)
+  @ManyToOne(() => Ride, (r) => r.payments, {
+    cascade: true,
+    nullable: true,
+    eager: true,
+  })
   @JoinColumn()
   ride: Ride;
 
-  @ManyToOne(() => User, (u) => u.payments)
+  @ManyToOne(() => User, (u) => u.payments, {
+    cascade: true,
+    nullable: true,
+    eager: true,
+  })
   user: User;
 
   @Column('decimal', { precision: 10, scale: 2 })
   amount: number;
 
-  @Column()
+  @Column({ nullable: true })
   currency: string;
 
   @Column({
     type: 'enum',
     enum: PaymentMethod,
+    default: PaymentMethod.CREDIT_CARD,
   })
   method: PaymentMethod;
 

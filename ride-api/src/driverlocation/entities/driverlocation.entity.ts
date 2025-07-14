@@ -1,3 +1,5 @@
+import { Driverprofile } from 'src/driverprofile/entities/driverprofile.entity';
+import { Riderprofile } from 'src/riderprofile/entities/riderprofile.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -34,7 +36,23 @@ export class Driverlocation {
 
   @ManyToOne(() => User, (user) => user.driverLocations, {
     onDelete: 'CASCADE',
+    eager: true,
   })
   @JoinColumn({ name: 'driverId' })
   driver: User;
+  @ManyToOne(() => Driverprofile, (profile) => profile.locationHistory, {
+    onDelete: 'CASCADE',
+    nullable: true,
+    eager: true,
+  })
+  @JoinColumn({ name: 'driverProfileId' })
+  driverProfile: Driverprofile;
+
+  @ManyToOne(() => Riderprofile, (profile) => profile.riderHistory, {
+    onDelete: 'CASCADE',
+    nullable: true,
+    eager: true,
+  })
+  @JoinColumn({ name: 'RiderProfileeId' })
+  riderProfile: Driverprofile;
 }

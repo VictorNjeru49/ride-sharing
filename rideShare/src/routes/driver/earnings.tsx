@@ -4,6 +4,7 @@ import { getUserById } from '@/api/UserApi'
 import { authStore } from '@/app/store'
 import { DollarSign } from 'lucide-react'
 import { format } from 'date-fns'
+import type { Payment } from '@/types/alltypes'
 
 export const Route = createFileRoute('/driver/earnings')({
   component: RouteComponent,
@@ -17,6 +18,7 @@ function RouteComponent() {
     queryFn: () => getUserById(userId!),
     enabled: !!userId,
   })
+  const displayName = user?.firstName || 'Alex'
 
   const earnings = user?.payments || []
 
@@ -24,11 +26,15 @@ function RouteComponent() {
     (acc, payment) => acc + payment.amount,
     0,
   )
+  console.log(user)
 
   return (
     <section className="p-6 bg-gray-50 min-h-screen space-y-6">
       <div>
-        <h2 className="text-2xl font-semibold text-gray-800 mb-1">Earnings</h2>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-1">
+          {' '}
+          {displayName} Earnings
+        </h2>
         <p className="text-gray-600 mb-4">
           Track your daily, weekly, and monthly earnings.
         </p>
@@ -40,7 +46,8 @@ function RouteComponent() {
             Total Earnings
           </h3>
           <div className="text-green-600 font-bold text-xl flex items-center gap-2">
-            <DollarSign className="w-5 h-5" />${totalEarnings.toFixed(2)}
+            <DollarSign className="w-5 h-5" />$
+            {Number(totalEarnings).toFixed(2)}
           </div>
         </div>
 
@@ -68,13 +75,13 @@ function RouteComponent() {
                   </td>
                 </tr>
               ) : (
-                earnings.map((payment) => (
+                earnings.map((payment: Payment) => (
                   <tr key={payment.id} className="border-b last:border-b-0">
                     <td className="px-4 py-2 text-gray-700">
                       {format(new Date(payment.paidAt), 'dd MMM yyyy')}
                     </td>
                     <td className="px-4 py-2 text-green-600 font-medium">
-                      ${payment.amount.toFixed(2)}
+                      ${Number(payment.amount).toFixed(2)}
                     </td>
                     <td className="px-4 py-2 capitalize text-gray-700">
                       {payment.method.replace('_', ' ')}

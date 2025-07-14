@@ -1,3 +1,4 @@
+import { Driverlocation } from 'src/driverlocation/entities/driverlocation.entity';
 import { Ride } from 'src/ride/entities/ride.entity';
 import { Riderequest } from 'src/riderequest/entities/riderequest.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -31,12 +32,17 @@ export class Riderprofile {
 
   @OneToOne(() => User, (user) => user.riderProfile, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @OneToMany(() => Riderequest, (rr) => rr.rider) rideRequests: Riderequest[];
+  @OneToMany(() => Riderequest, (rr) => rr.rider, { eager: true })
+  rideRequests: Riderequest[];
 
-  @OneToMany(() => Ride, (r) => r.rider) ridesTaken: Ride[];
+  @OneToMany(() => Ride, (r) => r.rider, { eager: true }) ridesTaken: Ride[];
+
+  @OneToMany(() => Driverlocation, (dl) => dl.riderProfile, {
+    cascade: true,
+  })
+  riderHistory: Driverlocation[];
 }

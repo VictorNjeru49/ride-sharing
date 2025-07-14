@@ -26,22 +26,27 @@ function RouteComponent() {
 
   const displayName = user?.firstName || 'Alex'
 
-  const rawEarnings = Array.isArray(user?.walletTransactions)
-    ? user.walletTransactions.reduce((acc, p) => acc + (p.amount || 0), 0)
-    : 125.5
+  const todayEarnings = (() => {
+    if (!Array.isArray(user?.walletTransactions)) return '125.50'
 
-  const todayEarnings =
-    typeof rawEarnings === 'number' && !isNaN(rawEarnings) ? rawEarnings : 125.5
+    const sum = user.walletTransactions.reduce(
+      (acc, p) => acc + (Number(p.amount) || 0),
+      0,
+    )
 
-  const totalTrips = user?.ridesOffered?.length || 8
+    return typeof sum === 'number' && !isNaN(sum) ? sum.toFixed(2) : '125.50'
+  })()
+  
 
-  const avgRating = user?.ratingsReceived?.length
-    ? (
-        user.ratingsReceived.reduce((acc, r) => acc + r.score, 0) /
-        user.ratingsReceived.length
-      ).toFixed(1)
-    : '4.9'
+    const totalTrips = user?.driverProfile?.ridesOffered?.length || 8
 
+    const avgRating = user?.driverProfile?.rating || '4.9'
+  
+
+    if (isLoading) {
+      return <div>Loading dashboard...</div>
+    }
+    
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
       {/* Welcome Section */}
@@ -56,7 +61,7 @@ function RouteComponent() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <SummaryCard
           label="Today’s Earnings"
-          value={`$${todayEarnings.toFixed(2)}`}
+          value={`$${todayEarnings}`}
           icon={<DollarSign className="w-5 h-5" />}
           color="green"
         />
@@ -199,3 +204,6 @@ function TripItem({
     </li>
   )
 }
+
+
+

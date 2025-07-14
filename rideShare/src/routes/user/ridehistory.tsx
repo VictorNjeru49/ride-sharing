@@ -3,155 +3,230 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Calendar } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { authStore } from '@/app/store'
+import { getUserById } from '@/api/UserApi'
+import { format } from 'date-fns'
+import { UserRole, type Ride } from '@/types/alltypes'
 
 export const Route = createFileRoute('/user/ridehistory')({
   component: RideHistoryPage,
 })
 
 function RideHistoryPage() {
-  const [filters, setFilters] = useState({
-    rideType: 'All Rides',
-    vehicleType: 'All Vehicle Types',
-    date: '',
+  const userId = authStore.state.user?.id
+
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['user‑with‑rides', userId],
+    queryFn: () => getUserById(userId!), // assumes this returns profiles + rides
+    enabled: !!userId,
   })
 
-  const rideData = [
-    {
-      type: 'Premium Ride',
-      date: 'Dec 15, 2024 - 2:30 PM',
-      from: 'Downtown Office Plaza',
-      to: 'Central Airport Terminal',
-      distance: '12.4 mi',
-      duration: '28 min',
-      driver: 'Michael R.',
-      rating: '4.9',
-      status: 'Completed',
-      fare: '$24.50',
-      fee: '$2.45',
-      tip: '$5.00',
-      total: '$31.95',
-      card: '**** 4532',
-    },
-    {
-      type: 'Economy Ride',
-      date: 'Dec 12, 2024 - 8:15 AM',
-      from: 'Home',
-      to: 'City Mall',
-      distance: '5.2 mi',
-      duration: '18 min',
-      driver: 'Sarah K.',
-      rating: '5.0',
-      status: 'Completed',
-      fare: '$12.80',
-      fee: '$1.28',
-      tip: '$2.50',
-      total: '$16.58',
-      card: '**** 4532',
-    },
-    {
-      type: 'SUV Ride',
-      date: 'Dec 10, 2024 - 6:45 PM',
-      from: 'Restaurant District',
-      to: 'Concert Hall',
-      distance: '—',
-      duration: '—',
-      driver: '—',
-      rating: '—',
-      status: 'Cancelled',
-      fare: '$0.00',
-      fee: '—',
-      tip: '—',
-      total: '$0.00',
-      card: '—',
-      reason:
-        'Driver was unable to reach pickup location due to traffic conditions.',
-    },
-  ]
+  const ridesTaken: Ride[] = useMemo(() => {
+    if (!user) return []
+    const allRides =
+      user.role === UserRole.RIDER
+        ? (user.riderProfile?.ridesTaken ?? [])
+        : user.role === UserRole.DRIVER
+          ? (user.driverProfile?.ridesTaken ?? [])
+          : []
+    return allRides.filter((r) => r.pickupLocation && r.dropoffLocation)
+  }, [user])
+
+  const [filters, setFilters] = useState({
+    rideStatus: 'All Rides', // Completed | Cancelled
+    vehicleType: 'All Vehicle Types',
+    date: '', // ISO yyyy‑MM‑dd
+  })
+
+  const onFilterChange =
+    (key: keyof typeof filters) =>
+    (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) =>
+      setFilters((prev) => ({ ...prev, [key]: e.target.value }))
+
+  const filteredRides = useMemo(() => {
+    return ridesTaken.filter((r) => {
+      if (filters.rideStatus !== 'All Rides' && r.status !== filters.rideStatus)
+        return false
+      if (
+        filters.vehicleType !== 'All Vehicle Types' &&
+        r.driver?.vehicle.vehicleType !== filters.vehicleType
+      )
+        return false
+      if (
+        filters.date &&
+        format(new Date(r.createdAt), 'yyyy‑MM‑dd') !== filters.date
+      )
+        return false
+      return true
+    })
+  }, [ridesTaken, filters])
+
+  if (isLoading) {
+    return (
+      <div className="p-6 text-center text-gray-500">
+        {' '}
+        Loading ride history…{' '}
+      </div>
+    )
+  }
+  if (error) {
+    return (
+      <div className="p-6 text-center text-red-500">
+        Error loading ride history.
+      </div>
+    )
+  }
+  if (!filteredRides.length) {
+    return (
+      <div className="p-6 text-center text-gray-600">
+        No rides match the current filters.
+      </div>
+    )
+  }
 
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Ride History</h1>
       <p className="text-gray-600">Track all your rides and transactions</p>
 
-      {/* Filter Controls */}
+      {/* 🔎 Filter Controls */}
       <div className="flex gap-4 items-center flex-wrap">
-        <select className="border px-3 py-2 rounded-md">
+        <select
+          className="border px-3 py-2 rounded-md"
+          value={filters.rideStatus}
+          onChange={onFilterChange('rideStatus')}
+        >
           <option>All Rides</option>
-          <option>Completed</option>
-          <option>Cancelled</option>
+          <option>completed</option>
+          <option>cancelled</option>
         </select>
-        <select className="border px-3 py-2 rounded-md">
+
+        <select
+          className="border px-3 py-2 rounded-md"
+          value={filters.vehicleType}
+          onChange={onFilterChange('vehicleType')}
+        >
           <option>All Vehicle Types</option>
-          <option>Economy</option>
-          <option>Premium</option>
-          <option>SUV</option>
+          <option>economy</option>
+          <option>premium</option>
+          <option>suv</option>
         </select>
+
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 text-gray-400" />
-          <Input type="date" className="w-[160px]" />
+          <Input
+            type="date"
+            className="w-[160px]"
+            value={filters.date}
+            onChange={onFilterChange('date')}
+          />
         </div>
-        <Button>Apply Filters</Button>
+
+        <Button
+          variant="outline"
+          onClick={() =>
+            setFilters({
+              rideStatus: 'All Rides',
+              vehicleType: 'All Vehicle Types',
+              date: '',
+            })
+          }
+        >
+          Reset
+        </Button>
       </div>
 
-      {/* Ride Cards */}
-      {rideData.map((ride, index) => (
-        <Card key={index} className="shadow-sm border border-gray-200">
+      {/* 🛣️ Ride Cards */}
+      {filteredRides.map((ride) => (
+        <Card key={ride.id} className="shadow-sm border border-gray-200">
           <CardContent className="p-4 grid md:grid-cols-3 gap-4">
+            {/* Column 1 – route & cancellation info */}
             <div className="space-y-1">
-              <h2 className="font-semibold text-sm text-gray-800">
-                {ride.type}
+              <h2 className="font-semibold text-sm text-gray-800 capitalize">
+                {ride.driver?.vehicle?.vehicleType ?? 'Ride'}
               </h2>
-              <p className="text-xs text-gray-500">{ride.date}</p>
+              <p className="text-xs text-gray-500">
+                {format(new Date(ride.createdAt), 'PP - p')}
+              </p>
+
               <div className="text-sm mt-2">
                 <p>
-                  <strong>From:</strong> {ride.from}
+                  <strong>From:</strong> {ride.pickupLocation?.address ?? '—'}
                 </p>
                 <p>
-                  <strong>To:</strong> {ride.to}
+                  <strong>To:</strong> {ride.dropoffLocation?.address ?? '—'}
                 </p>
               </div>
-              {ride.status === 'Cancelled' && (
+
+              {ride.status === 'cancelled' && ride.cancellation && (
                 <p className="mt-2 text-sm text-red-500 bg-red-50 p-2 rounded-md">
-                  {ride.reason}
+                  {ride.cancellation.reason}
                 </p>
               )}
             </div>
 
+            {/* Column 2 – metrics */}
             <div className="text-sm space-y-1">
               <p>
-                <strong>Distance:</strong> {ride.distance}
+                <strong>Distance:</strong> {ride.distanceKm ?? '—'} km
               </p>
               <p>
-                <strong>Duration:</strong> {ride.duration}
+                <strong>Duration:</strong>{' '}
+                {ride.endTime && ride.startTime
+                  ? `${Math.round(
+                      (new Date(ride.endTime).getTime() -
+                        new Date(ride.startTime).getTime()) /
+                        60000,
+                    )} min`
+                  : '—'}
               </p>
               <p>
-                <strong>Driver:</strong> {ride.driver}
+                <strong>Driver:</strong> {ride.driver?.user?.firstName ?? '—'}
               </p>
               <p>
-                <strong>Rating:</strong> {ride.rating}
+                <strong>Rating:</strong>{' '}
+                {Array.isArray(ride.ratings) && ride.ratings.length > 0
+                  ? Number(ride.ratings[0].score).toFixed(1)
+                  : '—'}
               </p>
             </div>
 
+            {/* Column 3 – pricing & status */}
             <div className="text-sm space-y-1 border-l pl-4">
               <p>
-                <strong>Ride Fare:</strong> {ride.fare}
+                <strong>Ride Fare:</strong> ${Number(ride.fare).toFixed(2)}
               </p>
               <p>
-                <strong>Service Fee:</strong> {ride.fee}
+                <strong>Service Fee:</strong> $
+                {Number(ride.fare * 0.1).toFixed(2)}
               </p>
               <p>
-                <strong>Tip:</strong> {ride.tip}
+                <strong>Tip:</strong>{' '}
+                {ride.payment && ride.payment.amount > ride.fare
+                  ? `$${(ride.payment.amount - ride.fare).toFixed(2)}`
+                  : '$0.00'}
               </p>
               <p>
-                <strong>Total:</strong> {ride.total}
+                <strong>Total:</strong> $
+                {Number(ride.payment?.amount).toFixed(2) ?? '—'}
               </p>
               <p>
-                <strong>Card:</strong> {ride.card}
+                <strong>Card:</strong> **** {ride.payment?.currency ?? '—'}
               </p>
+
               <p>
                 <span
-                  className={`text-xs font-semibold px-2 py-1 rounded ${ride.status === 'Completed' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}
+                  className={`text-xs font-semibold px-2 py-1 rounded ${
+                    ride.status === 'completed'
+                      ? 'bg-green-100 text-green-600'
+                      : 'bg-red-100 text-red-600'
+                  }`}
                 >
                   {ride.status}
                 </span>

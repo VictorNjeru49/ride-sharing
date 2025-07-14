@@ -17,7 +17,6 @@ import { Riderprofile } from 'src/riderprofile/entities/riderprofile.entity';
 import { Supportticket } from 'src/supportticket/entities/supportticket.entity';
 import { Userpromousage } from 'src/userpromousage/entities/userpromousage.entity';
 import { Wallet } from 'src/wallets/entities/wallet.entity';
-import { Ride } from 'src/ride/entities/ride.entity';
 
 @Module({
   imports: [
@@ -30,7 +29,6 @@ import { Ride } from 'src/ride/entities/ride.entity';
       Driverprofile,
       Notification,
       Payment,
-      Ride,
       Promocode,
       Rating,
       Ridefeedback,

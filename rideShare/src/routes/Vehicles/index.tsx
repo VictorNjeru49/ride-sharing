@@ -131,7 +131,7 @@ function RouteComponent() {
 
       <div className="min-h-screen bg-gray-100 flex justify-center items-start p-8 border">
         <Toaster />
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-7xl w-full border">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-7xl w-full">
           {filteredVehicles.map((vehicle) => (
             <Card key={vehicle.id} className="border border-gray-200">
               <img

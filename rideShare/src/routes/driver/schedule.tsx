@@ -2,7 +2,6 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { getUserById } from '@/api/UserApi'
 import { authStore } from '@/app/store'
-import { Clock } from 'lucide-react'
 import { format } from 'date-fns'
 
 export const Route = createFileRoute('/driver/schedule')({
@@ -18,7 +17,7 @@ function RouteComponent() {
     enabled: !!userId,
   })
 
-  const scheduleHistory = user?.DriverLocations || []
+  const scheduleHistory = user?.driverLocations || []
 
   return (
     <section className="p-6 bg-gray-50 min-h-screen space-y-6">

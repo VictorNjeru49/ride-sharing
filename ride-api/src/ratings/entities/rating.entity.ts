@@ -12,9 +12,15 @@ export class Rating {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Ride, (r) => r.ratings) ride: Ride;
-  @ManyToOne(() => User, (u) => u.ratingsGiven) rater: User;
-  @ManyToOne(() => User, (u) => u.ratingsReceived) ratee: User;
+  @ManyToOne(() => Ride, (r) => r.ratings, {
+    eager: true,
+    nullable: true,
+    cascade: true,
+  })
+  ride: Ride;
+
+  @ManyToOne(() => User, (u) => u.ratingsGiven, { eager: true }) rater: User;
+  @ManyToOne(() => User, (u) => u.ratingsReceived, { eager: true }) ratee: User;
   @Column('int')
   score: number;
 
