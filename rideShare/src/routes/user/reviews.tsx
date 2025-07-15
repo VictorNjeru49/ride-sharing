@@ -38,11 +38,11 @@ function RouteComponent() {
     )
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10">
+    <div className="mx-auto px-4 py-10">
       <h1 className="text-2xl font-bold mb-6 text-center">
         Reviews Received by {user.firstName || 'User'}
       </h1>
-      <ul className="space-y-6">
+      <ul className="space-y-6 flex flex-row flex-wrap gap-3">
         {user.ratingsReceived.map((rating: any) => (
           <li
             key={rating.id}

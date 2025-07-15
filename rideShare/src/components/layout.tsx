@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Users,
   Car,
@@ -42,6 +42,7 @@ type NavEntry = NavItemBase | NavDropdown
 
 function Layout({ role }: { role: UserRole }) {
   const router = useRouterState()
+  const [mobileOpen, setMobileOpen] = useState(false)
   const navigate = useNavigate()
   const logout = useLogout()
   const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>(
@@ -72,6 +73,12 @@ function Layout({ role }: { role: UserRole }) {
       },
     })
   }
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : ''
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [mobileOpen])
 
     // Admin nav with dropdown
   const adminNavItems: NavEntry[] = [
@@ -253,126 +260,230 @@ function Layout({ role }: { role: UserRole }) {
   }
 
   return (
-    <aside className="w-64 bg-white shadow-md border-r hidden md:flex flex-col min-h-screen">
-      {/* Header */}
-      <div className="p-4 font-bold text-xl border-b">
-        <Link to="/">🚗 RideShare</Link>
+    <>
+      {/* Mobile Header */}
+      <div className="md:hidden p-4 flex items-center justify-between bg-white shadow border-b">
+        <button className="text-gray-700" onClick={() => setMobileOpen(true)}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
+        <span className="text-lg font-semibold">🚗 RideShare</span>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex flex-col flex-grow p-4 space-y-2 text-sm font-medium">
-        {navItems.map((item) => {
-          if ('label' in item) {
-            const isOpen = openDropdowns[item.label] ?? false
-            return (
-              <div key={item.label}>
-                <button
-                  type="button"
-                  onClick={() => toggleDropdown(item.label)}
-                  aria-expanded={isOpen}
-                  className="flex items-center justify-between w-full px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700"
-                >
-                  <span className="flex items-center gap-2 font-medium">
-                    {item.icon || <Users className="w-4 h-4" />}
-                    {item.label}
-                  </span>
-                  {isOpen ? (
-                    <ChevronUp className="w-4 h-4" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4" />
-                  )}
-                </button>
-                {isOpen && (
-                  <div className="ml-6 mt-2 flex flex-col space-y-1">
-                    {item.children.map((sub) => {
-                      if (sub.name === 'Logout') {
-                        return (
-                          <button
-                            key="logout-button"
-                            onClick={handleLogout}
-                            className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 w-full text-left"
-                            type="button"
-                          >
-                            {sub.icon}
-                            {sub.name}
-                          </button>
-                        )
-                      }
+      {/* Main Wrapper */}
+      <div className="flex">
+        {/* Desktop Sidebar */}
+        <aside className="w-64 bg-white shadow-md border-r hidden md:flex flex-col min-h-screen">
+          {/* Header */}
+          <div className="p-4 font-bold text-xl border-b">
+            <Link to="/">🚗 RideShare</Link>
+          </div>
 
-                      const isActive = router.location.pathname === sub.path
-                      return (
-                        <Link
-                          key={sub.path}
-                          to={sub.path}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 ${
-                            isActive
-                              ? 'bg-blue-100 text-blue-600 font-semibold'
-                              : 'text-gray-700'
-                          }`}
-                        >
-                          {sub.icon}
-                          {sub.name}
-                        </Link>
-                      )
-                    })}
+          {/* Navigation */}
+          <nav className="flex flex-col flex-grow p-4 space-y-2 text-sm font-medium">
+            {navItems.map((item) => {
+              if ('label' in item) {
+                const isOpen = openDropdowns[item.label] ?? false
+                return (
+                  <div key={item.label}>
+                    <button
+                      type="button"
+                      onClick={() => toggleDropdown(item.label)}
+                      aria-expanded={isOpen}
+                      className="flex items-center justify-between w-full px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700"
+                    >
+                      <span className="flex items-center gap-2 font-medium">
+                        {item.icon || <Users className="w-4 h-4" />}
+                        {item.label}
+                      </span>
+                      {isOpen ? (
+                        <ChevronUp className="w-4 h-4" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4" />
+                      )}
+                    </button>
+                    {isOpen && (
+                      <div className="ml-6 mt-2 flex flex-col space-y-1">
+                        {item.children.map((sub) => {
+                          if (sub.name === 'Logout') {
+                            return (
+                              <button
+                                key="logout-button"
+                                onClick={handleLogout}
+                                className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 w-full text-left"
+                                type="button"
+                              >
+                                {sub.icon}
+                                {sub.name}
+                              </button>
+                            )
+                          }
+
+                          const isActive = router.location.pathname === sub.path
+                          return (
+                            <Link
+                              key={sub.path}
+                              to={sub.path}
+                              className={`flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 ${
+                                isActive
+                                  ? 'bg-blue-100 text-blue-600 font-semibold'
+                                  : 'text-gray-700'
+                              }`}
+                            >
+                              {sub.icon}
+                              {sub.name}
+                            </Link>
+                          )
+                        })}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            )
-          }
+                )
+              }
 
-          if (item.name === 'Logout') {
-            return (
-              <button
-                key="logout-button"
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 w-full text-left"
-                type="button"
-              >
-                {item.icon}
-                {item.name}
-              </button>
-            )
-          }
+              if (item.name === 'Logout') {
+                return (
+                  <button
+                    key="logout-button"
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 w-full text-left"
+                    type="button"
+                  >
+                    {item.icon}
+                    {item.name}
+                  </button>
+                )
+              }
 
-          const isActive = router.location.pathname === item.path
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 ${
-                isActive
-                  ? 'bg-blue-100 text-blue-600 font-semibold'
-                  : 'text-gray-700'
-              }`}
-            >
-              {item.icon}
-              {item.name}
-            </Link>
-          )
-        })}
-      </nav>
+              const isActive = router.location.pathname === item.path
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 ${
+                    isActive
+                      ? 'bg-blue-100 text-blue-600 font-semibold'
+                      : 'text-gray-700'
+                  }`}
+                >
+                  {item.icon}
+                  {item.name}
+                </Link>
+              )
+            })}
+          </nav>
 
-      {/* Footer */}
-      <div className="p-4 border-t bg-gray-50 flex items-center gap-3">
-        <img
-          src={
-            authStore.state.avatar?.profilePicture ||
-            'https://ui-avatars.com/api/?name=User'
-          }
-          alt="Avatar"
-          className="w-10 h-10 rounded-full object-cover border border-gray-200"
-        />
-        <div className="text-sm leading-tight">
-          <p className="font-medium text-gray-800">
-            {authStore.state.user?.email || 'Unknown'}
-          </p>
-          <p className="text-xs text-gray-500 capitalize">
-            {authStore.state.user?.role || 'N/A'}
-          </p>
+          {/* Footer */}
+          <div className="p-4 border-t bg-gray-50 flex items-center gap-3">
+            <img
+              src={
+                authStore.state.avatar?.profilePicture ||
+                'https://ui-avatars.com/api/?name=User'
+              }
+              alt="Avatar"
+              className="w-10 h-10 rounded-full object-cover border border-gray-200"
+            />
+            <div className="text-sm leading-tight">
+              <p className="font-medium text-gray-800">
+                {authStore.state.user?.email || 'Unknown'}
+              </p>
+              <p className="text-xs text-gray-500 capitalize">
+                {authStore.state.user?.role || 'N/A'}
+              </p>
+            </div>
+          </div>
+        </aside>
+        {/* Main Content (placeholder) */}
+        <div className="flex-1 p-4">
+          {/* Your outlet or main children goes here */}
         </div>
       </div>
-    </aside>
+
+      {/* Mobile Sidebar Overlay */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-40 md:hidden bg-black/50">
+          <aside className="fixed left-0 top-0 h-full w-64 bg-white shadow-lg z-50 p-4 flex flex-col mt-12">
+            <button
+              className="self-end mb-4"
+              onClick={() => setMobileOpen(false)}
+            >
+              ✕
+            </button>
+            <nav className="space-y-2 text-sm font-medium overflow-y-auto">
+              {navItems.map((item) => {
+                if ('label' in item) {
+                  const isOpen = openDropdowns[item.label] ?? false
+                  return (
+                    <div key={item.label}>
+                      <button
+                        onClick={() => toggleDropdown(item.label)}
+                        className="flex items-center justify-between w-full px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700"
+                      >
+                        <span className="flex items-center gap-2">
+                          {item.icon}
+                          {item.label}
+                        </span>
+                        {isOpen ? <ChevronUp /> : <ChevronDown />}
+                      </button>
+                      {isOpen && (
+                        <div className="ml-6 mt-2 flex flex-col space-y-1">
+                          {item.children.map((sub) =>
+                            sub.name === 'Logout' ? (
+                              <button
+                                key="logout-button"
+                                onClick={handleLogout}
+                                className="text-left flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700"
+                              >
+                                {sub.icon}
+                                {sub.name}
+                              </button>
+                            ) : (
+                              <Link
+                                key={sub.path}
+                                to={sub.path}
+                                onClick={() => setMobileOpen(false)}
+                                className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700"
+                              >
+                                {sub.icon}
+                                {sub.name}
+                              </Link>
+                            ),
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )
+                }
+
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700"
+                  >
+                    {item.icon}
+                    {item.name}
+                  </Link>
+                )
+              })}
+            </nav>
+          </aside>
+        </div>
+      )}
+    </>
   )
 }
 

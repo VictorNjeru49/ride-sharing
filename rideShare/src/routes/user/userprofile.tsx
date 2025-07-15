@@ -22,7 +22,7 @@ function RouteComponent() {
   return  (
     <>
 
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-6 mx-auto">
           <h2 className="text-2xl font-bold">Profile Settings</h2>
           <p className="text-sm text-muted-foreground">
             Manage your account settings and preferences

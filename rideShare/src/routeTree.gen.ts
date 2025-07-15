@@ -15,6 +15,9 @@ import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DriverRouteImport } from './routes/driver'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as ChatbotRouteImport } from './routes/chatbot'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as VehiclesRouteImport } from './routes/Vehicles'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UserIndexRouteImport } from './routes/user/index'
@@ -71,6 +74,21 @@ const DriverRoute = DriverRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatbotRoute = ChatbotRouteImport.update({
+  id: '/chatbot',
+  path: '/chatbot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VehiclesRoute = VehiclesRouteImport.update({
@@ -212,6 +230,9 @@ const VehiclesVehiclesIdRoute = VehiclesVehiclesIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/Vehicles': typeof VehiclesRouteWithChildren
+  '/about': typeof AboutRoute
+  '/chatbot': typeof ChatbotRoute
+  '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/driver': typeof DriverRouteWithChildren
   '/login': typeof LoginRoute
@@ -246,6 +267,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/chatbot': typeof ChatbotRoute
+  '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
   '/payments': typeof PaymentsRoute
   '/register': typeof RegisterRoute
@@ -279,6 +303,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/Vehicles': typeof VehiclesRouteWithChildren
+  '/about': typeof AboutRoute
+  '/chatbot': typeof ChatbotRoute
+  '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/driver': typeof DriverRouteWithChildren
   '/login': typeof LoginRoute
@@ -316,6 +343,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/Vehicles'
+    | '/about'
+    | '/chatbot'
+    | '/contact'
     | '/dashboard'
     | '/driver'
     | '/login'
@@ -350,6 +380,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
+    | '/chatbot'
+    | '/contact'
     | '/login'
     | '/payments'
     | '/register'
@@ -382,6 +415,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/Vehicles'
+    | '/about'
+    | '/chatbot'
+    | '/contact'
     | '/dashboard'
     | '/driver'
     | '/login'
@@ -418,6 +454,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   VehiclesRoute: typeof VehiclesRouteWithChildren
+  AboutRoute: typeof AboutRoute
+  ChatbotRoute: typeof ChatbotRoute
+  ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   DriverRoute: typeof DriverRouteWithChildren
   LoginRoute: typeof LoginRoute
@@ -468,6 +507,27 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chatbot': {
+      id: '/chatbot'
+      path: '/chatbot'
+      fullPath: '/chatbot'
+      preLoaderRoute: typeof ChatbotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/Vehicles': {
@@ -752,6 +812,9 @@ const UserRouteWithChildren = UserRoute._addFileChildren(UserRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   VehiclesRoute: VehiclesRouteWithChildren,
+  AboutRoute: AboutRoute,
+  ChatbotRoute: ChatbotRoute,
+  ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   DriverRoute: DriverRouteWithChildren,
   LoginRoute: LoginRoute,

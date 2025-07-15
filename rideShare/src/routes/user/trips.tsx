@@ -40,7 +40,7 @@ function RouteComponent() {
     return <div className="p-6 text-gray-500">No trips found.</div>
 
   return (
-    <Card className="mx-auto my-10 w-full max-w-5xl">
+    <Card className="mx-auto my-10 w-full">
       <CardHeader>
         <CardTitle className="text-2xl font-semibold">Your Trips</CardTitle>
       </CardHeader>

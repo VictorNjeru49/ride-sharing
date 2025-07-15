@@ -121,7 +121,7 @@ function RouteComponent() {
   }
 
   return (
-    <Card className="mx-auto mb-10 mt-6 w-full max-w-4xl">
+    <Card className="mx-auto mb-10 mt-6 w-full">
       <CardHeader>
         <CardTitle className="text-xl font-bold">
           Wallet & Payment History

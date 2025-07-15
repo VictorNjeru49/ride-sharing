@@ -72,7 +72,7 @@ function RouteComponent() {
   )
 
   // Pagination state
-  const [currentPage, setCurrentPage] = useState(0) // zero-based page index for MUI TablePagination
+  const [currentPage, setCurrentPage] = useState(0)
   const itemsPerPage = 5
 
   // Vehicles data
@@ -96,6 +96,7 @@ function RouteComponent() {
     vehicleImage: '',
     make: '',
     model: '',
+    rentalrate: 0,
     plateNumber: '',
     color: '',
     capacity: 0,
@@ -118,6 +119,7 @@ function RouteComponent() {
         vehicleImage: '',
         make: '',
         model: '',
+        rentalrate: 0,
         plateNumber: '',
         color: '',
         capacity: 0,
@@ -147,6 +149,7 @@ function RouteComponent() {
           vehicleImage: formData.vehicleImage,
           make: formData.make,
           model: formData.model,
+          rentalrate: Number(formData.rentalrate),
           plateNumber: formData.plateNumber,
           color: formData.color,
           available: formData.available,
@@ -266,6 +269,7 @@ function RouteComponent() {
               <TableCell>Image</TableCell>
               <TableCell>Make</TableCell>
               <TableCell>Model</TableCell>
+              <TableCell>Rate</TableCell>
               <TableCell>Plate Number</TableCell>
               <TableCell>Color</TableCell>
               <TableCell>Capacity</TableCell>
@@ -293,6 +297,7 @@ function RouteComponent() {
                 </TableCell>
                 <TableCell>{vehicle.make}</TableCell>
                 <TableCell>{vehicle.model}</TableCell>
+                <TableCell> {vehicle.rentalrate}</TableCell>
                 <TableCell>{vehicle.plateNumber}</TableCell>
                 <TableCell>{vehicle.color}</TableCell>
                 <TableCell>{vehicle.capacity}</TableCell>
@@ -366,6 +371,14 @@ function RouteComponent() {
               margin="normal"
               value={formData.model || ''}
               onChange={(e) => onChange('model', e.target.value)}
+            />
+            <TextField
+              label="Rental Rate"
+              type='number'
+              fullWidth
+              margin="normal"
+              value={formData.rentalrate || 0}
+              onChange={(e) => onChange('rentalrate', Number(e.target.value))}
             />
             <TextField
               label="Plate Number"

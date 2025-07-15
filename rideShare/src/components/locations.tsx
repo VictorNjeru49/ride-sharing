@@ -62,9 +62,9 @@ export default function MapDialog({
   }, [search])
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} >
-      <DialogContent className="max-w-7xl w-[800px] p-0">
-        <div className="p-4 border-b w-full">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-4xl w-full p-0">
+        <div className="p-4 border-b">
           <h2 className="text-lg font-semibold capitalize">
             Select {mode} Location
           </h2>
@@ -96,12 +96,12 @@ export default function MapDialog({
           )}
         </div>
 
-        <div className="w-full h-[800px]">
+        <div className="w-full h-[400px]">
           <MapContainer
             center={currentCoords ?? [0, 0]}
             zoom={13}
             scrollWheelZoom
-            // style={{ height: '100%', width: '100%' }}
+            style={{ height: '100%', width: '100%' }}
           >
             <TileLayer
               attribution="&copy; OpenStreetMap contributors"

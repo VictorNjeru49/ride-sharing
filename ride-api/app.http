@@ -115,3 +115,19 @@ Content-Type: application/json
 
 ### Delete payment by ID
 DELETE {{url}}/payments/paymentId
+
+
+######
+GET {{url}}/vehicle
+
+####
+PATCH {{url}}/vehicle/ccb796ea-03ef-423b-b9c3-85302f402fb7
+Content-Type: application/json
+
+{
+  "rentalrate": 67.90
+}
+
+
+####
+GET {{url}}/promocode
