@@ -88,7 +88,6 @@ function RouteComponent() {
       agreeToTerms: false,
     } as FormData,
     onSubmit: async ({ value }) => {
-      // Final validation before submission
       const result = formSchema.safeParse(value)
       if (!result.success) {
         console.error('Validation failed:', result.error.issues)
@@ -96,20 +95,16 @@ function RouteComponent() {
       }
 
       try {
-        // Register user
         const res = await create.mutateAsync(result.data)
         toast.success('User created successfully!')
 
-        // Invalidate users list if needed
         queryClient.invalidateQueries({ queryKey: ['users'] })
 
-        // Auto-login after registration
         const login = await loginMutation.mutateAsync({
           email: result.data.email,
           password: result.data.password,
         })
 
-        // Save auth info
         authActions.saveUser({
           isVerified: login.isVerified ?? false,
           tokens: login.tokens,
@@ -120,8 +115,7 @@ function RouteComponent() {
           },
         })
 
-        // After login success, get user role and navigate
-        const loggedInUserRole = login.user?.role // or get from login response if different
+        const loggedInUserRole = login.user?.role 
 
         if (loggedInUserRole === UserRole.ADMIN) {
           navigate({ to: '/dashboard' })
