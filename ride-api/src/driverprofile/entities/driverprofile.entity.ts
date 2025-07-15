@@ -54,6 +54,7 @@ export class Driverprofile {
 
   @OneToMany(() => Ride, (ride) => ride.rider, {
     cascade: true,
+    eager: true,
     onDelete: 'CASCADE',
   })
   ridesTaken: Ride[];

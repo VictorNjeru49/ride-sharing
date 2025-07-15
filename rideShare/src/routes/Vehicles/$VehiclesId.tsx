@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useParams } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { getVehiclesById } from '@/api/UserApi'
@@ -9,6 +9,7 @@ import Step from '@mui/material/Step'
 import StepLabel from '@mui/material/StepLabel'
 import { Button } from '@/components/ui/button' // shadcn button
 import { useEffect, useState } from 'react'
+import { authStore } from '@/app/store'
 
 const toRad = (d: number) => (d * Math.PI) / 180
 function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -22,6 +23,18 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
 }
 
 export const Route = createFileRoute('/Vehicles/$VehiclesId')({
+    //  beforeLoad: ({ location }) => {
+    //     const { isVerified } = authStore.state
+    //     console.log('isVerfied', isVerified)
+    //     if (!isVerified) {
+    //       throw redirect({
+    //         to: '/login',
+    //         search: {
+    //           redirect: location.href,
+    //         },
+    //       })
+    //     }
+    //   },
   component: RouteComponent,
 })
 

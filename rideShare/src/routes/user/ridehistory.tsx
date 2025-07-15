@@ -187,12 +187,17 @@ function RideHistoryPage() {
                   : '—'}
               </p>
               <p>
-                <strong>Driver:</strong> {ride.driver?.user?.firstName ?? '—'}
+                <strong>Driver:</strong>{' '}
+                {ride.ratings?.length
+                  ? ride.ratings.map((r) => r.rater.firstName).join(', ')
+                  : '—'}
               </p>
+
               <p>
                 <strong>Rating:</strong>{' '}
-                {Array.isArray(ride.ratings) && ride.ratings.length > 0
-                  ? Number(ride.ratings[0].score).toFixed(1)
+                {Array.isArray(ride.driver.rating) &&
+                ride.driver.rating.length > 0
+                  ? Number(ride.driver.rating[0].score).toFixed(1)
                   : '—'}
               </p>
             </div>
@@ -214,7 +219,8 @@ function RideHistoryPage() {
               </p>
               <p>
                 <strong>Total:</strong> $
-                {Number(ride.payment?.amount).toFixed(2) ?? '—'}
+                {(Number(ride.fare) * Number(ride.distanceKm)).toFixed(2) ??
+                  '_'}
               </p>
               <p>
                 <strong>Card:</strong> **** {ride.payment?.currency ?? '—'}

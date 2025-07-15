@@ -13,23 +13,17 @@ import { Link } from '@tanstack/react-router'
 
 export default function Header() {
   const { setTheme } = useTheme()
-     const [open, setOpen] = useState(false)
-     const [draft, setDraft] = useState('')
-     const [messages, setMessages] = useState<string[]>([
-       'Hi there 👋\nHow can I help you today?',
-     ])
+  const [open, setOpen] = useState(false)
+  const [draft, setDraft] = useState('')
+  const [messages, setMessages] = useState<string[]>([
+    'Hi there 👋\nHow can I help you today?',
+  ])
 
-     const send = () => {
-       if (!draft.trim()) return
-       setMessages([...messages, draft.trim()])
-       setDraft('')
-     }
-
-     const clearMessages = () => {
-       setMessages([])
-     }
-
-
+  const send = () => {
+    if (!draft.trim()) return
+    setMessages([...messages, draft.trim()])
+    setDraft('')
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white dark:bg-gray-900 shadow-sm">
@@ -65,7 +59,7 @@ export default function Header() {
           >
             About
           </Link>
-            <Link
+          <Link
             to="/contact"
             className="hover:text-blue-600"
             activeProps={{ className: 'text-blue-600 font-bold' }}

@@ -18,13 +18,14 @@ import {
   CalendarDays,
   Truck,
   PhoneCall,
+  MonitorSmartphone,
+  Inbox,
 } from 'lucide-react'
 import { Link, useRouterState, useNavigate } from '@tanstack/react-router'
 import { UserRole } from '@/types/alltypes'
 import { toast } from 'sonner'
 import { authActions, authStore } from '@/app/store'
 import { useLogout } from '@/api/LoginApi'
-
 
 type NavItemBase = {
   name: string
@@ -80,12 +81,17 @@ function Layout({ role }: { role: UserRole }) {
     }
   }, [mobileOpen])
 
-    // Admin nav with dropdown
+  // Admin nav with dropdown
   const adminNavItems: NavEntry[] = [
     {
       name: 'Dashboard',
       path: '/dashboard',
       icon: <Home className="w-4 h-4" />,
+    },
+    {
+      name: 'Inbox',
+      path: '/dashboard/inbox',
+      icon: <Inbox className="w-4 h-4" />,
     },
     {
       label: 'Management',
@@ -133,6 +139,11 @@ function Layout({ role }: { role: UserRole }) {
           path: '/dashboard/adminprofile',
         },
         {
+          name: 'Devices',
+          icon: <MonitorSmartphone className="w-4 h-4" />,
+          path: '/user/devices',
+        },
+        {
           name: 'Logout',
           icon: <LogOut className="w-4 h-4" />,
           path: '',
@@ -153,9 +164,9 @@ function Layout({ role }: { role: UserRole }) {
       icon: <Car className="w-4 h-4" />,
     },
     {
-      name: 'Book Ride',
-      path: '/Vehicles',
-      icon: <Car className="w-4 h-4" />,
+      name: 'Inbox',
+      path: '/user/inbox',
+      icon: <Inbox className="w-4 h-4" />,
     },
     {
       name: 'Wallet',
@@ -182,6 +193,11 @@ function Layout({ role }: { role: UserRole }) {
           path: '/user/userprofile',
         },
         {
+          name: 'Devices',
+          icon: <MonitorSmartphone className="w-4 h-4" />,
+          path: '/user/devices',
+        },
+        {
           name: 'Support',
           path: '/user/support',
           icon: <PhoneCall className="w-4 h-4" />,
@@ -189,7 +205,7 @@ function Layout({ role }: { role: UserRole }) {
         {
           name: 'Logout',
           icon: <LogOut className="w-4 h-4" />,
-          path: '', // path is not used for logout button
+          path: '',
         },
       ],
     },
@@ -205,6 +221,11 @@ function Layout({ role }: { role: UserRole }) {
       name: 'My Trips',
       path: '/driver/trips',
       icon: <Car className="w-4 h-4" />,
+    },
+    {
+      name: 'Inbox',
+      path: '/driver/inbox',
+      icon: <Inbox className="w-4 h-4" />,
     },
     {
       name: 'Earnings',
@@ -242,6 +263,11 @@ function Layout({ role }: { role: UserRole }) {
           icon: <User className="w-4 h-4" />,
         },
         {
+          name: 'Devices',
+          icon: <MonitorSmartphone className="w-4 h-4" />,
+          path: '/user/devices',
+        },
+        {
           name: 'Logout',
           path: '',
           icon: <LogOut className="w-4 h-4" />,
@@ -249,7 +275,7 @@ function Layout({ role }: { role: UserRole }) {
       ],
     },
   ]
-  
+
   let navItems: NavEntry[] = []
   if (role === UserRole.ADMIN) {
     navItems = adminNavItems

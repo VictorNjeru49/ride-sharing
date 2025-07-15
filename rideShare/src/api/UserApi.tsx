@@ -13,6 +13,7 @@ import type {
   RiderProfile,
   SupportTicket,
   UserPromoUsage,
+  Notification,
   userTypes,
   Vehicle,
   Wallet,
