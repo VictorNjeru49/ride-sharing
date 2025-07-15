@@ -2,6 +2,7 @@ import { getUserById } from '@/api/UserApi'
 import { authStore } from '@/app/store'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
+import { RingLoader } from 'react-spinners'
 
 export const Route = createFileRoute('/user/reviews')({
   component: RouteComponent,
@@ -22,7 +23,10 @@ function RouteComponent() {
 
   if (isLoading)
     return (
-      <div className="text-center text-gray-500 py-8">Loading reviews...</div>
+      <div className=" w-fit text-center py-10 m-auto">
+        <RingLoader color="#0017ff" />
+        Loading...
+      </div>
     )
   if (error)
     return (

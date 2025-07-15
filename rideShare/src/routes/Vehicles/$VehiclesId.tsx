@@ -8,8 +8,9 @@ import Stepper from '@mui/material/Stepper'
 import Step from '@mui/material/Step'
 import StepLabel from '@mui/material/StepLabel'
 import { Button } from '@/components/ui/button' // shadcn button
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { authStore } from '@/app/store'
+import {RingLoader} from 'react-spinners'
 
 const toRad = (d: number) => (d * Math.PI) / 180
 function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -97,7 +98,10 @@ function RouteComponent() {
   const totalCost = baseCost + serviceFee + tipFee
 
   // Loading / error ----------------------------------------------------------
-  if (isVehicleLoading) return <div className="text-center py-10">Loading…</div>
+  if (isVehicleLoading) return <div className=" w-fit text-center py-10 m-auto">
+    <RingLoader color="#0017ff" />
+    Loading...
+  </div>
   if (vehicleError)
     return (
       <div className="text-center text-red-600 py-10">Error loading data.</div>

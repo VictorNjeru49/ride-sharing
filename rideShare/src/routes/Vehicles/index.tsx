@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import FilterComponent from '@/components/FilterComponent'
-import { createFileRoute, Outlet, useRouter } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { useCrudOperations } from '@/hooks/crudops'
 import type { Vehicle } from '@/types/alltypes'
 import {
@@ -49,6 +49,7 @@ function RouteComponent() {
       deleteFn: (userId: string) => deleteVehicles(userId),
     },
   )
+
 
   const allVehicles = query.data ?? []
 

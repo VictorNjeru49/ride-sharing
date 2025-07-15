@@ -16,6 +16,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { getUserById, updateUser } from '@/api/UserApi'
 import { UserRole, type userTypes } from '@/types/alltypes'
 import { authStore } from '@/app/store'
+import { RingLoader } from 'react-spinners'
 
 function Profiles() {
   const userId = authStore.state.user?.id
@@ -109,9 +110,17 @@ function Profiles() {
     password = '',
   } = formData
 
+  if (isLoading) {
+    return (
+      <div className=" w-fit text-center py-10 m-auto">
+        <RingLoader color="#0017ff" />
+        Loading...
+      </div>
+    )
+  }
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <Toaster/>
+      <Toaster />
       <h2 className="text-2xl font-bold">Profile Settings</h2>
       <p className="text-sm text-muted-foreground">
         Manage your account settings and preferences

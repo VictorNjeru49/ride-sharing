@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getUserById } from '@/api/UserApi'
 import { authStore } from '@/app/store'
 import { Car } from 'lucide-react'
+import { RingLoader } from 'react-spinners'
 
 export const Route = createFileRoute('/driver/vehicle')({
   component: RouteComponent,
@@ -38,8 +39,9 @@ function RouteComponent() {
         </div>
 
         {isLoading ? (
-          <div className="text-center text-gray-500 py-6">
-            Loading vehicle details...
+          <div className=" w-fit text-center py-10 m-auto">
+            <RingLoader color="#0017ff" />
+            Loading...
           </div>
         ) : !vehicle ? (
           <div className="text-center text-gray-500 py-6">

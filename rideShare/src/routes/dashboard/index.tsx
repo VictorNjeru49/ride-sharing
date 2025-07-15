@@ -29,6 +29,7 @@ import {
   updateUser,
 } from '@/api/UserApi'
 import { useQuery } from '@tanstack/react-query'
+import { RingLoader } from 'react-spinners'
 
 export const Route = createFileRoute('/dashboard/')({
   component: RouteComponent,
@@ -81,7 +82,12 @@ function RouteComponent() {
 
   console.log(`The array data: `, datas)
   if (isLoading) {
-    return <div>Loading dashboard...</div>
+    return (
+      <div className=" w-fit text-center py-10 m-auto">
+        <RingLoader color="#0017ff" />
+        Loading...
+      </div>
+    )
   }
   
   

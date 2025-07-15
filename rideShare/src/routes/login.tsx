@@ -63,7 +63,6 @@ function RouteComponent() {
           password: result.data.password,
         })
 
-        // ✅ Save user to store
         authActions.saveUser({
           isVerified: res.isVerified ?? false,
           tokens: res.tokens,

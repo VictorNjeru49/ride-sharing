@@ -9,6 +9,7 @@ import { authStore } from '@/app/store'
 import { getUserById } from '@/api/UserApi'
 import { format } from 'date-fns'
 import { UserRole, type Ride } from '@/types/alltypes'
+import { RingLoader } from 'react-spinners'
 
 export const Route = createFileRoute('/user/ridehistory')({
   component: RideHistoryPage,
@@ -69,9 +70,9 @@ function RideHistoryPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6 text-center text-gray-500">
-        {' '}
-        Loading ride history…{' '}
+      <div className=" w-fit text-center py-10 m-auto">
+        <RingLoader color="#0017ff" />
+        Loading...
       </div>
     )
   }

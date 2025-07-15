@@ -105,8 +105,8 @@ function RouteComponent() {
   // ---------------------------------------------------------------------------
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-10 text-gray-500">
-        <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Loading payment
+      <div className="flex items-center justify-center p-10 text-gray-500 m-auto mt-1/2">
+        <Loader2 className="mr-2 h-20 w-20 animate-spin" /> Loading payment
         history…
       </div>
     )

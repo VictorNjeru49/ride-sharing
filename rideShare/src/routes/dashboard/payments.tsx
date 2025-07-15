@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import {
   Card,
@@ -25,12 +25,11 @@ import {
   deletePayment,
 } from '@/api/UserApi'
 import { type Payment, PaymentMethod, PaymentStatus } from '@/types/alltypes'
+import { RingLoader } from 'react-spinners'
 
 export const Route = createFileRoute('/dashboard/payments')({
   component: RouteComponent,
 })
-
-const PAGE_SIZE = 10
 
 function RouteComponent() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -72,7 +71,12 @@ function RouteComponent() {
   )
 
   if (paymentsQuery.isLoading) {
-    return <div>Loading payments...</div>
+    return (
+      <div className=" w-fit text-center py-10 m-auto">
+        <RingLoader color="#0017ff" />
+        Loading...
+      </div>
+    )
   }
 
   if (paymentsQuery.isError) {

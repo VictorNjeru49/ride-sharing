@@ -11,6 +11,7 @@ import {
   TableBody,
   TableCell,
 } from '@/components/ui/table'
+import { RingLoader } from 'react-spinners'
 
 export const Route = createFileRoute('/user/trips')({
   component: RouteComponent,
@@ -33,7 +34,10 @@ function RouteComponent() {
   const riderTrips = userData?.riderProfile?.ridesTaken ?? []
 
   if (isLoading)
-    return <div className="p-6 text-center">Loading your trips…</div>
+    return <div className=" w-fit text-center py-10 m-auto">
+        <RingLoader color="#0017ff" />
+        Loading...
+      </div>
   if (error)
     return <div className="p-6 text-red-500">Failed to load trips.</div>
   if (!riderTrips.length)

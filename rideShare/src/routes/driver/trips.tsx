@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getUserById } from '@/api/UserApi'
 import { authStore } from '@/app/store'
 import { Car, MapPin, Clock, DollarSign } from 'lucide-react'
+import { RingLoader } from 'react-spinners'
 
 export const Route = createFileRoute('/driver/trips')({
   component: RouteComponent,
@@ -32,7 +33,10 @@ function RouteComponent() {
       </p>
 
       {isLoading ? (
-        <p className="text-gray-500">Loading...</p>
+        <div className=" w-fit text-center py-10 m-auto">
+          <RingLoader color="#0017ff" />
+          Loading...
+        </div>
       ) : trips.length === 0 ? (
         <p className="text-gray-500">No trips found.</p>
       ) : (
@@ -83,7 +87,8 @@ function RouteComponent() {
                     {trip.pickupLocation?.address ?? 'Not specified'}
                   </p>
                   <p className="text-gray-500 text-sm mt-1">
-                    End Location: {trip?.dropoffLocation?.address ?? 'Not specified'}
+                    End Location:{' '}
+                    {trip?.dropoffLocation?.address ?? 'Not specified'}
                   </p>
                   {durationMinutes !== null && (
                     <p className="text-gray-500 text-sm mt-1">

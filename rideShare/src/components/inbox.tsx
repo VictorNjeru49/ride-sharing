@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/select'
 import { useCrudOperations } from '@/hooks/crudops'
 import { Trash2 } from 'lucide-react'
+import { RingLoader } from 'react-spinners'
 
 function Inbox() {
   const userId = authStore.state.user?.id
@@ -101,7 +102,12 @@ function Inbox() {
   }
 
   if (isLoading) {
-    return <div className="p-6 text-center text-gray-500">Loading inbox…</div>
+    return (
+      <div className=" w-fit text-center py-10 m-auto">
+        <RingLoader color="#0017ff" />
+        Loading...
+      </div>
+    )
   }
 
   if (isError || !user) {

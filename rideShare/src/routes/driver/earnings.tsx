@@ -5,6 +5,7 @@ import { authStore } from '@/app/store'
 import { DollarSign } from 'lucide-react'
 import { format } from 'date-fns'
 import type { Payment } from '@/types/alltypes'
+import { RingLoader } from 'react-spinners'
 
 export const Route = createFileRoute('/driver/earnings')({
   component: RouteComponent,
@@ -65,7 +66,10 @@ function RouteComponent() {
               {isLoading ? (
                 <tr>
                   <td colSpan={4} className="text-center py-6 text-gray-500">
-                    Loading earnings...
+                    <div className=" w-fit text-center py-10 m-auto">
+                      <RingLoader color="#0017ff" />
+                      Loading...
+                    </div>
                   </td>
                 </tr>
               ) : earnings.length === 0 ? (

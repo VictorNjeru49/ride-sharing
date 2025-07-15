@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getUserById } from '@/api/UserApi'
 import { authStore } from '@/app/store'
 import { formatDistanceToNow } from 'date-fns'
+import { RingLoader } from 'react-spinners'
 
 export const Route = createFileRoute('/driver/requests')({
   component: RouteComponent,
@@ -36,7 +37,10 @@ function RouteComponent() {
         </h3>
 
         {isLoading ? (
-          <p className="text-gray-500">Loading ride requests...</p>
+          <div className=" w-fit text-center py-10 m-auto">
+            <RingLoader color="#0017ff" />
+            Loading...
+          </div>
         ) : requests.length === 0 ? (
           <p className="text-gray-500">No ride requests assigned yet.</p>
         ) : (

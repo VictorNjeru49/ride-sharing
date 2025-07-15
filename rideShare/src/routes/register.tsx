@@ -11,7 +11,6 @@ import { z } from 'zod'
 import { toast, Toaster } from 'sonner'
 import { useNavigate } from '@tanstack/react-router'
 import { useLogin } from '@/api/LoginApi'
-import { useRouter } from '@tanstack/react-router'
 import { authActions } from '@/app/store'
 
 export const Route = createFileRoute('/register')({
@@ -56,7 +55,6 @@ const validateField = <T,>(value: T, schema: z.ZodType<T>) => {
 }
 function RouteComponent() {
   const navigate = useNavigate()
-  const router = useRouter()
   const queryClient = useQueryClient()
   const loginMutation = useLogin()
 
@@ -95,7 +93,7 @@ function RouteComponent() {
       }
 
       try {
-        const res = await create.mutateAsync(result.data)
+        await create.mutateAsync(result.data)
         toast.success('User created successfully!')
 
         queryClient.invalidateQueries({ queryKey: ['users'] })

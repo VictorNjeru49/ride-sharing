@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getUserById } from '@/api/UserApi'
 import { authStore } from '@/app/store'
 import { format } from 'date-fns'
+import { RingLoader } from 'react-spinners'
 
 export const Route = createFileRoute('/driver/schedule')({
   component: RouteComponent,
@@ -48,7 +49,10 @@ function RouteComponent() {
               {isLoading ? (
                 <tr>
                   <td colSpan={3} className="text-center py-6 text-gray-500">
-                    Loading schedule...
+                    <div className=" w-fit text-center py-10 m-auto">
+                      <RingLoader color="#0017ff" />
+                      Loading...
+                    </div>
                   </td>
                 </tr>
               ) : scheduleHistory.length === 0 ? (

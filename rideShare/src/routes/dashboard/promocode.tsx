@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import {
   Table,
@@ -31,20 +31,20 @@ import {
   updatePromoCode,
   deletePromoCode,
 } from '@/api/UserApi'
-import { type Promocode, type Userpromousage, type userTypes } from '@/types/alltypes'
+import type { PromoCode, UserPromoUsage, userTypes } from '@/types/alltypes'
 
 export const Route = createFileRoute('/dashboard/promocode')({
   component: RouteComponent,
 })
 
-// 🔽 PromoCode Row with collapsible relationship data
+
 function PromoRow({
   promo,
   onEdit,
   onDelete,
 }: {
-  promo: Promocode
-  onEdit: (data: Promocode) => void
+  promo: PromoCode
+  onEdit: (data: PromoCode) => void
   onDelete: (id: string) => void
 }) {
   const [open, setOpen] = useState(false)
@@ -79,7 +79,7 @@ function PromoRow({
               </Typography>
               {promo.usages.length > 0 ? (
                 <ul>
-                  {promo.usages.map((usage: Userpromousage) => (
+                  {promo.usages.map((usage: UserPromoUsage) => (
                     <li key={usage.id}>
                       Used by User ID: <strong>{usage.user?.id}</strong> on{' '}
                       {new Date(usage.usedAt).toLocaleDateString()}
@@ -105,7 +105,9 @@ function PromoRow({
                   {promo.createdBy.map((createdBy: userTypes) => (
                     <li key={createdBy.id}>
                       Used by User ID: <strong>{createdBy.firstName}</strong> on{' '}
-                      {new Date(createdBy.updatedAt).toLocaleDateString()}
+                      {createdBy.updatedAt
+                        ? new Date(createdBy.updatedAt).toLocaleString()
+                        : 'No update date'}
                     </li>
                   ))}
                 </ul>
@@ -129,9 +131,9 @@ function RouteComponent() {
     update,
     delete: remove,
   } = useCrudOperations<
-    Promocode,
-    Partial<Promocode>,
-    Partial<Promocode>,
+    PromoCode,
+    Partial<PromoCode>,
+    Partial<PromoCode>,
     string
   >(
     { all: ['promocodes'], details: (id) => ['promocodes', id] },
@@ -147,7 +149,7 @@ function RouteComponent() {
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(5)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [formData, setFormData] = useState<Partial<Promocode>>({})
+  const [formData, setFormData] = useState<Partial<PromoCode>>({})
   const [editId, setEditId] = useState<string | null>(null)
 
   const filtered = useMemo(() => {
@@ -181,7 +183,7 @@ function RouteComponent() {
     }
   }
 
-  const handleEdit = (promo: Promocode) => {
+  const handleEdit = (promo: PromoCode) => {
     setFormData(promo)
     setEditId(promo.id)
     setDialogOpen(true)

@@ -5,6 +5,7 @@ import { authStore } from '@/app/store'
 import type { userTypes } from '@/types/alltypes'
 import { format } from 'date-fns'
 import Devices from '@/components/devices'
+import { RingLoader } from 'react-spinners'
 
 export const Route = createFileRoute('/user/devices')({
   component: Devices,
@@ -25,7 +26,12 @@ function DevicePage() {
   })
 
   if (isPending) {
-    return <div className="p-6 text-center text-gray-500">Loading devices…</div>
+    return (
+      <div className=" w-fit text-center py-10 m-auto">
+        <RingLoader color="#0017ff" />
+        Loading...
+      </div>
+    )
   }
 
   if (isError || !user) {

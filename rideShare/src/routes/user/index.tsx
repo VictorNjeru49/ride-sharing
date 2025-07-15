@@ -7,6 +7,7 @@ import { authStore } from '@/app/store'
 import { useQuery } from '@tanstack/react-query'
 import { getUserById } from '@/api/UserApi'
 import MapDialog from '@/components/locations'
+import { RingLoader } from 'react-spinners'
 
 export const Route = createFileRoute('/user/')({
   component: RouteComponent,
@@ -189,7 +190,12 @@ function RouteComponent() {
   // -------------------------------------------------------------------------
   // Loading guard
   // -------------------------------------------------------------------------
-  if (isLoading) return <div>Loading dashboard…</div>
+  if (isLoading) return (
+    <div className=" w-fit text-center py-10 m-auto">
+      <RingLoader color="#0017ff" />
+      Loading...
+    </div>
+  )
 
   const walletBalance = Number(user?.walletBalance ?? 0)
   const userName = user?.firstName ?? 'User'

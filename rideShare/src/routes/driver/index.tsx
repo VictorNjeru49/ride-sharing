@@ -10,6 +10,7 @@ import {
   Phone,
   ArrowRightLeft,
 } from 'lucide-react'
+import { RingLoader } from 'react-spinners'
 
 export const Route = createFileRoute('/driver/')({
   component: RouteComponent,
@@ -44,7 +45,12 @@ function RouteComponent() {
   
 
     if (isLoading) {
-      return <div>Loading dashboard...</div>
+      return (
+        <div className=" w-fit text-center py-10 m-auto">
+          <RingLoader color="#0017ff" />
+          Loading...
+        </div>
+      )
     }
     
   return (
