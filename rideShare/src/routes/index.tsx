@@ -8,26 +8,74 @@ import {
 } from 'react-icons/fa'
 import { Button } from '@/components/ui/button'
 import Footer from '@/components/Footer'
-
-
 export const Route = createFileRoute('/')({
   component: App,
 })
 
-
+// type Theme = 'light' | 'dark' | 'system'
 
 function App() {
+  // const [theme, setThemeState] = useState<Theme>('system')
+
+  // // Apply theme to <html> and persist in localStorage
+  // const applyTheme = (theme: Theme) => {
+  //   const root = window.document.documentElement
+
+  //   if (theme === 'system') {
+  //     localStorage.removeItem('theme')
+  //     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  //       root.classList.add('dark')
+  //     } else {
+  //       root.classList.remove('dark')
+  //     }
+  //   } else if (theme === 'dark') {
+  //     root.classList.add('dark')
+  //     localStorage.setItem('theme', 'dark')
+  //   } else {
+  //     root.classList.remove('dark')
+  //     localStorage.setItem('theme', 'light')
+  //   }
+  // }
+
+  // const setTheme = (newTheme: Theme) => {
+  //   setThemeState(newTheme)
+  //   applyTheme(newTheme)
+  // }
+
+  // // On mount, read saved theme or fallback to system
+  // useEffect(() => {
+  //   const savedTheme = localStorage.getItem('theme') as Theme | null
+  //   if (savedTheme === 'light' || savedTheme === 'dark') {
+  //     setThemeState(savedTheme)
+  //     applyTheme(savedTheme)
+  //   } else {
+  //     setThemeState('system')
+  //     applyTheme('system')
+  //   }
+
+  //   // Listen to system theme changes if in system mode
+  //   const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+  //   const handler = (e: MediaQueryListEvent) => {
+  //     if (theme === 'system') {
+  //       applyTheme('system')
+  //     }
+  //   }
+  //   mediaQuery.addEventListener('change', handler)
+  //   return () => mediaQuery.removeEventListener('change', handler)
+  // }, [])
+
   return (
     <>
-      <section className="w-full bg-gradient-to-b from-white to-blue-50 py-16">
+
+      <section className="w-full bg-gradient-to-b from-white to-blue-50 dark:from-gray-900 dark:to-gray-800 py-16 transition-colors duration-500">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 items-center gap-10">
           {/* Left Side: Text Content */}
           <div className="space-y-6">
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-gray-100 leading-tight transition-colors duration-500">
               Your ride is just a{' '}
-              <span className="text-blue-600">tap away</span>
+              <span className="text-blue-600 dark:text-blue-400">tap away</span>
             </h1>
-            <p className="text-lg text-gray-600 max-w-md">
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-md transition-colors duration-500">
               Safe, reliable, and affordable rides whenever you need them. Join
               millions of riders worldwide.
             </p>
@@ -52,45 +100,45 @@ function App() {
         </div>
       </section>
 
-      <div className="bg-white text-gray-900">
+      <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-500">
         {/* Why Choose */}
         <section className="py-16">
           <div className="max-w-6xl mx-auto px-4 text-center space-y-4">
             <h2 className="text-3xl font-bold">Why Choose RideShare?</h2>
-            <p className="text-gray-600 text-lg">
+            <p className="text-gray-600 dark:text-gray-300 text-lg">
               Experience the future of transportation with our cutting-edge
               features
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-10">
               {/* Card 1 */}
-              <div className="p-6 rounded-lg bg-blue-50 shadow-sm">
-                <div className="text-blue-600 text-3xl mb-4">
+              <div className="p-6 rounded-lg bg-blue-50 dark:bg-blue-900 shadow-sm">
+                <div className="text-blue-600 dark:text-blue-400 text-3xl mb-4">
                   <FaBolt />
                 </div>
                 <h3 className="font-semibold text-lg">Quick & Easy</h3>
-                <p className="text-gray-600 mt-2 text-sm">
+                <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm">
                   Book your ride in seconds with our intuitive app. No waiting,
                   no hassle.
                 </p>
               </div>
               {/* Card 2 */}
-              <div className="p-6 rounded-lg bg-green-50 shadow-sm">
-                <div className="text-green-600 text-3xl mb-4">
+              <div className="p-6 rounded-lg bg-green-50 dark:bg-green-900 shadow-sm">
+                <div className="text-green-600 dark:text-green-400 text-3xl mb-4">
                   <FaShieldAlt />
                 </div>
                 <h3 className="font-semibold text-lg">Safe & Secure</h3>
-                <p className="text-gray-600 mt-2 text-sm">
+                <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm">
                   All drivers are verified and tracked. Your safety is our top
                   priority.
                 </p>
               </div>
               {/* Card 3 */}
-              <div className="p-6 rounded-lg bg-purple-50 shadow-sm">
-                <div className="text-purple-600 text-3xl mb-4">
+              <div className="p-6 rounded-lg bg-purple-50 dark:bg-purple-900 shadow-sm">
+                <div className="text-purple-600 dark:text-purple-400 text-3xl mb-4">
                   <FaDollarSign />
                 </div>
                 <h3 className="font-semibold text-lg">Affordable</h3>
-                <p className="text-gray-600 mt-2 text-sm">
+                <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm">
                   Transparent pricing with no hidden fees. Pay less, travel
                   more.
                 </p>
@@ -100,10 +148,10 @@ function App() {
         </section>
 
         {/* How It Works */}
-        <section className="bg-gray-50 py-16">
+        <section className="bg-gray-50 dark:bg-gray-800 py-16">
           <div className="max-w-6xl mx-auto px-4 text-center space-y-6">
             <h2 className="text-3xl font-bold">How It Works</h2>
-            <p className="text-gray-600 text-lg">
+            <p className="text-gray-600 dark:text-gray-300 text-lg">
               Getting your ride is as easy as 1-2-3
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-10">
@@ -126,7 +174,9 @@ function App() {
                     {i + 1}
                   </div>
                   <h3 className="text-lg font-semibold">{step.title}</h3>
-                  <p className="text-sm text-gray-600">{step.desc}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    {step.desc}
+                  </p>
                 </div>
               ))}
             </div>
@@ -134,7 +184,7 @@ function App() {
         </section>
 
         {/* Stats */}
-        <section className="bg-blue-600 text-white py-14">
+        <section className="bg-blue-600 dark:bg-blue-800 text-white py-14">
           <div className="max-w-6xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 text-center gap-6">
             <div>
               <h4 className="text-2xl font-bold">10M+</h4>
@@ -156,12 +206,12 @@ function App() {
         </section>
 
         {/* Call to Action */}
-        <section className="py-16 bg-white">
+        <section className="py-16 bg-white dark:bg-gray-900">
           <div className="max-w-3xl mx-auto px-4 text-center space-y-6">
             <h2 className="text-2xl sm:text-3xl font-bold">
               Ready to Get Started?
             </h2>
-            <p className="text-gray-600 text-lg">
+            <p className="text-gray-600 dark:text-gray-300 text-lg">
               Download the app and take your first ride today
             </p>
             <div className="flex justify-center gap-4 flex-wrap">
@@ -181,7 +231,8 @@ function App() {
           </div>
         </section>
       </div>
-      <Footer/>
+
+      <Footer />
     </>
   )
 }

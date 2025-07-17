@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 import axios from 'axios'
 import { API_BASE_URL } from './BaseUrl'
 import type { LoginPayload, LoginResponse } from '@/types/alltypes'
+import { authStore } from '@/app/store'
 
 const loginFn = async (payload: LoginPayload): Promise<LoginResponse> => {
   const response = await axios.post<LoginResponse>(
@@ -59,4 +60,17 @@ export const useLogout = () => {
       )
     },
   })
+}
+
+export const getNewToken = async () => {
+  const refreshToken = authStore.state.tokens.refreshToken
+  const id = authStore.state.user.id
+    if (!refreshToken || !id) {
+      throw new Error('something is missing')
+    }
+
+    const response = await axios.get(`${API_BASE_URL}/auth/refresh${id}`)
+
+    const result = await response.data
+    return result
 }

@@ -1,3 +1,4 @@
+import React from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { getUserById } from '@/api/UserApi'
@@ -10,6 +11,15 @@ import {
   Phone,
   ArrowRightLeft,
 } from 'lucide-react'
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { RingLoader } from 'react-spinners'
 
 export const Route = createFileRoute('/driver/')({
@@ -25,170 +35,175 @@ function RouteComponent() {
     enabled: !!userId,
   })
 
+  /* ───── Derived metrics ───── */
   const displayName = user?.firstName || 'Alex'
 
-  const todayEarnings = (() => {
+  const todayEarnings = React.useMemo(() => {
     if (!Array.isArray(user?.walletTransactions)) return '125.50'
-
     const sum = user.walletTransactions.reduce(
       (acc, p) => acc + (Number(p.amount) || 0),
       0,
     )
+    return sum.toFixed(2)
+  }, [user])
 
-    return typeof sum === 'number' && !isNaN(sum) ? sum.toFixed(2) : '125.50'
-  })()
-  
+  const totalTrips = user?.driverProfile?.ridesOffered?.length ?? 8
+  const avgRating = user?.driverProfile?.rating ?? '4.9'
 
-    const totalTrips = user?.driverProfile?.ridesOffered?.length || 8
+  if (isLoading) {
+    return (
+      <div className="py-10 text-center">
+        <RingLoader color="#3b82f6" />
+      </div>
+    )
+  }
 
-    const avgRating = user?.driverProfile?.rating || '4.9'
-  
-
-    if (isLoading) {
-      return (
-        <div className=" w-fit text-center py-10 m-auto">
-          <RingLoader color="#0017ff" />
-          Loading...
-        </div>
-      )
-    }
-    
   return (
-    <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
-      {/* Welcome Section */}
+    <div className="p-6 space-y-6 bg-muted/50 min-h-screen">
+      {/* Welcome */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">
-          Welcome Back, {displayName}!
-        </h1>
-        <p className="text-gray-500 text-sm">Here’s your summary for today</p>
+        <h1 className="text-2xl font-semibold">Welcome back, {displayName}!</h1>
+        <p className="text-muted-foreground text-sm">
+          Here’s your summary for today.
+        </p>
       </div>
 
-      {/* Summary Cards */}
+      {/* Summary */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <SummaryCard
+        <StatCard
           label="Today’s Earnings"
           value={`$${todayEarnings}`}
           icon={<DollarSign className="w-5 h-5" />}
-          color="green"
+          tone="success"
         />
-        <SummaryCard
+        <StatCard
           label="Trips Completed"
           value={totalTrips}
           icon={<Car className="w-5 h-5" />}
-          color="blue"
+          tone="info"
         />
-        <SummaryCard
+        <StatCard
           label="Avg Rating"
           value={avgRating}
           icon={<Star className="w-5 h-5" />}
-          color="yellow"
+          tone="warning"
         />
-        <SummaryCard
+        <StatCard
           label="Hours Online"
           value="5h 20m"
           icon={<Clock className="w-5 h-5" />}
-          color="indigo"
+          tone="secondary"
         />
       </div>
 
-      {/* Current Ride Section */}
-      <div className="bg-white rounded-xl shadow p-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <p className="text-sm text-gray-500">Current Ride</p>
-            <h3 className="text-lg font-semibold text-gray-800">
-              Downtown → Airport
-            </h3>
-            <p className="text-sm text-gray-500 mt-1">
-              Passenger: Jane Doe • 12.4 mi • ETA: 10 mins
-            </p>
-          </div>
+      {/* Current Ride */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Current Ride</CardTitle>
+          <CardDescription>Downtown → Airport</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-6 md:flex-row md:justify-between md:items-center">
+          <p className="text-sm text-muted-foreground">
+            Passenger: Jane Doe • 12.4 mi • ETA: 10&nbsp;mins
+          </p>
           <div className="flex gap-3">
-            <button className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700">
-              Call Rider <Phone className="inline-block w-4 h-4 ml-1" />
-            </button>
-            <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700">
-              Navigate
-            </button>
+            <Button variant="default" className="flex gap-1 items-center">
+              Call Rider <Phone className="w-4 h-4" />
+            </Button>
+            <Button variant="secondary">Navigate</Button>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      {/* Quick Actions and Trip History */}
+      {/* Actions + Trips */}
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Quick Actions */}
-        <div className="bg-white p-6 rounded-xl shadow space-y-4">
-          <h2 className="text-lg font-semibold text-gray-800">Quick Actions</h2>
-          <div className="grid grid-cols-2 gap-4">
+        {/* Quick actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-2 gap-4">
             <ActionButton
-              icon={<Car className="w-6 h-6 mb-2" />}
               label="Start Trip"
-              color="blue"
+              icon={<Car className="w-6 h-6" />}
+              tone="info"
             />
             <ActionButton
-              icon={<ArrowRightLeft className="w-6 h-6 mb-2" />}
               label="Trip History"
-              color="yellow"
+              icon={<ArrowRightLeft className="w-6 h-6" />}
+              tone="warning"
             />
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        {/* Recent Trips */}
-        <div className="bg-white p-6 rounded-xl shadow">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">
-            Recent Trips
-          </h2>
-          <ul className="space-y-3 text-sm text-gray-700">
+        {/* Recent trips */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Trips</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
             <TripItem from="Mall" to="Office" amount="$12.50" />
             <TripItem from="Restaurant" to="Home" amount="$18.90" />
             <TripItem from="Park" to="Mall" amount="$9.75" />
-          </ul>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
 }
 
-function SummaryCard({
+/* ────────────────────────────────────────────────────────────────── */
+
+function StatCard({
   label,
   value,
   icon,
-  color,
+  tone,
 }: {
   label: string
   value: string | number
   icon: React.ReactNode
-  color: string
+  tone: 'success' | 'info' | 'warning' | 'secondary'
 }) {
+  const colorMap = {
+    success: 'text-green-600',
+    info: 'text-blue-600',
+    warning: 'text-yellow-600',
+    secondary: 'text-indigo-600',
+  } as const
+
   return (
-    <div className="bg-white rounded-xl shadow p-4">
-      <p className="text-gray-500 text-sm">{label}</p>
-      <div
-        className={`text-xl font-bold text-${color}-600 flex items-center gap-2 mt-1`}
-      >
-        {icon}
-        {value}
-      </div>
-    </div>
+    <Card>
+      <CardContent className="p-4">
+        <p className="text-muted-foreground text-sm">{label}</p>
+        <div
+          className={cn(
+            'text-xl font-bold flex items-center gap-2',
+            colorMap[tone],
+          )}
+        >
+          {icon} {value}
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 
 function ActionButton({
-  icon,
   label,
-  color,
+  icon,
+  tone,
 }: {
-  icon: React.ReactNode
   label: string
-  color: string
+  icon: React.ReactNode
+  tone: 'info' | 'warning'
 }) {
+  const variant = tone === 'info' ? 'default' : 'secondary'
   return (
-    <button
-      className={`bg-${color}-100 text-${color}-700 font-medium p-4 rounded-xl flex flex-col items-center hover:bg-${color}-200`}
-    >
+    <Button variant={variant} className="flex flex-col items-center gap-1 py-6">
       {icon}
-      {label}
-    </button>
+      <span className="text-sm font-medium">{label}</span>
+    </Button>
   )
 }
 
@@ -202,14 +217,13 @@ function TripItem({
   amount: string
 }) {
   return (
-    <li className="flex justify-between">
+    <div className="flex justify-between">
       <span>
         {from} → {to}
       </span>
       <span>{amount}</span>
-    </li>
+    </div>
   )
 }
 
-
-
+export default RouteComponent

@@ -56,6 +56,7 @@ export enum PaymentMethod {
   PAYPAL = 'paypal',
   CASH = 'cash',
   BANK_TRANSFER = 'bank_transfer',
+  STRIPE_CHECKOUT = 'stripe_checkout',
 }
 
 // Define enum for payment status
@@ -180,13 +181,18 @@ export interface Ride extends GenericsType {
 export interface Payment extends GenericsType {
   ride: Ride
   user: userTypes
+  userId?: string
+  rideId?: string
+  vehicleId: string
   amount: number
+  clientSecret?: string
   currency: string
-  method: PaymentMethod
+  method?: PaymentMethod
   stripePaymentIntentId?: string
-  status: PaymentStatus
-  paidAt: Date
-  createdAt: Date
+  status?: PaymentStatus
+  paidAt?: Date
+  vehicle: Vehicle
+  createdAt?: Date
 }
 export interface Rating extends GenericsType {
   ride: Ride

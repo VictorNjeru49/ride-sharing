@@ -2,12 +2,14 @@ import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import Layout from '@/components/layout';
 import { UserRole } from '@/types/alltypes';
 import { authStore } from '@/app/store';
+import { isLoggedIn } from '@/app/authPersistence';
 
 export const Route = createFileRoute('/dashboard')({
   // beforeLoad: ({ location }) => {
   //   const { isVerified } = authStore.state
   //   console.log('isVerfied', isVerified)
-  //   if (!isVerified) {
+  //   console.log('user logged‑in?', isLoggedIn())
+  //   if (!isVerified || !isLoggedIn()) {
   //     throw redirect({
   //       to: '/login',
   //       search: {
@@ -22,7 +24,7 @@ export const Route = createFileRoute('/dashboard')({
 function RouteComponent() {
   return (
     <>
-     <div className="min-h-screen flex flex-col md:flex-row bg-gray-50">
+     <div className="min-h-screen flex flex-col md:flex-row bg-gray-50 dark:bg-gray-900">
     {/* Sidebar */}
     <Layout role={UserRole.ADMIN}/>
 

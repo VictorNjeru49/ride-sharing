@@ -141,7 +141,7 @@ function Layout({ role }: { role: UserRole }) {
         {
           name: 'Devices',
           icon: <MonitorSmartphone className="w-4 h-4" />,
-          path: '/user/devices',
+          path: '',
         },
         {
           name: 'Logout',
@@ -265,7 +265,7 @@ function Layout({ role }: { role: UserRole }) {
         {
           name: 'Devices',
           icon: <MonitorSmartphone className="w-4 h-4" />,
-          path: '/user/devices',
+          path: '',
         },
         {
           name: 'Logout',
@@ -288,8 +288,11 @@ function Layout({ role }: { role: UserRole }) {
   return (
     <>
       {/* Mobile Header */}
-      <div className="md:hidden p-4 flex items-center justify-between bg-white shadow border-b">
-        <button className="text-gray-700" onClick={() => setMobileOpen(true)}>
+      <div className="md:hidden p-4 flex items-center justify-between bg-white dark:bg-gray-900 shadow border-b border-gray-200 dark:border-gray-700">
+        <button
+          className="text-gray-700 dark:text-gray-300"
+          onClick={() => setMobileOpen(true)}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-6 w-6"
@@ -305,16 +308,19 @@ function Layout({ role }: { role: UserRole }) {
             />
           </svg>
         </button>
-        <span className="text-lg font-semibold">🚗 RideShare</span>
+        <span className="text-lg font-semibold text-gray-900 dark:text-white">
+          🚗 RideShare
+        </span>
       </div>
 
       {/* Main Wrapper */}
       <div className="flex">
         {/* Desktop Sidebar */}
-        <aside className="w-64 bg-white shadow-md border-r hidden md:flex flex-col min-h-screen">
-          {/* Header */}
-          <div className="p-4 font-bold text-xl border-b">
-            <Link to="/">🚗 RideShare</Link>
+        <aside className="w-64 bg-white dark:bg-gray-800 shadow-md border-r border-gray-200 dark:border-gray-700 hidden md:flex flex-col min-h-screen">
+          <div className="p-4 font-bold text-xl border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <Link to="/" className="text-gray-900 dark:text-white">
+              🚗 RideShare
+            </Link>
           </div>
 
           {/* Navigation */}
@@ -328,7 +334,7 @@ function Layout({ role }: { role: UserRole }) {
                       type="button"
                       onClick={() => toggleDropdown(item.label)}
                       aria-expanded={isOpen}
-                      className="flex items-center justify-between w-full px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700"
+                      className="flex items-center justify-between w-full px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 dark:text-white dark:hover:bg-gray-700"
                     >
                       <span className="flex items-center gap-2 font-medium">
                         {item.icon || <Users className="w-4 h-4" />}
@@ -348,7 +354,7 @@ function Layout({ role }: { role: UserRole }) {
                               <button
                                 key="logout-button"
                                 onClick={handleLogout}
-                                className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 w-full text-left"
+                                className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-700 text-gray-700 w-full text-left dark:text-white"
                                 type="button"
                               >
                                 {sub.icon}
@@ -362,10 +368,10 @@ function Layout({ role }: { role: UserRole }) {
                             <Link
                               key={sub.path}
                               to={sub.path}
-                              className={`flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 ${
+                              className={`flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white ${
                                 isActive
-                                  ? 'bg-blue-100 text-blue-600 font-semibold'
-                                  : 'text-gray-700'
+                                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 font-semibold'
+                                  : 'text-gray-700 dark:text-gray-300'
                               }`}
                             >
                               {sub.icon}
@@ -384,7 +390,7 @@ function Layout({ role }: { role: UserRole }) {
                   <button
                     key="logout-button"
                     onClick={handleLogout}
-                    className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 w-full text-left"
+                    className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 w-full text-left dark:text-white"
                     type="button"
                   >
                     {item.icon}
@@ -398,10 +404,10 @@ function Layout({ role }: { role: UserRole }) {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-700 ${
                     isActive
-                      ? 'bg-blue-100 text-blue-600 font-semibold'
-                      : 'text-gray-700'
+                      ? 'bg-blue-200 text-blue-600 font-semibold'
+                      : 'text-gray-700 dark:text-white'
                   }`}
                 >
                   {item.icon}
@@ -412,27 +418,27 @@ function Layout({ role }: { role: UserRole }) {
           </nav>
 
           {/* Footer */}
-          <div className="p-4 border-t bg-gray-50 flex items-center gap-3">
+          <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex items-center gap-3">
             <img
               src={
                 authStore.state.avatar?.profilePicture ||
                 'https://ui-avatars.com/api/?name=User'
               }
               alt="Avatar"
-              className="w-10 h-10 rounded-full object-cover border border-gray-200"
+              className="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-gray-700"
             />
-            <div className="text-sm leading-tight">
-              <p className="font-medium text-gray-800">
+            <div className="text-sm leading-tight text-gray-800 dark:text-gray-200">
+              <p className="font-medium">
                 {authStore.state.user?.email || 'Unknown'}
               </p>
-              <p className="text-xs text-gray-500 capitalize">
+              <p className="text-xs capitalize">
                 {authStore.state.user?.role || 'N/A'}
               </p>
             </div>
           </div>
         </aside>
         {/* Main Content (placeholder) */}
-        <div className="flex-1 p-4">
+        <div className="flex-1 p-4 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
           {/* Your outlet or main children goes here */}
         </div>
       </div>
@@ -440,7 +446,7 @@ function Layout({ role }: { role: UserRole }) {
       {/* Mobile Sidebar Overlay */}
       {mobileOpen && (
         <div className="fixed inset-0 z-40 md:hidden bg-black/50">
-          <aside className="fixed left-0 top-0 h-full w-64 bg-white shadow-lg z-50 p-4 flex flex-col mt-12">
+          <aside className="fixed left-0 top-0 h-full w-64 bg-white shadow-lg z-50 p-4 flex flex-col dark:bg-gray-700">
             <button
               className="self-end mb-4"
               onClick={() => setMobileOpen(false)}
@@ -455,9 +461,9 @@ function Layout({ role }: { role: UserRole }) {
                     <div key={item.label}>
                       <button
                         onClick={() => toggleDropdown(item.label)}
-                        className="flex items-center justify-between w-full px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700"
+                        className="flex items-center justify-between w-full px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 dark:text-white dark:hover:bg-gray-900"
                       >
-                        <span className="flex items-center gap-2">
+                        <span className="flex items-center gap-2 dark:text-white">
                           {item.icon}
                           {item.label}
                         </span>
@@ -470,7 +476,7 @@ function Layout({ role }: { role: UserRole }) {
                               <button
                                 key="logout-button"
                                 onClick={handleLogout}
-                                className="text-left flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700"
+                                className="text-left flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 dark:text-white dark:hover:bg-gray-900"
                               >
                                 {sub.icon}
                                 {sub.name}
@@ -480,7 +486,7 @@ function Layout({ role }: { role: UserRole }) {
                                 key={sub.path}
                                 to={sub.path}
                                 onClick={() => setMobileOpen(false)}
-                                className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700"
+                                className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 dark:text-white dark:hover:bg-gray-900"
                               >
                                 {sub.icon}
                                 {sub.name}
@@ -498,7 +504,7 @@ function Layout({ role }: { role: UserRole }) {
                     key={item.path}
                     to={item.path}
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700"
+                    className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 dark:text-white dark:hover:bg-gray-900"
                   >
                     {item.icon}
                     {item.name}

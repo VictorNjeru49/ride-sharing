@@ -1,5 +1,6 @@
 import { Ride } from 'src/ride/entities/ride.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Vehicle } from 'src/vehicle/entities/vehicle.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -16,6 +17,7 @@ export enum PaymentMethod {
   PAYPAL = 'paypal',
   CASH = 'cash',
   BANK_TRANSFER = 'bank_transfer',
+  STRIPE_CHECKOUT = 'stripe_checkout',
 }
 
 // Define enum for payment status
@@ -59,6 +61,13 @@ export class Payment {
     default: PaymentMethod.CREDIT_CARD,
   })
   method: PaymentMethod;
+
+  @ManyToOne(() => Vehicle, (vehicle) => vehicle.payments, {
+    cascade: true,
+    nullable: true,
+    eager: true,
+  })
+  vehicle: Vehicle;
 
   @Column({ nullable: true })
   stripePaymentIntentId?: string;

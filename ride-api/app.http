@@ -82,15 +82,15 @@ GET {{url}}/payments
 
 #####
 ### Create a payment
-POST {{url}}/payments
+POST {{url}}/payments/checkout
 Content-Type: application/json
 
 {
   "amount": 50.00,
-  "currency": "usd",
-  "method": "credit_card",
+  "currency": "USD",
+  "method": "stripe_checkout",
   "userId": "31511632-b063-4e4a-bcad-8a24954d1987",
-  "rideId": "5a150f68-e7ed-43c2-b0c1-fa6aa644499d"
+  "vehicleId": "09b6e08e-abdc-44f3-b9b8-ccecbacdc611"
 }
 
 ### Confirm a payment by Stripe Payment Intent ID
@@ -98,7 +98,7 @@ POST {{url}}/payments/confirm
 Content-Type: application/json
 
 {
-  "paymentIntentId": "pi_3RkkiIBhAVCGhfBd0yuqIOMD"
+  "paymentIntentId": "pi_3RlqCFBhAVCGhfBd1FiXbNns"
 }
 
 
@@ -131,3 +131,12 @@ Content-Type: application/json
 
 ####
 GET {{url}}/promocode
+
+
+#####
+POST {{url}}/chatbot
+Content-Type: application/json
+
+{
+  "message": "help"
+}

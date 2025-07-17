@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UserRouteImport } from './routes/user'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as PaymentsRouteImport } from './routes/payments'
+import { Route as PaymentSuccessRouteImport } from './routes/payment-success'
+import { Route as PaymentCancelRouteImport } from './routes/payment-cancel'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DriverRouteImport } from './routes/driver'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -23,6 +25,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as UserIndexRouteImport } from './routes/user/index'
 import { Route as DriverIndexRouteImport } from './routes/driver/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as ChatbotIndexRouteImport } from './routes/chatbot/index'
 import { Route as VehiclesIndexRouteImport } from './routes/Vehicles/index'
 import { Route as UserWalletRouteImport } from './routes/user/wallet'
 import { Route as UserUserprofileRouteImport } from './routes/user/userprofile'
@@ -63,6 +66,16 @@ const RegisterRoute = RegisterRouteImport.update({
 const PaymentsRoute = PaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentSuccessRoute = PaymentSuccessRouteImport.update({
+  id: '/payment-success',
+  path: '/payment-success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentCancelRoute = PaymentCancelRouteImport.update({
+  id: '/payment-cancel',
+  path: '/payment-cancel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -119,6 +132,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRoute,
+} as any)
+const ChatbotIndexRoute = ChatbotIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ChatbotRoute,
 } as any)
 const VehiclesIndexRoute = VehiclesIndexRouteImport.update({
   id: '/',
@@ -255,11 +273,13 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/Vehicles': typeof VehiclesRouteWithChildren
   '/about': typeof AboutRoute
-  '/chatbot': typeof ChatbotRoute
+  '/chatbot': typeof ChatbotRouteWithChildren
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/driver': typeof DriverRouteWithChildren
   '/login': typeof LoginRoute
+  '/payment-cancel': typeof PaymentCancelRoute
+  '/payment-success': typeof PaymentSuccessRoute
   '/payments': typeof PaymentsRoute
   '/register': typeof RegisterRoute
   '/user': typeof UserRouteWithChildren
@@ -289,6 +309,7 @@ export interface FileRoutesByFullPath {
   '/user/userprofile': typeof UserUserprofileRoute
   '/user/wallet': typeof UserWalletRoute
   '/Vehicles/': typeof VehiclesIndexRoute
+  '/chatbot/': typeof ChatbotIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/driver/': typeof DriverIndexRoute
   '/user/': typeof UserIndexRoute
@@ -296,9 +317,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/chatbot': typeof ChatbotRoute
   '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
+  '/payment-cancel': typeof PaymentCancelRoute
+  '/payment-success': typeof PaymentSuccessRoute
   '/payments': typeof PaymentsRoute
   '/register': typeof RegisterRoute
   '/Vehicles/$VehiclesId': typeof VehiclesVehiclesIdRoute
@@ -327,6 +349,7 @@ export interface FileRoutesByTo {
   '/user/userprofile': typeof UserUserprofileRoute
   '/user/wallet': typeof UserWalletRoute
   '/Vehicles': typeof VehiclesIndexRoute
+  '/chatbot': typeof ChatbotIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/driver': typeof DriverIndexRoute
   '/user': typeof UserIndexRoute
@@ -336,11 +359,13 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/Vehicles': typeof VehiclesRouteWithChildren
   '/about': typeof AboutRoute
-  '/chatbot': typeof ChatbotRoute
+  '/chatbot': typeof ChatbotRouteWithChildren
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/driver': typeof DriverRouteWithChildren
   '/login': typeof LoginRoute
+  '/payment-cancel': typeof PaymentCancelRoute
+  '/payment-success': typeof PaymentSuccessRoute
   '/payments': typeof PaymentsRoute
   '/register': typeof RegisterRoute
   '/user': typeof UserRouteWithChildren
@@ -370,6 +395,7 @@ export interface FileRoutesById {
   '/user/userprofile': typeof UserUserprofileRoute
   '/user/wallet': typeof UserWalletRoute
   '/Vehicles/': typeof VehiclesIndexRoute
+  '/chatbot/': typeof ChatbotIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/driver/': typeof DriverIndexRoute
   '/user/': typeof UserIndexRoute
@@ -385,6 +411,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/driver'
     | '/login'
+    | '/payment-cancel'
+    | '/payment-success'
     | '/payments'
     | '/register'
     | '/user'
@@ -414,6 +442,7 @@ export interface FileRouteTypes {
     | '/user/userprofile'
     | '/user/wallet'
     | '/Vehicles/'
+    | '/chatbot/'
     | '/dashboard/'
     | '/driver/'
     | '/user/'
@@ -421,9 +450,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
-    | '/chatbot'
     | '/contact'
     | '/login'
+    | '/payment-cancel'
+    | '/payment-success'
     | '/payments'
     | '/register'
     | '/Vehicles/$VehiclesId'
@@ -452,6 +482,7 @@ export interface FileRouteTypes {
     | '/user/userprofile'
     | '/user/wallet'
     | '/Vehicles'
+    | '/chatbot'
     | '/dashboard'
     | '/driver'
     | '/user'
@@ -465,6 +496,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/driver'
     | '/login'
+    | '/payment-cancel'
+    | '/payment-success'
     | '/payments'
     | '/register'
     | '/user'
@@ -494,6 +527,7 @@ export interface FileRouteTypes {
     | '/user/userprofile'
     | '/user/wallet'
     | '/Vehicles/'
+    | '/chatbot/'
     | '/dashboard/'
     | '/driver/'
     | '/user/'
@@ -503,11 +537,13 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   VehiclesRoute: typeof VehiclesRouteWithChildren
   AboutRoute: typeof AboutRoute
-  ChatbotRoute: typeof ChatbotRoute
+  ChatbotRoute: typeof ChatbotRouteWithChildren
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   DriverRoute: typeof DriverRouteWithChildren
   LoginRoute: typeof LoginRoute
+  PaymentCancelRoute: typeof PaymentCancelRoute
+  PaymentSuccessRoute: typeof PaymentSuccessRoute
   PaymentsRoute: typeof PaymentsRoute
   RegisterRoute: typeof RegisterRoute
   UserRoute: typeof UserRouteWithChildren
@@ -534,6 +570,20 @@ declare module '@tanstack/react-router' {
       path: '/payments'
       fullPath: '/payments'
       preLoaderRoute: typeof PaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment-success': {
+      id: '/payment-success'
+      path: '/payment-success'
+      fullPath: '/payment-success'
+      preLoaderRoute: typeof PaymentSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment-cancel': {
+      id: '/payment-cancel'
+      path: '/payment-cancel'
+      fullPath: '/payment-cancel'
+      preLoaderRoute: typeof PaymentCancelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -612,6 +662,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/chatbot/': {
+      id: '/chatbot/'
+      path: '/'
+      fullPath: '/chatbot/'
+      preLoaderRoute: typeof ChatbotIndexRouteImport
+      parentRoute: typeof ChatbotRoute
     }
     '/Vehicles/': {
       id: '/Vehicles/'
@@ -812,6 +869,17 @@ const VehiclesRouteWithChildren = VehiclesRoute._addFileChildren(
   VehiclesRouteChildren,
 )
 
+interface ChatbotRouteChildren {
+  ChatbotIndexRoute: typeof ChatbotIndexRoute
+}
+
+const ChatbotRouteChildren: ChatbotRouteChildren = {
+  ChatbotIndexRoute: ChatbotIndexRoute,
+}
+
+const ChatbotRouteWithChildren =
+  ChatbotRoute._addFileChildren(ChatbotRouteChildren)
+
 interface DashboardRouteChildren {
   DashboardAdminprofileRoute: typeof DashboardAdminprofileRoute
   DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
@@ -897,11 +965,13 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   VehiclesRoute: VehiclesRouteWithChildren,
   AboutRoute: AboutRoute,
-  ChatbotRoute: ChatbotRoute,
+  ChatbotRoute: ChatbotRouteWithChildren,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   DriverRoute: DriverRouteWithChildren,
   LoginRoute: LoginRoute,
+  PaymentCancelRoute: PaymentCancelRoute,
+  PaymentSuccessRoute: PaymentSuccessRoute,
   PaymentsRoute: PaymentsRoute,
   RegisterRoute: RegisterRoute,
   UserRoute: UserRouteWithChildren,

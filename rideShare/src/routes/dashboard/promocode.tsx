@@ -1,29 +1,5 @@
-import { useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  Box,
-  Collapse,
-  IconButton,
-  TextField,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TablePagination,
-} from '@mui/material'
-import {
-  KeyboardArrowDown as KeyboardArrowDownIcon,
-  KeyboardArrowUp as KeyboardArrowUpIcon,
-} from '@mui/icons-material'
 import { useCrudOperations } from '@/hooks/crudops'
 import {
   getPromoCodes,
@@ -32,97 +8,36 @@ import {
   deletePromoCode,
 } from '@/api/UserApi'
 import type { PromoCode, UserPromoUsage, userTypes } from '@/types/alltypes'
+import { Toaster } from 'sonner'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
+import { ChevronDown, ChevronUp } from 'lucide-react'
+import clsx from 'clsx'
 
 export const Route = createFileRoute('/dashboard/promocode')({
   component: RouteComponent,
 })
-
-
-function PromoRow({
-  promo,
-  onEdit,
-  onDelete,
-}: {
-  promo: PromoCode
-  onEdit: (data: PromoCode) => void
-  onDelete: (id: string) => void
-}) {
-  const [open, setOpen] = useState(false)
-
-  return (
-    <>
-      <TableRow>
-        <TableCell>
-          <IconButton size="small" onClick={() => setOpen(!open)}>
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
-        <TableCell>{promo.code}</TableCell>
-        <TableCell>${promo.discountAmount}</TableCell>
-        <TableCell>{promo.usageLimit}</TableCell>
-        <TableCell>{promo.isActive ? 'Active' : 'Inactive'}</TableCell>
-        <TableCell>
-          <Button size="small" onClick={() => onEdit(promo)}>
-            Edit
-          </Button>
-          <Button size="small" color="error" onClick={() => onDelete(promo.id)}>
-            Delete
-          </Button>
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell colSpan={6} style={{ paddingBottom: 0, paddingTop: 0 }}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box margin={2}>
-              <Typography variant="subtitle1" gutterBottom>
-                Promo Code Usages
-              </Typography>
-              {promo.usages.length > 0 ? (
-                <ul>
-                  {promo.usages.map((usage: UserPromoUsage) => (
-                    <li key={usage.id}>
-                      Used by User ID: <strong>{usage.user?.id}</strong> on{' '}
-                      {new Date(usage.usedAt).toLocaleDateString()}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  No usages recorded.
-                </Typography>
-              )}
-            </Box>
-          </Collapse>
-        </TableCell>
-        <TableCell colSpan={6} style={{ paddingBottom: 0, paddingTop: 0 }}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box margin={2}>
-              <Typography variant="subtitle1" gutterBottom>
-                Promo User
-              </Typography>
-              {promo.createdBy.length > 0 ? (
-                <ul>
-                  {promo.createdBy.map((createdBy: userTypes) => (
-                    <li key={createdBy.id}>
-                      Used by User ID: <strong>{createdBy.firstName}</strong> on{' '}
-                      {createdBy.updatedAt
-                        ? new Date(createdBy.updatedAt).toLocaleString()
-                        : 'No update date'}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  No usages recorded.
-                </Typography>
-              )}
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    </>
-  )
-}
 
 function RouteComponent() {
   const {
@@ -152,6 +67,7 @@ function RouteComponent() {
   const [formData, setFormData] = useState<Partial<PromoCode>>({})
   const [editId, setEditId] = useState<string | null>(null)
 
+  // ───────────────────────────── Filter + Pagination
   const filtered = useMemo(() => {
     return (
       query.data?.filter((p) =>
@@ -165,6 +81,7 @@ function RouteComponent() {
     return filtered.slice(start, start + rowsPerPage)
   }, [filtered, page, rowsPerPage])
 
+  // ───────────────────────────── CRUD helpers
   const handleClose = () => {
     setDialogOpen(false)
     setFormData({})
@@ -189,111 +106,255 @@ function RouteComponent() {
     setDialogOpen(true)
   }
 
-  const handleDelete = (id: string) => {
-    remove.mutate(id)
-  }
+  const handleDelete = (id: string) => remove.mutate(id)
 
+  // ───────────────────────────── Render
   return (
-    <Box p={4}>
-      <Typography variant="h5" gutterBottom>
-        Promo Code Management
-      </Typography>
+    <div className="p-6 space-y-6">
+      <Toaster />
+      <div className="flex justify-between items-center gap-4 flex-wrap">
+        <h1 className="text-2xl font-bold">Promo Code Management</h1>
+        <div className="flex gap-2 flex-wrap">
+          <Input
+            placeholder="Filter by code"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="max-w-xs"
+          />
+          <Button onClick={() => setDialogOpen(true)}>Create Promo Code</Button>
+        </div>
+      </div>
 
-      <Box display="flex" justifyContent="space-between" mb={2}>
-        <TextField
-          label="Filter by Code"
-          variant="outlined"
-          size="small"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-        />
-        <Button variant="contained" onClick={() => setDialogOpen(true)}>
-          Create Promo Code
-        </Button>
-      </Box>
-
-      <TableContainer component={Paper}>
+      {/* Table */}
+      <div className="rounded-md border overflow-x-auto">
         <Table>
-          <TableHead>
+          <TableHeader>
             <TableRow>
-              <TableCell />
-              <TableCell>Code</TableCell>
-              <TableCell>Discount</TableCell>
-              <TableCell>Usage Limit</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableHead />
+              <TableHead>Code</TableHead>
+              <TableHead>Discount</TableHead>
+              <TableHead>Usage Limit</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
-          </TableHead>
+          </TableHeader>
           <TableBody>
-            {paginated.map((promo) => (
+            {paginated.map((p) => (
               <PromoRow
-                key={promo.id}
-                promo={promo}
+                key={p.id}
+                promo={p}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
               />
             ))}
           </TableBody>
         </Table>
-        <TablePagination
-          component="div"
-          count={filtered.length}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          rowsPerPageOptions={[5, 10, 25]}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          onRowsPerPageChange={(e) => {
-            setRowsPerPage(parseInt(e.target.value, 10))
-            setPage(0)
-          }}
-        />
-      </TableContainer>
+      </div>
 
-      {/* 🔽 Dialog */}
-      <Dialog open={dialogOpen} onClose={handleClose} fullWidth>
-        <DialogTitle>{editId ? 'Edit' : 'Create'} Promo Code</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Code"
-            fullWidth
-            margin="dense"
-            value={formData.code || ''}
-            onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-          />
-          <TextField
-            label="Discount Amount"
-            fullWidth
-            margin="dense"
-            type="number"
-            value={formData.discountAmount || ''}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                discountAmount: parseFloat(e.target.value),
-              })
-            }
-          />
-          <TextField
-            label="Usage Limit"
-            fullWidth
-            margin="dense"
-            type="number"
-            value={formData.usageLimit || ''}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                usageLimit: parseInt(e.target.value, 10),
-              })
-            }
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button variant="contained" onClick={handleSave}>
-            {editId ? 'Update' : 'Create'}
+      {/* Pagination controls */}
+      <div className="flex justify-between items-center text-sm text-muted-foreground">
+        <span>
+          Showing {page * rowsPerPage + 1} to{' '}
+          {Math.min((page + 1) * rowsPerPage, filtered.length)} of{' '}
+          {filtered.length} entries
+        </span>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage((p) => Math.max(p - 1, 0))}
+            disabled={page === 0}
+          >
+            Previous
           </Button>
-        </DialogActions>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              setPage((p) =>
+                (p + 1) * rowsPerPage < filtered.length ? p + 1 : p,
+              )
+            }
+            disabled={(page + 1) * rowsPerPage >= filtered.length}
+          >
+            Next
+          </Button>
+          <select
+            className={clsx(
+              buttonVariants({ variant: 'outline', size: 'sm' }),
+              'cursor-pointer',
+            )}
+            value={rowsPerPage}
+            onChange={(e) => {
+              setRowsPerPage(parseInt(e.target.value, 10))
+              setPage(0)
+            }}
+          >
+            {[5, 10, 25].map((n) => (
+              <option key={n} value={n}>
+                {n}/page
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Create / Edit dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>{editId ? 'Edit' : 'Create'} Promo Code</DialogTitle>
+            <DialogDescription>
+              Define code, discount and usage limit.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="text-sm font-medium" htmlFor="code">
+                Code
+              </label>
+              <Input
+                id="code"
+                value={formData.code || ''}
+                onChange={(e) =>
+                  setFormData({ ...formData, code: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium" htmlFor="discount">
+                Discount Amount ($)
+              </label>
+              <Input
+                id="discount"
+                type="number"
+                value={formData.discountAmount ?? ''}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    discountAmount: parseFloat(e.target.value),
+                  })
+                }
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium" htmlFor="limit">
+                Usage Limit
+              </label>
+              <Input
+                id="limit"
+                type="number"
+                value={formData.usageLimit ?? ''}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    usageLimit: parseInt(e.target.value, 10),
+                  })
+                }
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="ghost" onClick={handleClose} type="button">
+              Cancel
+            </Button>
+            <Button onClick={handleSave}>{editId ? 'Update' : 'Create'}</Button>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
-    </Box>
+    </div>
   )
 }
+
+// ───────────────────────────── Promo Row component
+function PromoRow({
+  promo,
+  onEdit,
+  onDelete,
+}: {
+  promo: PromoCode
+  onEdit: (p: PromoCode) => void
+  onDelete: (id: string) => void
+}) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <>
+      <TableRow>
+        <TableCell>
+          <Collapsible open={open} onOpenChange={setOpen}>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="icon">
+                {open ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
+              </Button>
+            </CollapsibleTrigger>
+          </Collapsible>
+        </TableCell>
+        <TableCell>{promo.code}</TableCell>
+        <TableCell>${promo.discountAmount}</TableCell>
+        <TableCell>{promo.usageLimit}</TableCell>
+        <TableCell>{promo.isActive ? 'Active' : 'Inactive'}</TableCell>
+        <TableCell className="space-x-2">
+          <Button size="sm" variant="secondary" onClick={() => onEdit(promo)}>
+            Edit
+          </Button>
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={() => onDelete(promo.id)}
+          >
+            Delete
+          </Button>
+        </TableCell>
+      </TableRow>
+
+      <Collapsible>
+        <CollapsibleContent className="px-4 py-2 bg-muted/50">
+          {/* Usages */}
+          <h4 className="font-medium mb-1">Promo Code Usages</h4>
+          {promo.usages.length ? (
+            <ul className="list-disc list-inside space-y-1 text-sm">
+              {promo.usages.map((u: UserPromoUsage) => (
+                <li key={u.id}>
+                  User <span className="font-semibold">{u.user?.id}</span> on{' '}
+                  {new Date(u.usedAt).toLocaleDateString()}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted-foreground mb-2">
+              No usages recorded.
+            </p>
+          )}
+
+          {/* Created By / Admins */}
+          <h4 className="font-medium mb-1 mt-4">Promo User</h4>
+          {promo.createdBy.length ? (
+            <ul className="list-disc list-inside space-y-1 text-sm">
+              {promo.createdBy.map((c: userTypes) => (
+                <li key={c.id}>
+                  {c.firstName}{' '}
+                  {c.updatedAt ? (
+                    <span className="text-muted-foreground">
+                      — {new Date(c.updatedAt).toLocaleString()}
+                    </span>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted-foreground">No users recorded.</p>
+          )}
+        </CollapsibleContent>
+      </Collapsible>
+    </>
+  )
+}
+
+export default RouteComponent

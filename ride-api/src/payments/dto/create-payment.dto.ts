@@ -27,8 +27,24 @@ export class CreatePaymentDto {
   @IsString()
   @IsOptional()
   userId: string;
+  // @ApiProperty()
+  // @IsString()
+  // @IsOptional()
+  // rideId: string;
   @ApiProperty()
   @IsString()
   @IsOptional()
-  rideId: string;
+  vehicleId: string;
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  paymentIntentId: string;
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  clientSecret: string;
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  url: string;
 }

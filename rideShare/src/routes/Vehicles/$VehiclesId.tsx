@@ -1,16 +1,22 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { useParams } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { getVehiclesById } from '@/api/UserApi'
 import type { Vehicle } from '@/types/alltypes'
-import Box from '@mui/material/Box'
-import Stepper from '@mui/material/Stepper'
-import Step from '@mui/material/Step'
-import StepLabel from '@mui/material/StepLabel'
 import { Button } from '@/components/ui/button' // shadcn button
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { authStore } from '@/app/store'
-import {RingLoader} from 'react-spinners'
+import { RingLoader } from 'react-spinners'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu'
+import { Sun, Moon, CarTaxiFrontIcon } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import { Toaster } from 'sonner'
+
 
 const toRad = (d: number) => (d * Math.PI) / 180
 function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -24,20 +30,18 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
 }
 
 export const Route = createFileRoute('/Vehicles/$VehiclesId')({
-    //  beforeLoad: ({ location }) => {
-    //     const { isVerified } = authStore.state
-    //     console.log('isVerfied', isVerified)
-    //     if (!isVerified) {
-    //       throw redirect({
-    //         to: '/login',
-    //         search: {
-    //           redirect: location.href,
-    //         },
-    //       })
-    //     }
-    //   },
-  component: RouteComponent,
+  // beforeLoad: ({ location }) => {
+  //   const { isVerified } = authStore.state
+  //   if (!isVerified) {
+  //     throw redirect({
+  //       to: '/login',
+  //       search: { redirect: location.href },
+  //     })
+  //   }
+  // },
+  component: RouteComponentWrapper,
 })
+
 
 function getCoords(key: string): [number, number] | null {
   try {
@@ -50,6 +54,8 @@ function getCoords(key: string): [number, number] | null {
 
 function RouteComponent() {
   const { VehiclesId } = useParams({ from: '/Vehicles/$VehiclesId' })
+   const navigate = useNavigate()
+
 
   // Vehicle details -----------------------------------------------------------
   const {
@@ -61,6 +67,8 @@ function RouteComponent() {
     queryFn: () => getVehiclesById(VehiclesId),
     enabled: !!VehiclesId,
   })
+
+  // Theme state
 
   // Locations pulled from localStorage ---------------------------------------
   const pickupCoords = getCoords('pickupCoords')
@@ -91,17 +99,20 @@ function RouteComponent() {
     early: 0.5,
   }
   const baseRate = Number(vehicle?.rentalrate) ?? 0
-  const adjustedRate = baseRate * timeBandFactor[timeBand]
+  const adjustedRate = ((baseRate)/10) * timeBandFactor[timeBand]
   const baseCost = distanceKm * adjustedRate
   const serviceFee = 2
   const tipFee = baseCost * 0.05
   const totalCost = baseCost + serviceFee + tipFee
 
   // Loading / error ----------------------------------------------------------
-  if (isVehicleLoading) return <div className=" w-fit text-center py-10 m-auto">
-    <RingLoader color="#0017ff" />
-    Loading...
-  </div>
+  if (isVehicleLoading)
+    return (
+      <div className="w-fit text-center py-10 m-auto">
+        <RingLoader color="#0017ff" />
+        Loading...
+      </div>
+    )
   if (vehicleError)
     return (
       <div className="text-center text-red-600 py-10">Error loading data.</div>
@@ -109,152 +120,190 @@ function RouteComponent() {
   if (!vehicle)
     return <div className="text-center py-10">Vehicle not found.</div>
 
+  const handleBookNow = () => {
+    localStorage.setItem('vehicleId', VehiclesId)
+    localStorage.setItem('Amount', totalCost.toString())
+    navigate({ to: '/payments' }) // navigate after saving
+  }
+
   return (
     <>
-      {/* Stepper */}
-      <Box sx={{ width: '100%' }} className="mb-8">
-        <Stepper activeStep={1} alternativeLabel>
-          {['Select car', 'Confirm Location', 'Payment', 'Pickup'].map((l) => (
-            <Step key={l}>
-              <StepLabel>{l}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-      </Box>
+      <Toaster />
 
-      <div className="grid lg:grid-cols-2 gap-12 px-6 max-w-6xl mx-auto">
-        {/* Vehicle details */}
-        <div className="space-y-6">
-          <h1 className="text-4xl font-extrabold text-gray-900">
-            {vehicle.make} {vehicle.model}
-          </h1>
+      {/* ───────────────────── Header ───────────────────── */}
+      <header className="sticky top-0 z-40 flex items-center justify-between px-6 py-4 border-b bg-white/80 backdrop-blur dark:bg-gray-900/80">
+        <Link
+          to="/Vehicles"
+          className="flex items-center gap-2 text-lg font-bold text-blue-600"
+        >
+          <CarTaxiFrontIcon className="h-6 w-6" />
+          Vehicles
+        </Link>
+
+        <h1 className="text-base md:text-xl font-semibold text-gray-900 dark:text-gray-100">
+          {vehicle.make} {vehicle.model}
+        </h1>
+
+        {/* Theme toggle */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="icon" variant="outline">
+              <Sun className="h-5 w-5 dark:hidden" />
+              <Moon className="h-5 w-5 hidden dark:block" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem>Light</DropdownMenuItem>
+            <DropdownMenuItem>Dark</DropdownMenuItem>
+            <DropdownMenuItem>System</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </header>
+
+      {/* ───────────────────── Main Grid ───────────────────── */}
+      <div className="mx-auto max-w-6xl px-4 pb-10 grid lg:grid-cols-[2fr_1fr] gap-10">
+        {/* Vehicle card */}
+        <section className="space-y-6">
+          <h2 className="text-2xl font-extrabold text-gray-900 dark:text-gray-100">
+            {vehicle.make} {vehicle.model}
+          </h2>
+
           <div className="relative">
             <img
               src={vehicle.vehicleImage}
               alt={vehicle.model}
-              className="w-full h-64 object-cover rounded-lg shadow-md"
+              className="w-full h-80 object-cover rounded-xl shadow-lg"
             />
-            <p className="absolute -bottom-5 w-full bg-blue-700 text-center text-white p-4 rounded-2xl">
-              Ksh {vehicle.rentalrate} / km
-            </p>
+            <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-blue-600 dark:bg-blue-500 text-white px-6 py-2 rounded-full shadow">
+              Ksh {vehicle.rentalrate} / km
+            </div>
           </div>
-          <ul className="mt-6 space-y-2 text-gray-700 text-base">
+
+          <ul className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
             <li>
-              <strong>Plate:</strong> {vehicle.plateNumber}
+              <strong className="font-extrabold text-xm">Plate:</strong>{' '}
+              {vehicle.plateNumber}
             </li>
             <li>
-              <strong>Color:</strong> {vehicle.color}
+              <strong className="font-extrabold text-xm">Color:</strong>{' '}
+              {vehicle.color}
             </li>
             <li>
-              <strong>Capacity:</strong> {vehicle.capacity} persons
+              <strong className="font-extrabold text-xm">Capacity:</strong>{' '}
+              {vehicle.capacity}
             </li>
             <li>
-              <strong>Year:</strong> {vehicle.year}
+              <strong className="font-extrabold text-xm">Year:</strong>{' '}
+              {vehicle.year}
             </li>
             <li>
-              <strong>Type:</strong> {vehicle.vehicleType}
+              <strong className="font-extrabold text-xm">Type:</strong>{' '}
+              {vehicle.vehicleType}
             </li>
           </ul>
-        </div>
+        </section>
 
-        {/* Booking summary & controls */}
-        <form className="space-y-5">
-          {/* Show stored addresses */}
-          <div className="space-y-2 text-sm text-gray-700">
-            <p>
-              <strong>Pickup:</strong> {pickupAddress}
-            </p>
-            <p>
-              <strong>Destination:</strong> {destAddress}
-            </p>
-          </div>
-
-          {/* Time band */}
-          <label
-            htmlFor="timeband"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Time of Day
-          </label>
-          <select
-            id="timeband"
-            value={timeBand}
-            onChange={(e) => setTimeBand(e.target.value as any)}
-            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="normal">Normal Hours (−30%)</option>
-            <option value="rush">Rush Hours (+30%)</option>
-            <option value="evening">Evening (−50%)</option>
-            <option value="early">Early Morning (−50%)</option>
-          </select>
-
-          {/* Date & time */}
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <label
-                htmlFor="date"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Date
-              </label>
-              <input
-                type="date"
-                id="date"
-                min={todayStr}
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+        {/* Sticky sidebar (booking) */}
+        <aside className="lg:sticky lg:top-20 space-y-6">
+          <div className="rounded-xl border bg-white dark:bg-gray-800 shadow-sm p-6 space-y-6">
+            {/* Locations */}
+            <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+              <p>
+                <strong className="font-extrabold ">Pickup:</strong> <br />{' '}
+                {pickupAddress}
+              </p>
+              <p>
+                <strong className="font-extrabold ">Destination:</strong> <br />{' '}
+                {destAddress}
+              </p>
             </div>
-            <div className="flex-1">
-              <label
-                htmlFor="time"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Time
+
+            {/* Time band */}
+            <div className="space-y-1">
+              <label htmlFor="timeband" className="text-sm font-medium">
+                Time&nbsp;of&nbsp;Day
               </label>
-              <input
-                type="time"
-                id="time"
-                min={minTime}
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              <select
+                id="timeband"
+                value={timeBand}
+                onChange={(e) => setTimeBand(e.target.value as any)}
+                className="w-full rounded-md border px-3 py-2 dark:bg-gray-700"
+              >
+                <option value="normal">Normal (−30%)</option>
+                <option value="rush">Rush (+30%)</option>
+                <option value="evening">Evening (−50%)</option>
+                <option value="early">Early Morning (−50%)</option>
+              </select>
             </div>
-          </div>
 
-          {/* Cost breakdown */}
-          <div className="mt-6 space-y-2 text-sm text-gray-700">
-            <p>
-              <strong>Distance:</strong>{' '}
-              {distanceKm ? `${distanceKm.toFixed(2)} km` : 'Unavailable'}
-            </p>
-            <p>
-              <strong>Service Fee:</strong> Ksh {serviceFee.toFixed(2)}
-            </p>
-            <p>
-              <strong>Tip (5%):</strong> Ksh {tipFee.toFixed(2)}
-            </p>
-            <p>
-              <strong>Total Cost:</strong>{' '}
-              <span className="font-semibold text-blue-800">
-                Ksh {totalCost.toFixed(2)}
-              </span>
-            </p>
-          </div>
+            {/* Date / time */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="date" className="text-sm font-medium">
+                  Date
+                </label>
+                <input
+                  id="date"
+                  type="date"
+                  min={todayStr}
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="w-full rounded-md border px-3 py-2 dark:bg-gray-700"
+                />
+              </div>
+              <div>
+                <label htmlFor="time" className="text-sm font-medium">
+                  Time
+                </label>
+                <input
+                  id="time"
+                  type="time"
+                  min={minTime}
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                  className="w-full rounded-md border px-3 py-2 dark:bg-gray-700"
+                />
+              </div>
+            </div>
 
-          <Button
-            type="button"
-            className="w-full py-3 text-lg font-semibold"
-            disabled={!pickupCoords || !destCoords || distanceKm === 0}
-          >
-            Book Now & Pay
-          </Button>
-        </form>
+            {/* Cost */}
+            <div className="divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+              <p className="py-1 flex justify-between">
+                <span>Distance</span>
+                <span>{distanceKm ? distanceKm.toFixed(2) : '—'} km</span>
+              </p>
+              <p className="py-1 flex justify-between">
+                <span>Service Fee</span>
+                <span>Ksh {serviceFee.toFixed(2)}</span>
+              </p>
+              <p className="py-1 flex justify-between">
+                <span>Tip (5%)</span>
+                <span>Ksh {tipFee.toFixed(2)}</span>
+              </p>
+              <p className="pt-2 flex justify-between font-semibold text-base">
+                <span>Total</span>
+                <span className="text-blue-700 dark:text-blue-400">
+                  Ksh {totalCost.toFixed(2)}
+                </span>
+              </p>
+            </div>
+            <Button
+              onClick={handleBookNow}
+              className="w-full py-3 text-lg font-semibold"
+              disabled={!pickupCoords || !destCoords || distanceKm === 0}
+            >
+              Book Now & Pay
+            </Button>
+          </div>
+        </aside>
       </div>
     </>
   )
 }
 
-export default RouteComponent
+// Wrapper to add ThemeToggle outside main RouteComponent
+function RouteComponentWrapper() {
+  return <RouteComponent />
+}
+
+export default RouteComponentWrapper

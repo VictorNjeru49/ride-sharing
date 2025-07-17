@@ -27,6 +27,9 @@ import { APP_GUARD } from '@nestjs/core';
 import { AtGuard } from './auth/guards';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { LoggerMiddleware } from './logger.middleware';
+import { ChatbotController } from './chatbot/chatbot.controller';
+import { ChatbotService } from './chatbot/chatbot.service';
+import { ChatbotModule } from './chatbot/chatbot.module';
 
 @Module({
   imports: [
@@ -66,8 +69,9 @@ import { LoggerMiddleware } from './logger.middleware';
         },
       ],
     }),
+    ChatbotModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, ChatbotController],
   providers: [
     AppService,
     {
@@ -78,6 +82,7 @@ import { LoggerMiddleware } from './logger.middleware';
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
+    ChatbotService,
   ],
 })
 export class AppModule implements NestModule {

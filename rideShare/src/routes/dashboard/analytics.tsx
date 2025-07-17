@@ -150,11 +150,13 @@ function RouteComponent() {
   const COLORS = ['#00C49F', '#FFBB28', '#FF8042', '#0088FE']
 
   return (
-    <div className="p-6 space-y-10 min-h-screen bg-gray-50">
-      <h1 className="text-2xl font-bold text-gray-800">Analytics Dashboard</h1>
+    <div className="p-6 space-y-10 min-h-screen bg-gray-50 dark:bg-gray-900">
+      <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+        Analytics Dashboard
+      </h1>
 
       {/* Bar Chart */}
-      <div className="bg-white rounded-xl shadow p-6">
+      <div className="bg-white rounded-xl shadow p-6 dark:bg-gray-700">
         <h2 className="text-lg font-semibold mb-4">System Entities Overview</h2>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={barData}>
@@ -167,7 +169,7 @@ function RouteComponent() {
       </div>
 
       {/* Pie Chart */}
-      <div className="bg-white rounded-xl shadow p-6">
+      <div className="bg-white rounded-xl shadow p-6 dark:bg-gray-700">
         <h2 className="text-lg font-semibold mb-4">Finance Distribution</h2>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
@@ -194,7 +196,7 @@ function RouteComponent() {
       </div>
 
       {/* Line Chart */}
-      <div className="bg-white rounded-xl shadow p-6">
+      <div className="bg-white rounded-xl shadow p-6 dark:bg-gray-700">
         <h2 className="text-lg font-semibold mb-4">Recent Ratings Trend</h2>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={lineData}>

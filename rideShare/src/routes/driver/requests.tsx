@@ -3,7 +3,14 @@ import { useQuery } from '@tanstack/react-query'
 import { getUserById } from '@/api/UserApi'
 import { authStore } from '@/app/store'
 import { formatDistanceToNow } from 'date-fns'
-import { RingLoader } from 'react-spinners'
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export const Route = createFileRoute('/driver/requests')({
   component: RouteComponent,
@@ -21,66 +28,75 @@ function RouteComponent() {
   const requests = user?.driverProfile?.assignedRequests ?? []
 
   return (
-    <section className="p-6 bg-gray-50 min-h-screen space-y-6">
-      <div>
-        <h2 className="text-2xl font-semibold text-gray-800 mb-1">
-          Ride Requests
-        </h2>
-        <p className="text-gray-600 mb-4">
+    <section className="p-6 min-h-screen bg-muted/50 dark:bg-gray-900 space-y-6">
+      <header>
+        <h2 className="text-2xl font-semibold">Ride Requests</h2>
+        <p className="text-muted-foreground text-sm">
           Manage and respond to ride requests from users.
         </p>
-      </div>
+      </header>
 
-      <div className="bg-white rounded-xl shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">
-          Assigned Ride Requests
-        </h3>
-
-        {isLoading ? (
-          <div className=" w-fit text-center py-10 m-auto">
-            <RingLoader color="#0017ff" />
-            Loading...
-          </div>
-        ) : requests.length === 0 ? (
-          <p className="text-gray-500">No ride requests assigned yet.</p>
-        ) : (
-          <ul className="divide-y divide-gray-200">
-            {requests.map((req) => (
-              <li key={req.id} className="py-4">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="font-medium text-gray-800">
-                      Pickup location unknown → Dropoff location unknown
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Requested{' '}
-                      {req.requestedAt
-                        ? formatDistanceToNow(new Date(req.requestedAt), {
-                            addSuffix: true,
-                          })
-                        : 'unknown time'}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Preferred Vehicle: {req.preferredVehicleType ?? 'N/A'}
-                    </p>
+      <Card>
+        <CardHeader>
+          <CardTitle>Assigned Ride Requests</CardTitle>
+          <CardDescription>Newest first</CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <Skeleton className="w-full h-40" />
+          ) : requests.length === 0 ? (
+            <p className="text-muted-foreground p-6">
+              No ride requests assigned yet.
+            </p>
+          ) : (
+            <ul className="divide-y divide-border">
+              {requests.map((req) => (
+                <li key={req.id} className="p-4 hover:bg-muted/40">
+                  <div className="flex justify-between items-center">
+                    <div className="space-y-1 text-sm">
+                      <p className="font-medium">
+                        Pickup location unknown → Dropoff location unknown
+                      </p>
+                      <p className="text-muted-foreground">
+                        Requested{' '}
+                        {req.requestedAt
+                          ? formatDistanceToNow(new Date(req.requestedAt), {
+                              addSuffix: true,
+                            })
+                          : '—'}
+                      </p>
+                      <p className="text-muted-foreground">
+                        Preferred Vehicle: {req.preferredVehicleType ?? 'N/A'}
+                      </p>
+                    </div>
+                    <StatusPill status={req.status} />
                   </div>
-                  <span
-                    className={`text-xs font-semibold px-3 py-1 rounded-full capitalize ${
-                      req.status === 'pending'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : req.status === 'accepted'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-red-100 text-red-700'
-                    }`}
-                  >
-                    {req.status ?? 'unknown'}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
     </section>
   )
 }
+
+function StatusPill({ status }: { status?: string }) {
+  const map: Record<string, string> = {
+    pending:
+      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+    accepted:
+      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+    rejected: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+  }
+  const cls = map[status ?? 'pending'] || map.pending
+  return (
+    <span
+      className={`text-xs font-semibold capitalize px-3 py-1 rounded-full ${cls}`}
+    >
+      {status ?? 'unknown'}
+    </span>
+  )
+}
+
+export default RouteComponent

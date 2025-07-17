@@ -86,7 +86,7 @@ function RouteComponent() {
                   )}
                 </div>
                 {expandedIndex === index && (
-                  <p className="mt-2 text-sm text-gray-700">{faq.answer}</p>
+                  <p className="mt-2 text-sm text-gray-700 dark:text-white">{faq.answer}</p>
                 )}
               </CardContent>
             </Card>

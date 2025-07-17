@@ -4,8 +4,22 @@ import { getUserById } from '@/api/UserApi'
 import { authStore } from '@/app/store'
 import { DollarSign } from 'lucide-react'
 import { format } from 'date-fns'
-import type { Payment } from '@/types/alltypes'
-import { RingLoader } from 'react-spinners'
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card'
+import {
+  Table,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableBody,
+  TableCell,
+} from '@/components/ui/table'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export const Route = createFileRoute('/driver/earnings')({
   component: RouteComponent,
@@ -19,97 +33,93 @@ function RouteComponent() {
     queryFn: () => getUserById(userId!),
     enabled: !!userId,
   })
-  const displayName = user?.firstName || 'Alex'
 
-  const earnings = user?.payments || []
-
-  const totalEarnings = earnings.reduce(
-    (acc, payment) => acc + payment.amount,
-    0,
-  )
-  console.log(user)
+  const displayName = user?.firstName ?? 'Alex'
+  const earnings = user?.payments ?? []
+  const total = earnings.reduce((acc, p) => acc + p.amount, 0)
 
   return (
-    <section className="p-6 bg-gray-50 min-h-screen space-y-6">
-      <div>
-        <h2 className="text-2xl font-semibold text-gray-800 mb-1">
-          {' '}
-          {displayName} Earnings
-        </h2>
-        <p className="text-gray-600 mb-4">
-          Track your daily, weekly, and monthly earnings.
+    <section className="p-6 min-h-screen bg-muted/50 dark:bg-gray-900 space-y-6">
+      <header>
+        <h2 className="text-2xl font-semibold">{displayName} Earnings</h2>
+        <p className="text-muted-foreground text-sm">
+          Track your daily, weekly & monthly earnings.
         </p>
-      </div>
+      </header>
 
-      <div className="bg-white rounded-xl shadow p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-semibold text-gray-800">
-            Total Earnings
-          </h3>
-          <div className="text-green-600 font-bold text-xl flex items-center gap-2">
-            <DollarSign className="w-5 h-5" />$
-            {Number(totalEarnings).toFixed(2)}
-          </div>
-        </div>
+      {/* Total */}
+      <Card>
+        <CardHeader className="flex justify-between items-center">
+          <CardTitle>Total Earnings</CardTitle>
+          <CardDescription className="text-green-600 dark:text-green-400 flex items-center gap-1 font-semibold">
+            <DollarSign className="w-5 h-5" /> {Number(total).toFixed(2)}
+          </CardDescription>
+        </CardHeader>
+      </Card>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full table-auto text-sm text-left">
-            <thead>
-              <tr className="bg-gray-100 text-gray-600">
-                <th className="px-4 py-2 font-medium">Date</th>
-                <th className="px-4 py-2 font-medium">Amount</th>
-                <th className="px-4 py-2 font-medium">Method</th>
-                <th className="px-4 py-2 font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {isLoading ? (
-                <tr>
-                  <td colSpan={4} className="text-center py-6 text-gray-500">
-                    <div className=" w-fit text-center py-10 m-auto">
-                      <RingLoader color="#0017ff" />
-                      Loading...
-                    </div>
-                  </td>
-                </tr>
-              ) : earnings.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="text-center py-6 text-gray-500">
-                    No earnings data available.
-                  </td>
-                </tr>
-              ) : (
-                earnings.map((payment: Payment) => (
-                  <tr key={payment.id} className="border-b last:border-b-0">
-                    <td className="px-4 py-2 text-gray-700">
-                      {format(new Date(payment.paidAt), 'dd MMM yyyy')}
-                    </td>
-                    <td className="px-4 py-2 text-green-600 font-medium">
-                      ${Number(payment.amount).toFixed(2)}
-                    </td>
-                    <td className="px-4 py-2 capitalize text-gray-700">
-                      {payment.method.replace('_', ' ')}
-                    </td>
-                    <td className="px-4 py-2">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          payment.status === 'completed'
-                            ? 'bg-green-100 text-green-700'
-                            : payment.status === 'pending'
-                              ? 'bg-yellow-100 text-yellow-700'
-                              : 'bg-red-100 text-red-700'
-                        }`}
-                      >
-                        {payment.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/* Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Earnings History</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <Skeleton className="w-full h-40" />
+          ) : earnings.length === 0 ? (
+            <p className="text-muted-foreground p-6">
+              No earnings data available.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    {['Date', 'Amount', 'Method', 'Status'].map((h) => (
+                      <TableHead key={h}>{h}</TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {earnings.map((p) => (
+                    <TableRow key={p.id}>
+                      <TableCell>
+                        {format(new Date(p.paidAt), 'dd MMM yyyy')}
+                      </TableCell>
+                      <TableCell className="text-green-600 dark:text-green-400 font-medium">
+                        ${Number(p.amount).toFixed(2)}
+                      </TableCell>
+                      <TableCell className="capitalize">
+                        {p.method.replace('_', ' ')}
+                      </TableCell>
+                      <TableCell>
+                        <StatusPill status={p.status} />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </section>
   )
 }
+
+function StatusPill({ status }: { status?: string }) {
+  const map: Record<string, string> = {
+    completed:
+      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+    pending:
+      'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300',
+    failed: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+  }
+  const cls = map[status ?? 'pending'] || map.pending
+  return (
+    <span className={`text-xs font-medium px-2 py-1 rounded-full ${cls}`}>
+      {status ?? 'pending'}
+    </span>
+  )
+}
+
+export default RouteComponent

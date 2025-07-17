@@ -7,7 +7,7 @@ import { authStore } from '@/app/store'
 import { useQuery } from '@tanstack/react-query'
 import { getUserById } from '@/api/UserApi'
 import MapDialog from '@/components/locations'
-import { RingLoader } from 'react-spinners'
+import { ClipLoader, RingLoader } from 'react-spinners'
 
 export const Route = createFileRoute('/user/')({
   component: RouteComponent,
@@ -131,6 +131,8 @@ function RouteComponent() {
         }
       },
       () => setLoadingLocation(false),
+
+      
     )
   }, [pickupLocation])
 
@@ -179,6 +181,7 @@ function RouteComponent() {
     if (pickupLocation && destinationLocation) {
       const km = haversineKm(pickupLocation, destinationLocation)
       localStorage.setItem('distanceKm', km.toString())
+      
     }
   }, [pickupLocation, destinationLocation])
 
@@ -192,7 +195,7 @@ function RouteComponent() {
   // -------------------------------------------------------------------------
   if (isLoading) return (
     <div className=" w-fit text-center py-10 m-auto">
-      <RingLoader color="#0017ff" />
+      <ClipLoader color="#1700ff" size={35} />
       Loading...
     </div>
   )
@@ -216,6 +219,8 @@ function RouteComponent() {
         currentCoords={
           pickerMode === 'pickup' ? pickupLocation : destinationLocation
         }
+        pickupCoords={pickupLocation}
+        destinationCoords={destinationLocation}
       />
 
       {/* Book ride hero */}

@@ -6,13 +6,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from '@/components/ui/select'
 import { getUserById, updateUser } from '@/api/UserApi'
 import { UserRole, type userTypes } from '@/types/alltypes'
 import { authStore } from '@/app/store'
@@ -126,18 +119,44 @@ function Profiles() {
         Manage your account settings and preferences
       </p>
 
-      <Tabs defaultValue="profile" className="mt-6">
-        <TabsList className="grid grid-cols-3 w-full mb-4">
-          <TabsTrigger value="profile">Profile Details</TabsTrigger>
-          <TabsTrigger value="account">Account Settings</TabsTrigger>
-          <TabsTrigger value="recovery">Recovery & Security</TabsTrigger>
-        </TabsList>
+     <Tabs defaultValue="profile" className="mt-6 md:mt-9">
+  <TabsList
+    className="
+      flex flex-col space-y-2 md:grid md:grid-cols-3 md:space-y-4 w-full mb-9
+    "
+  >
+    <TabsTrigger
+      value="profile"
+      className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-600
+        dark:data-[state=active]:bg-blue-900 dark:data-[state=active]:text-white
+        font-medium text-gray-700 dark:text-gray-300 md:p-8"
+    >
+      Profile Details
+    </TabsTrigger>
+    <TabsTrigger
+      value="account"
+      className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-600
+        dark:data-[state=active]:bg-blue-900 dark:data-[state=active]:text-white
+        font-medium text-gray-700 dark:text-gray-300"
+    >
+      Account Settings
+    </TabsTrigger>
+    <TabsTrigger
+      value="recovery"
+      className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-600
+        dark:data-[state=active]:bg-blue-900 dark:data-[state=active]:text-white
+        font-medium text-gray-700 dark:text-gray-300"
+    >
+      Recovery & Security
+    </TabsTrigger>
+  </TabsList>
+
 
         <form
-          className="bg-white rounded-lg border p-6 space-y-6 shadow"
+          className="bg-white rounded-lg border p-6 space-y-6 shadow dark:bg-gray-700"
           onSubmit={handleSubmit}
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 dark:text-white">
             <Avatar className="w-16 h-16">
               {profilePicture ? (
                 <AvatarImage src={profilePicture} />
@@ -162,6 +181,7 @@ function Profiles() {
                   value={firstName}
                   onChange={handleChange}
                   disabled={isLoading || updateMutation.isPending}
+                  className="mt-2"
                 />
               </div>
               <div>
@@ -171,6 +191,7 @@ function Profiles() {
                   value={lastName}
                   onChange={handleChange}
                   disabled={isLoading || updateMutation.isPending}
+                  className="mt-2"
                 />
               </div>
               <div className="md:col-span-2">
@@ -181,6 +202,7 @@ function Profiles() {
                   value={email}
                   onChange={handleChange}
                   disabled={isLoading || updateMutation.isPending}
+                  className="mt-2"
                 />
               </div>
               <div>
@@ -190,6 +212,7 @@ function Profiles() {
                   value={phone}
                   onChange={handleChange}
                   disabled={isLoading || updateMutation.isPending}
+                  className="mt-2"
                 />
               </div>
               {/* <div>
@@ -221,6 +244,7 @@ function Profiles() {
                 id="username"
                 defaultValue={user?.firstName || user?.lastName || ''}
                 disabled
+                className="mt-2"
               />
             </div>
             {/* <div>
@@ -238,6 +262,7 @@ function Profiles() {
                 value={password}
                 onChange={handleChange}
                 disabled={isLoading || updateMutation.isPending}
+                className="mt-2"
               />
             </div>
             <div>
@@ -247,6 +272,7 @@ function Profiles() {
                 type="password"
                 // You can add confirm password state and validation as needed
                 disabled={isLoading || updateMutation.isPending}
+                className="mt-2"
               />
             </div>
             <div>
@@ -256,6 +282,7 @@ function Profiles() {
                 type="email"
                 placeholder="backup@company.com"
                 disabled={isLoading || updateMutation.isPending}
+                className="mt-2"
               />
             </div>
           </TabsContent>

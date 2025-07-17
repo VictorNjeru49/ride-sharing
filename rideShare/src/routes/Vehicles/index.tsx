@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import FilterComponent from '@/components/FilterComponent'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { useCrudOperations } from '@/hooks/crudops'
@@ -10,10 +10,6 @@ import {
   deleteVehicles,
 } from '@/api/UserApi'
 import { toast, Toaster } from 'sonner'
-import Box from '@mui/material/Box'
-import Stepper from '@mui/material/Stepper'
-import Step from '@mui/material/Step'
-import StepLabel from '@mui/material/StepLabel'
 import {
   Card,
   CardContent,
@@ -22,6 +18,14 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu'
+import { Sun, Moon, Laptop, CarTaxiFrontIcon } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/Vehicles/')({
   component: RouteComponent,
@@ -31,6 +35,7 @@ function RouteComponent() {
   const router = useRouter()
   const [searchText, setSearchText] = useState('')
   const [filterBy, setFilterBy] = useState('all')
+
 
   const { query } = useCrudOperations<
     Vehicle,
@@ -50,7 +55,6 @@ function RouteComponent() {
     },
   )
 
-
   const allVehicles = query.data ?? []
 
   // Filter vehicles based on searchText and filterBy
@@ -61,7 +65,6 @@ function RouteComponent() {
 
     return allVehicles.filter((vehicle) => {
       if (filterBy === 'all') {
-        // Search in all relevant fields
         return (
           vehicle.make.toLowerCase().includes(lowerSearch) ||
           vehicle.model.toLowerCase().includes(lowerSearch) ||
@@ -72,7 +75,6 @@ function RouteComponent() {
           vehicle.vehicleType.toLowerCase().includes(lowerSearch)
         )
       } else {
-        // Search in specific field only
         switch (filterBy) {
           case 'make':
             return vehicle.make.toLowerCase().includes(lowerSearch)
@@ -95,12 +97,7 @@ function RouteComponent() {
     })
   }, [allVehicles, searchText, filterBy])
 
-  const steps = [
-    'Select a car to book for you ride',
-    'Confirm your Location',
-    'Confirm your payment',
-    'Wait for a reply and pickup',
-  ]
+
 
   function handleBookNow(vehicle: Vehicle) {
     toast.success(
@@ -112,17 +109,48 @@ function RouteComponent() {
     })
   }
 
+
   return (
     <>
-      <Box sx={{ width: '100%', mt: 1 }}>
-        <Stepper activeStep={0} alternativeLabel>
-          {steps.map((label) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-      </Box>
+      <Toaster />
+      <header className="w-full py-4 px-6 bg-white dark:bg-gray-900 shadow-sm flex justify-between items-center transition-colors duration-500">
+        <div className="flex items-center space-x-2 text-lg font-bold text-blue-600">
+          <CarTaxiFrontIcon />
+          <Link to="/" className="hover:text-blue-800">
+            RideShare
+          </Link>
+        </div>
+        <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          Vehicles
+        </h1>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              className="relative"
+              title="Toggle theme"
+            >
+              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem>
+              Light
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              Dark
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              System
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </header>
+
       <FilterComponent
         searchText={searchText}
         filterBy={filterBy}
@@ -130,11 +158,14 @@ function RouteComponent() {
         setFilterBy={setFilterBy}
       />
 
-      <div className="min-h-screen bg-gray-100 flex justify-center items-start p-8 border">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-800 flex justify-center items-start p-8 border transition-colors duration-500">
         <Toaster />
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-7xl w-full">
           {filteredVehicles.map((vehicle) => (
-            <Card key={vehicle.id} className="border border-gray-200">
+            <Card
+              key={vehicle.id}
+              className="border border-gray-200 dark:border-gray-700 transition-colors duration-500"
+            >
               <img
                 src={vehicle.vehicleImage}
                 alt={`${vehicle.make} ${vehicle.model}`}

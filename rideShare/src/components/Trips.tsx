@@ -103,7 +103,7 @@ function Trips() {
    // UI
    // ---------------------------------------------------------------------------
    return (
-     <Card className="mx-auto mb-10 mt-6 w-full max-w-7xl">
+     <Card className="mx-auto mb-10 mt-6 w-full ">
        <CardHeader>
          <CardTitle className="text-2xl font-bold">Trips Management</CardTitle>
        </CardHeader>

@@ -21,6 +21,33 @@ import type {
 import axios from 'axios'
 import { API_BASE_URL } from './BaseUrl'
 
+//  ------------------------------------------------
+
+//            CHATBOT  -> chatbot
+
+// -------------------------------------------------
+
+
+export const fetchBotReply = async (userMessage: string): Promise<string>  => {
+  try {
+    const response = await axios.post<{ reply: string }>(
+      `${API_BASE_URL}/chatbot`,
+      {
+        message: userMessage,
+      },
+      {
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
+
+    const {data} = await response
+    return data.reply
+  } catch (error) {
+    console.error('fetchBotReply error:', error)
+    return 'Sorry, something went wrong. Please try again later.'
+  }
+}
+
 
 
 
@@ -604,9 +631,7 @@ export const deletePromoCode = async (id: string): Promise<void> => {
 
 
 // -------------------------------------------------
-
 //                 PAYMENTS -> payments
-
 // ---------------------------------------------------
 
 // GET all Payments
@@ -629,6 +654,32 @@ export const createPayment = async (
   return response.data
 }
 
+// CREATE Stripe Checkout Session
+export const createCheckoutSession = async (
+  paymentData: Partial<Payment>,
+): Promise<{ url: string }> => {
+  const response = await axios.post(`${API_BASE_URL}/payments/checkout`, paymentData)
+  return response.data
+}
+
+//  NEW: GET Stripe Checkout Session by Session ID
+export const getStripeSessionById = async (
+  sessionId: string,
+): Promise<{ paymentIntentId: string }> => {
+  const response = await axios.get(`${API_BASE_URL}/payments/session/${sessionId}`)
+  return response.data
+}
+
+// CONFIRM Payment by PaymentIntent ID
+export const confirmPayment = async (
+  paymentIntentId: string,
+): Promise<Payment> => {
+  const response = await axios.post(`${API_BASE_URL}/payments/confirm`, {
+    paymentIntentId,
+  })
+  return response.data
+}
+
 // UPDATE Payment
 export const updatePayment = async (
   id: string,
@@ -642,6 +693,7 @@ export const updatePayment = async (
 export const deletePayment = async (id: string): Promise<void> => {
   await axios.delete(`${API_BASE_URL}/payments/${id}`)
 }
+
 
 
 

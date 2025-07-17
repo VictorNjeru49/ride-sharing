@@ -1,4 +1,5 @@
 import { Driverprofile } from 'src/driverprofile/entities/driverprofile.entity';
+import { Payment } from 'src/payments/entities/payment.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -6,6 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToOne,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -14,6 +16,9 @@ export class Vehicle {
   id: string;
   @OneToOne(() => Driverprofile, (dp) => dp.vehicle)
   driver: Driverprofile;
+
+  @OneToMany(() => Payment, (payment) => payment.vehicle)
+  payments: Payment[];
 
   @Column()
   vehicleImage: string;

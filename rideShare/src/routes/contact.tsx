@@ -22,22 +22,22 @@ return (
         Reach out to our support team for any issues or inquiries related to
         your ride bookings.
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-10 dark:text-black">
         <div className="p-6 shadow-md rounded-lg bg-blue-50 hover:bg-blue-100 transition">
           <h3 className="text-lg font-semibold">📞 Call Support</h3>
-          <p className="mt-2 text-gray-600 dark:text-gray-300">
+          <p className="mt-2 text-gray-600 ">
             +254 700 123 456
           </p>
         </div>
         <div className="p-6 shadow-md rounded-lg bg-blue-50 hover:bg-blue-100 transition">
           <h3 className="text-lg font-semibold">📧 Email Support</h3>
-          <p className="mt-2 text-gray-600 dark:text-gray-300">
+          <p className="mt-2 text-gray-600">
             support@rideshare.co.ke
           </p>
         </div>
         <div className="p-6 shadow-md rounded-lg bg-blue-50 hover:bg-blue-100 transition">
           <h3 className="text-lg font-semibold">📍 Office Visit</h3>
-          <p className="mt-2 text-gray-600 dark:text-gray-300">
+          <p className="mt-2 text-gray-600 ">
             1st Floor, Highway Plaza, Nairobi
           </p>
         </div>

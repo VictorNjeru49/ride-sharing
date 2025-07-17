@@ -9,7 +9,7 @@ import { authStore } from '@/app/store'
 import { getUserById } from '@/api/UserApi'
 import { format } from 'date-fns'
 import { UserRole, type Ride } from '@/types/alltypes'
-import { RingLoader } from 'react-spinners'
+import { PropagateLoader, RingLoader } from 'react-spinners'
 
 export const Route = createFileRoute('/user/ridehistory')({
   component: RideHistoryPage,
@@ -71,8 +71,7 @@ function RideHistoryPage() {
   if (isLoading) {
     return (
       <div className=" w-fit text-center py-10 m-auto">
-        <RingLoader color="#0017ff" />
-        Loading...
+        <PropagateLoader color="#0026ff" size={20} />
       </div>
     )
   }
@@ -196,7 +195,8 @@ function RideHistoryPage() {
 
               <p>
                 <strong>Rating:</strong>{' '}
-                {Array.isArray(ride.driver.rating) &&
+                {ride.driver &&
+                Array.isArray(ride.driver.rating) &&
                 ride.driver.rating.length > 0
                   ? Number(ride.driver.rating[0].score).toFixed(1)
                   : '—'}

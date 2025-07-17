@@ -1,15 +1,28 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   Payment,
+  PaymentMethod,
   // PaymentMethod,
   PaymentStatus,
 } from './entities/payment.entity';
 import { Repository } from 'typeorm';
 import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
+
+type CreatePaymentResponse = {
+  clientSecret: string;
+  url?: string;
+  payment: Partial<Payment>;
+};
+
+interface CreateCheckoutSessionResponse {
+  url: string;
+  clientSecret: string;
+  payment: Partial<Payment>;
+}
 
 @Injectable()
 export class PaymentsService {
@@ -30,37 +43,44 @@ export class PaymentsService {
 
   async create(
     createPaymentDto: CreatePaymentDto,
-  ): Promise<{ clientSecret; payment: Payment }> {
+  ): Promise<CreatePaymentResponse> {
     const paymentIntent = await this.stripe.paymentIntents.create({
       amount: Math.round(createPaymentDto.amount * 100),
       currency: createPaymentDto.currency,
       payment_method_types: ['card'],
       metadata: {
-        userId: createPaymentDto.userId,
-        rideId: createPaymentDto.rideId,
+        user: createPaymentDto.userId,
+        vehicle: createPaymentDto.vehicleId,
       },
     });
 
+    console.log(paymentIntent);
     const payment = this.paymentRepo.create({
       amount: createPaymentDto.amount,
       method: createPaymentDto.method,
       status: PaymentStatus.PENDING,
       user: { id: createPaymentDto.userId },
-      ride: { id: createPaymentDto.rideId },
+      vehicle: { id: createPaymentDto.vehicleId },
       stripePaymentIntentId: paymentIntent.id,
-      // paidAt: null,
     });
+
     await this.paymentRepo.save(payment);
 
-    return { clientSecret: paymentIntent.client_secret, payment };
+    return {
+      clientSecret: paymentIntent.client_secret!,
+      payment,
+    };
   }
 
-  async comfirmPayment(paymentIntentId: string): Promise<Payment> {
+  async confirmPaymentation(paymentIntentId: string): Promise<{
+    payment: Payment;
+    stripePaymentIntentId: string;
+  }> {
     const paymentIntent =
       await this.stripe.paymentIntents.retrieve(paymentIntentId);
 
     const payment = await this.paymentRepo.findOneOrFail({
-      where: { id: paymentIntent.metadata.paymentIntentId },
+      where: { stripePaymentIntentId: paymentIntent.id },
     });
 
     if (paymentIntent.status === 'succeeded') {
@@ -69,8 +89,129 @@ export class PaymentsService {
     } else if (paymentIntent.status === 'requires_payment_method') {
       payment.status = PaymentStatus.FAILED;
     }
+
     await this.paymentRepo.save(payment);
-    return payment;
+
+    return {
+      payment,
+      stripePaymentIntentId: paymentIntent.id,
+    };
+  }
+
+  async confirmPayment(paymentIntentId: string): Promise<{
+    payment: Payment;
+    stripePaymentIntentId: string;
+  }> {
+    const paymentIntent =
+      await this.stripe.paymentIntents.retrieve(paymentIntentId);
+
+    const payment = await this.paymentRepo.findOneOrFail({
+      where: { stripePaymentIntentId: paymentIntent.id },
+    });
+
+    // Update payment status based on PaymentIntent status
+    switch (paymentIntent.status) {
+      case 'succeeded':
+        payment.status = PaymentStatus.COMPLETED;
+        payment.paidAt = payment.paidAt || new Date();
+        break;
+
+      case 'requires_payment_method':
+      case 'canceled':
+        payment.status = PaymentStatus.FAILED;
+        break;
+
+      case 'processing':
+      case 'requires_confirmation':
+        payment.status = PaymentStatus.PENDING;
+        break;
+
+      default:
+        throw new Error(
+          `Unhandled payment intent status: ${paymentIntent.status}`,
+        );
+    }
+
+    // Save the updated payment record
+    await this.paymentRepo.save(payment);
+
+    return {
+      payment,
+      stripePaymentIntentId: paymentIntent.id,
+    };
+  }
+
+  async createCheckoutSession(
+    createPaymentDto: CreatePaymentDto,
+  ): Promise<CreateCheckoutSessionResponse> {
+    const session = await this.stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items: [
+        {
+          price_data: {
+            currency: createPaymentDto.currency,
+            product_data: {
+              name: `Vehicle Rental - ${createPaymentDto.vehicleId}`,
+            },
+            unit_amount: Math.round(createPaymentDto.amount * 100),
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        user: createPaymentDto.userId,
+        vehicle: createPaymentDto.vehicleId,
+      },
+      payment_intent_data: {
+        metadata: {
+          user: createPaymentDto.userId,
+          vehicle: createPaymentDto.vehicleId,
+        },
+      },
+      success_url: `${this.configService.get('FRONTEND_URL')}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${this.configService.get('FRONTEND_URL')}/payment-cancel`,
+      expand: ['payment_intent'],
+    });
+    console.log(session);
+
+    console.log(session.payment_intent);
+    // Destructure payment_intent from session
+    const { payment_intent: paymentIntent } = session;
+
+    if (!paymentIntent || typeof paymentIntent === 'string') {
+      throw new Error('payment_intent is null or not expanded');
+    }
+    if (!paymentIntent.client_secret) {
+      throw new Error('PaymentIntent client_secret is null');
+    }
+
+    const payment = this.paymentRepo.create({
+      amount: createPaymentDto.amount,
+      method: PaymentMethod.STRIPE_CHECKOUT,
+      status: PaymentStatus.PENDING,
+      user: { id: createPaymentDto.userId },
+      vehicle: { id: createPaymentDto.vehicleId },
+      currency: createPaymentDto.currency,
+      stripePaymentIntentId: paymentIntent.id,
+      paidAt: new Date(),
+    });
+
+    await this.paymentRepo.save(payment);
+
+    if (!session.url) {
+      throw new Error('Stripe Checkout session URL is null');
+    }
+
+    if (!paymentIntent.client_secret) {
+      throw new Error('PaymentIntent client_secret is null');
+    }
+
+    return {
+      url: session.url,
+      clientSecret: paymentIntent.client_secret,
+      payment,
+    };
   }
 
   // async create(createPaymentDto: CreatePaymentDto) {
@@ -78,25 +219,34 @@ export class PaymentsService {
   //   return await this.paymentRepo.save(payment);
   // }
 
-  async findAll() {
+  async findAll(): Promise<Payment[]> {
     return await this.paymentRepo.find({
-      relations: ['user', 'ride'],
+      relations: ['user', 'ride', 'vehicle'],
     });
   }
 
-  async findOne(id: string) {
-    return await this.paymentRepo.findOne({
+  async findOne(id: string): Promise<Payment> {
+    const payment = await this.paymentRepo.findOne({
       where: { id },
-      relations: ['user', 'ride'],
+      relations: ['user', 'ride', 'vehicle'],
     });
+    if (!payment) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return payment;
   }
 
-  async update(id: string, updatePaymentDto: UpdatePaymentDto) {
+  async update(
+    id: string,
+    updatePaymentDto: UpdatePaymentDto,
+  ): Promise<Payment> {
     await this.paymentRepo.update(id, updatePaymentDto);
     return this.findOne(id);
   }
 
-  async remove(id: string) {
-    return await this.paymentRepo.delete(id);
+  async remove(id: string): Promise<void> {
+    const Payment = await this.findOne(id);
+    console.log(`the Payment with id: ${id}`);
+    await this.paymentRepo.delete(Payment);
   }
 }
