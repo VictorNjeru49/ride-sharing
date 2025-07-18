@@ -319,7 +319,7 @@ export default function Header() {
         </div>
       )}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 md:hidden">
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 md:flex lg:hidden">
           <div className="absolute top-0 right-0 w-64 h-full bg-white dark:bg-gray-900 shadow-lg p-6 space-y-4">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">

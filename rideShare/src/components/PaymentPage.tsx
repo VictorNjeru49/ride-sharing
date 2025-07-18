@@ -17,9 +17,7 @@ function PaymentsPage() {
       const amountString = localStorage.getItem('Amount')
 
       if (!user?.id || !vehicleId || !amountString) {
-        throw new Error(
-          'Missing user ID, vehicle ID, or amount in localStorage.',
-        )
+        throw new Error('Missing user ID, ride ID, or amount in localStorage.')
       }
 
       const amount = Number(amountString)
@@ -30,7 +28,7 @@ function PaymentsPage() {
       // Call backend to create checkout session and get URL
       const { url } = await createCheckoutSession({
         userId: user.id,
-        vehicleId: vehicleId,
+        vehicleId,
         amount,
         method: PaymentMethod.STRIPE_CHECKOUT,
         currency: 'USD',
@@ -40,7 +38,7 @@ function PaymentsPage() {
         throw new Error('No checkout URL returned.')
       }
 
-      // ✅ Redirect to Stripe-hosted checkout page
+      // Redirect to Stripe-hosted checkout page
       window.location.href = url
     } catch (err: any) {
       setMessage(`Checkout failed: ${err.message || 'Something went wrong.'}`)

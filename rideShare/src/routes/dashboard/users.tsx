@@ -1,8 +1,8 @@
-import React, { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useCrudOperations } from '@/hooks/crudops'
-import { getUsers, createUser, updateUser, deleteUser } from '@/api/UserApi'
-import { type userTypes, UserRole } from '@/types/alltypes'
+import { getUsers, createUser, updateUser, deleteUser, createRiderProfile, createDriverProfile, getUserById, getVehiclesById, createAdmin, getVehicles } from '@/api/UserApi'
+import { type userTypes, type Vehicle, UserRole } from '@/types/alltypes'
 import { Toaster } from 'sonner'
 import {
   Table,
@@ -62,6 +62,11 @@ function RouteComponent() {
   const [formData, setFormData] = useState<Partial<userTypes>>({})
   const [editId, setEditId] = useState<string | null>(null)
   const [viewUser, setViewUser] = useState<userTypes | null>(null)
+  const [vehicles, setVehicles] = useState<Vehicle[]>([])
+  const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(
+    null,
+  )
+
 
   const filteredData = useMemo(() => {
     return (
@@ -84,6 +89,8 @@ function RouteComponent() {
     setOpenDialog(false)
     setFormData({})
     setEditId(null)
+     setSelectedVehicleId(null)
+     setVehicles([])
   }
 
   const handleEdit = (user: userTypes) => {
@@ -98,6 +105,18 @@ function RouteComponent() {
     setEditId(user.id)
     setOpenDialog(true)
   }
+
+useEffect(() => {
+  if (formData.role === UserRole.DRIVER) {
+    getVehicles()
+      .then((allVehicles) => {
+        
+        const availableVehicles = allVehicles.filter((v) => !v.driver)
+        setVehicles(availableVehicles)
+      })
+      .catch((err) => console.error('Failed to load vehicles:', err))
+  }
+}, [formData.role])
 
   const handleSave = () => {
     if (!formData.email || !formData.firstName) return
@@ -122,7 +141,35 @@ function RouteComponent() {
         },
       )
     } else {
-      create.mutate(payload, { onSuccess: handleDialogClose })
+      create.mutate(payload, {
+        onSuccess: async (newUser) => {
+  try {
+    const fullUser = await getUserById(newUser.id)
+
+    if (fullUser.role === UserRole.RIDER) {
+      await createRiderProfile({ user: fullUser, rating: 5 })
+    } else if (fullUser.role === UserRole.DRIVER) {
+      if (!selectedVehicleId) throw new Error('Please select a vehicle')
+
+      const fullVehicle = await getVehiclesById(selectedVehicleId)
+
+      await createDriverProfile({
+        user: fullUser,
+        licenseNumber: 'DEFAULT-LICENSE',
+        rating: 5,
+        isAvailable: true,
+        vehicle: fullVehicle,
+      })
+    } else if (fullUser.role === UserRole.ADMIN) {
+      await createAdmin({ user: fullUser})
+    }
+  } catch (profileErr) {
+    console.error('Profile creation failed:', profileErr)
+  } finally {
+    handleDialogClose()
+  }
+        },
+      })
     }
   }
 
@@ -314,6 +361,24 @@ function RouteComponent() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {formData.role === UserRole.DRIVER && (
+        <Select
+          value={selectedVehicleId ?? ''}
+          onValueChange={setSelectedVehicleId}
+        >
+          <SelectTrigger className="w-full mt-2">
+            <SelectValue placeholder="Select Vehicle" />
+          </SelectTrigger>
+          <SelectContent>
+            {vehicles.map((v) => (
+              <SelectItem key={v.id} value={v.id}>
+                {v.make} {v.model} ({v.plateNumber})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
     </div>
   )
 }

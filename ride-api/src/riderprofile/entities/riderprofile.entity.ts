@@ -36,10 +36,14 @@ export class Riderprofile {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @OneToMany(() => Riderequest, (rr) => rr.rider, { eager: true })
+  @OneToMany(() => Riderequest, (rr) => rr.rider, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
   rideRequests: Riderequest[];
 
-  @OneToMany(() => Ride, (r) => r.rider, { eager: true }) ridesTaken: Ride[];
+  @OneToMany(() => Ride, (r) => r.rider, { eager: true, onDelete: 'CASCADE' })
+  ridesTaken: Ride[];
 
   @OneToMany(() => Driverlocation, (dl) => dl.riderProfile, {
     cascade: true,

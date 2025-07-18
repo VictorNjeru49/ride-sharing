@@ -13,6 +13,7 @@ import {
   ManyToOne,
   OneToMany,
   OneToOne,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity()
@@ -22,22 +23,26 @@ export class Ride {
 
   @ManyToOne(() => Riderprofile, (rp) => rp.ridesTaken, {
     nullable: true,
+    onDelete: 'CASCADE',
   })
   rider: Riderprofile;
 
   @ManyToOne(() => Driverprofile, (dp) => dp.ridesOffered, {
+    onDelete: 'CASCADE',
     nullable: true,
   })
   driver: Driverprofile;
   @ManyToOne(() => Location, (l) => l.ridesPickup, {
-    cascade: true,
+    nullable: true,
+    onDelete: 'CASCADE',
     eager: true,
   })
   pickupLocation: Location;
 
   @ManyToOne(() => Location, (l) => l.ridesDropoff, {
-    cascade: true,
+    nullable: true,
     eager: true,
+    onDelete: 'CASCADE',
   })
   dropoffLocation: Location;
 
@@ -59,11 +64,13 @@ export class Ride {
   @CreateDateColumn()
   createdAt: Date;
 
-  @OneToMany(() => Payment, (p) => p.ride, {
-    onDelete: 'CASCADE',
+  @OneToOne(() => Payment, (p) => p.ride, {
+    cascade: true,
     nullable: true,
+    onDelete: 'CASCADE',
   })
-  payments: Payment[];
+  @JoinColumn()
+  payment: Payment;
 
   @OneToMany(() => Rating, (r) => r.ride, {
     onDelete: 'CASCADE',
@@ -74,12 +81,14 @@ export class Ride {
   @OneToOne(() => Ridecancel, (c) => c.ride, {
     cascade: true,
     nullable: true,
+    onDelete: 'CASCADE',
   })
   cancellation: Ridecancel;
 
   @OneToMany(() => Ridefeedback, (f) => f.ride, {
     cascade: true,
     nullable: true,
+    onDelete: 'CASCADE',
   })
   feedbacks: Ridefeedback[];
 }

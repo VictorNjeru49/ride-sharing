@@ -7,7 +7,7 @@ import {
   Column,
   CreateDateColumn,
   ManyToOne,
-  JoinColumn,
+  OneToOne,
 } from 'typeorm';
 
 // Define enum for payment methods
@@ -34,16 +34,14 @@ export class Payment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Ride, (r) => r.payments, {
-    cascade: true,
+  @OneToOne(() => Ride, (r) => r.payment, {
     nullable: true,
-    eager: true,
+    onDelete: 'CASCADE',
   })
-  @JoinColumn()
   ride: Ride;
 
   @ManyToOne(() => User, (u) => u.payments, {
-    cascade: true,
+    onDelete: 'CASCADE',
     nullable: true,
     eager: true,
   })
@@ -64,13 +62,17 @@ export class Payment {
 
   @ManyToOne(() => Vehicle, (vehicle) => vehicle.payments, {
     cascade: true,
+    onDelete: 'CASCADE',
     nullable: true,
     eager: true,
   })
   vehicle: Vehicle;
 
   @Column({ nullable: true })
-  stripePaymentIntentId?: string;
+  stripeCheckoutSessionId: string;
+
+  @Column({ nullable: true })
+  stripePaymentIntentId: string;
 
   @Column({
     type: 'enum',

@@ -18,6 +18,8 @@ import { ConfigService } from '@nestjs/config';
 
 @Controller('payments')
 export class PaymentsController {
+  private stripe: Stripe;
+
   constructor(
     private readonly paymentsService: PaymentsService,
     private readonly configService: ConfigService,
@@ -30,7 +32,7 @@ export class PaymentsController {
       apiVersion: '2025-06-30.basil',
     });
   }
-  private stripe: Stripe;
+
   @Public()
   @Post()
   async create(
@@ -43,13 +45,18 @@ export class PaymentsController {
   @Post('checkout')
   async createCheckoutSession(
     @Body() createPaymentDto: CreatePaymentDto,
-  ): Promise<{ url: string }> {
+  ): Promise<{
+    url: string;
+    clientSecret?: string;
+    payment?: Partial<Payment>;
+  }> {
     return this.paymentsService.createCheckoutSession(createPaymentDto);
   }
 
   @Public()
   @Post('confirm')
-  async confirmPayment(@Body() { paymentIntentId }: CreatePaymentDto) {
+  async confirmPayment(@Body() body: { paymentIntentId: string }) {
+    const { paymentIntentId } = body;
     if (!paymentIntentId) {
       throw new BadRequestException('paymentIntentId is required');
     }
@@ -57,13 +64,14 @@ export class PaymentsController {
   }
 
   @Public()
-  @Get('session/:sessionId')
-  async getSession(sessionId: string) {
-    const session = await this.stripe.checkout.sessions.retrieve(sessionId);
-    if (!session.payment_intent) {
-      throw new BadRequestException('payment_intent is missing from session');
-    }
-    return { paymentIntentId: session.payment_intent };
+  @Get('session/:id')
+  async getSessionById(@Param('id') sessionId: string) {
+    const session = await this.paymentsService.getSession(sessionId);
+    const paymentIntent = session.payment_intent as Stripe.PaymentIntent;
+
+    return {
+      paymentIntentId: paymentIntent.id,
+    };
   }
 
   @Public()

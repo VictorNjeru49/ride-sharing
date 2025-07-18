@@ -1,10 +1,20 @@
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { useParams } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { getVehiclesById } from '@/api/UserApi'
-import type { Vehicle } from '@/types/alltypes'
-import { Button } from '@/components/ui/button' // shadcn button
-import { useState, useEffect, useMemo } from 'react'
+import {
+  createLocation,
+  getRiderProfileById,
+  getUserById,
+  getVehiclesById,
+} from '@/api/UserApi'
+import {
+  type GenericsType,
+  type Ride,
+  type userTypes,
+  type Vehicle,
+} from '@/types/alltypes'
+import { Button } from '@/components/ui/button'
+import { useState } from 'react'
 import { authStore } from '@/app/store'
 import { RingLoader } from 'react-spinners'
 import {
@@ -15,12 +25,13 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Sun, Moon, CarTaxiFrontIcon } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
-import { Toaster } from 'sonner'
-
+import { toast, Toaster } from 'sonner'
+import axios from 'axios'
+import { API_BASE_URL } from '@/api/BaseUrl'
 
 const toRad = (d: number) => (d * Math.PI) / 180
 function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
-  const R = 6371 // Earth radius (km)
+  const R = 6371
   const dLat = toRad(lat2 - lat1)
   const dLon = toRad(lon2 - lon1)
   const a =
@@ -30,18 +41,8 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
 }
 
 export const Route = createFileRoute('/Vehicles/$VehiclesId')({
-  // beforeLoad: ({ location }) => {
-  //   const { isVerified } = authStore.state
-  //   if (!isVerified) {
-  //     throw redirect({
-  //       to: '/login',
-  //       search: { redirect: location.href },
-  //     })
-  //   }
-  // },
   component: RouteComponentWrapper,
 })
-
 
 function getCoords(key: string): [number, number] | null {
   try {
@@ -52,12 +53,27 @@ function getCoords(key: string): [number, number] | null {
   }
 }
 
+export interface RideInput {
+  rider: string
+  pickupLocation: string
+  dropoffLocation: string
+  fare: number
+  status: string
+  distanceKm: number
+  startTime: Date
+  endTime: Date
+  vehicle: string
+}
+
+export const createRides = async (rideData: RideInput): Promise<Ride> => {
+  const response = await axios.post(`${API_BASE_URL}/ride`, rideData)
+  return response.data
+}
+
 function RouteComponent() {
   const { VehiclesId } = useParams({ from: '/Vehicles/$VehiclesId' })
-   const navigate = useNavigate()
+  const navigate = useNavigate()
 
-
-  // Vehicle details -----------------------------------------------------------
   const {
     data: vehicle,
     isLoading: isVehicleLoading,
@@ -68,9 +84,20 @@ function RouteComponent() {
     enabled: !!VehiclesId,
   })
 
-  // Theme state
+  const userId = authStore.state.user.id
+  console.log('user', userId)
 
-  // Locations pulled from localStorage ---------------------------------------
+ const {
+   data: riderProfile,
+   isLoading: isRiderLoading,
+   error: riderError,
+ } = useQuery({
+   queryKey: ['riderProfile', userId],
+   queryFn: () => getUserById(userId),
+   enabled: !!userId,
+ })
+  console.log('riderProfile', riderProfile?.riderProfile)
+
   const pickupCoords = getCoords('pickupCoords')
   const destCoords = getCoords('destinationCoords')
   const pickupAddress = localStorage.getItem('pickupAddress') || '—'
@@ -79,7 +106,6 @@ function RouteComponent() {
   const distanceKm =
     pickupCoords && destCoords ? haversineKm(...pickupCoords, ...destCoords) : 0
 
-  // Date / Time --------------------------------------------------------------
   const [date, setDate] = useState('')
   const [time, setTime] = useState('')
   const [timeBand, setTimeBand] = useState<
@@ -91,7 +117,6 @@ function RouteComponent() {
   const currentTimeStr = now.toTimeString().slice(0, 5)
   const minTime = date === todayStr ? currentTimeStr : '00:00'
 
-  // Cost calculations --------------------------------------------------------
   const timeBandFactor: Record<typeof timeBand, number> = {
     normal: 0.7,
     rush: 1.3,
@@ -99,13 +124,12 @@ function RouteComponent() {
     early: 0.5,
   }
   const baseRate = Number(vehicle?.rentalrate) ?? 0
-  const adjustedRate = ((baseRate)/10) * timeBandFactor[timeBand]
+  const adjustedRate = (baseRate / 10) * timeBandFactor[timeBand]
   const baseCost = distanceKm * adjustedRate
   const serviceFee = 2
   const tipFee = baseCost * 0.05
   const totalCost = baseCost + serviceFee + tipFee
 
-  // Loading / error ----------------------------------------------------------
   if (isVehicleLoading)
     return (
       <div className="w-fit text-center py-10 m-auto">
@@ -120,11 +144,69 @@ function RouteComponent() {
   if (!vehicle)
     return <div className="text-center py-10">Vehicle not found.</div>
 
-  const handleBookNow = () => {
-    localStorage.setItem('vehicleId', VehiclesId)
-    localStorage.setItem('Amount', totalCost.toString())
-    navigate({ to: '/payments' }) // navigate after saving
+  const handleBookNow = async () => {
+    if (
+      !pickupCoords ||
+      !destCoords ||
+      distanceKm === 0 ||
+      !authStore.state.user ||
+      !date ||
+      !time
+    ) {
+      return toast.error('Missing location, user or time data.')
+    }
+
+    try {
+      const rider = await getUserById(userId)
+      if (!rider?.id) {
+        return toast.error('User profile not found')
+      }
+
+      const riderProfile = rider.riderProfile?.id
+      if (!riderProfile) {
+        return toast.error('Rider profile not found')
+      }
+      const pickupLocation = await createLocation({
+        address: pickupAddress,
+        latitude: pickupCoords[0],
+        longitude: pickupCoords[1],
+      })
+
+      const dropoffLocation = await createLocation({
+        address: destAddress,
+        latitude: destCoords[0],
+        longitude: destCoords[1],
+      })
+
+      const isoDateTime = new Date(`${date}`)
+
+      const ride = await createRides({
+        rider: riderProfile,
+        pickupLocation: pickupLocation.id,
+        dropoffLocation: dropoffLocation.id,
+        fare: totalCost,
+        distanceKm,
+        status: 'schedule',
+        startTime: isoDateTime,
+        endTime: new Date(isoDateTime.getTime() + 30 * 60 * 1000),
+        vehicle: VehiclesId,
+      })
+      console.log('ride', ride)
+
+      localStorage.setItem('vehicleId', VehiclesId)
+      localStorage.setItem('Amount', totalCost.toString())
+      localStorage.setItem('rideId', ride.id)
+
+      navigate({ to: '/payments' })
+    } catch (error) {
+      toast.error('Failed to create ride or locations.')
+      console.error(error)
+    }
   }
+
+  if (isRiderLoading) return <div>Loading rider profile...</div>
+  if (riderError || !riderProfile)
+    return <div>Error loading rider profile.</div>
 
   return (
     <>
@@ -244,7 +326,7 @@ function RouteComponent() {
                 </label>
                 <input
                   id="date"
-                  type="date"
+                  type="datetime-local"
                   min={todayStr}
                   value={date}
                   onChange={(e) => setDate(e.target.value)}

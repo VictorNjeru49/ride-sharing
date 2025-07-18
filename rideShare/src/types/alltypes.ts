@@ -122,7 +122,8 @@ export interface Vehicle extends GenericsType {
   updatedAt?: Date
   driver?: DriverProfile
 }
-export interface RiderProfile extends GenericsType {
+export interface RiderProfile {
+  id:string
   preferredPaymentMethod?: string
   rating: number
   createdAt?: Date
@@ -163,8 +164,8 @@ export interface Riderequest extends GenericsType {
   requestedAt: Date
 }
 export interface Ride extends GenericsType {
-  rider: RiderProfile
-  driver: DriverProfile
+  rider?: RiderProfile
+  driver?: DriverProfile
   pickupLocation: Location
   dropoffLocation: Location
   status: string
@@ -202,7 +203,8 @@ export interface Rating extends GenericsType {
   comment: string
   createdAt: Date
 }
-export interface Location extends GenericsType {
+export interface Location {
+  id: string
   address: string
   latitude: number
   longitude: number

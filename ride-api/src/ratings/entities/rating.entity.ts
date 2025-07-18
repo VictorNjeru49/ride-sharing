@@ -14,13 +14,22 @@ export class Rating {
 
   @ManyToOne(() => Ride, (r) => r.ratings, {
     eager: true,
+    onDelete: 'CASCADE',
     nullable: true,
     cascade: true,
   })
   ride: Ride;
 
-  @ManyToOne(() => User, (u) => u.ratingsGiven, { eager: true }) rater: User;
-  @ManyToOne(() => User, (u) => u.ratingsReceived, { eager: true }) ratee: User;
+  @ManyToOne(() => User, (u) => u.ratingsGiven, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
+  rater: User;
+  @ManyToOne(() => User, (u) => u.ratingsReceived, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
+  ratee: User;
   @Column('int')
   score: number;
 

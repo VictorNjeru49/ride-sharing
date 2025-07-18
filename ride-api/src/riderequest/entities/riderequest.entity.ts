@@ -16,19 +16,19 @@ export class Riderequest {
 
   @ManyToOne(() => Driverprofile, (dp) => dp.assignedRequests, {
     nullable: true,
-    onDelete: 'SET NULL',
+    onDelete: 'CASCADE',
   })
   assignedDriver: Driverprofile;
 
   @ManyToOne(() => Location, (l) => l.requestsPickup, {
-    nullable: false,
+    nullable: true,
     onDelete: 'CASCADE',
     eager: true,
   })
   pickupLocation: Location;
 
   @ManyToOne(() => Location, (l) => l.requestsDropoff, {
-    nullable: false,
+    nullable: true,
     eager: true,
     onDelete: 'CASCADE',
   })

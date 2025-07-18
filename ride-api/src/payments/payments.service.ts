@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,6 +15,7 @@ import {
 import { Repository } from 'typeorm';
 import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
+import { Ride } from 'src/ride/entities/ride.entity';
 
 type CreatePaymentResponse = {
   clientSecret: string;
@@ -30,6 +35,8 @@ export class PaymentsService {
   constructor(
     @InjectRepository(Payment)
     private readonly paymentRepo: Repository<Payment>,
+    @InjectRepository(Ride)
+    private readonly rideRepo: Repository<Ride>,
     private readonly configService: ConfigService,
   ) {
     const stripeSecretKey = this.configService.get<string>('STRIPE_SECRET_KEY');
@@ -98,7 +105,7 @@ export class PaymentsService {
     };
   }
 
-  async confirmPayment(paymentIntentId: string): Promise<{
+  async confirmPayments(paymentIntentId: string): Promise<{
     payment: Payment;
     stripePaymentIntentId: string;
   }> {
@@ -141,9 +148,84 @@ export class PaymentsService {
     };
   }
 
+  private async getSessionWithPaymentIntent(
+    sessionId: string,
+    maxRetries = 10,
+    delayMs = 1500,
+  ): Promise<Stripe.Checkout.Session> {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      const session = await this.stripe.checkout.sessions.retrieve(sessionId, {
+        expand: ['payment_intent'],
+      });
+
+      if (
+        session.payment_intent &&
+        typeof session.payment_intent !== 'string'
+      ) {
+        return session;
+      }
+
+      if (attempt < maxRetries) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+      }
+    }
+    throw new Error('payment_intent not available after retries');
+  }
+
+  async confirmPayment(paymentIntentId: string): Promise<Payment> {
+    if (!paymentIntentId) {
+      throw new BadRequestException('paymentIntentId is required');
+    }
+
+    const paymentIntent =
+      await this.stripe.paymentIntents.retrieve(paymentIntentId);
+
+    if (paymentIntent.status !== 'succeeded') {
+      throw new BadRequestException('Payment not completed');
+    }
+
+    const userId = paymentIntent.metadata.user;
+    const vehicleId = paymentIntent.metadata.vehicle;
+
+    if (!userId || !vehicleId) {
+      throw new BadRequestException('Missing metadata in payment intent');
+    }
+
+    const amount = paymentIntent.amount_received / 100;
+
+    const payment = this.paymentRepo.create({
+      amount,
+      method: PaymentMethod.STRIPE_CHECKOUT,
+      status: PaymentStatus.COMPLETED,
+      user: { id: userId },
+      vehicle: { id: vehicleId },
+      currency: paymentIntent.currency,
+      stripePaymentIntentId: paymentIntent.id,
+      paidAt: new Date(),
+    });
+
+    return await this.paymentRepo.save(payment);
+  }
+
+  async getSession(sessionId: string) {
+    const session = await this.stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ['payment_intent'],
+    });
+
+    if (!session.payment_intent) {
+      throw new BadRequestException('payment_intent missing in session');
+    }
+
+    return session;
+  }
+
   async createCheckoutSession(
     createPaymentDto: CreatePaymentDto,
   ): Promise<CreateCheckoutSessionResponse> {
+    const amountInCents = Number.isInteger(createPaymentDto.amount)
+      ? createPaymentDto.amount * 100
+      : Math.round(createPaymentDto.amount * 100);
+
     const session = await this.stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
@@ -152,9 +234,9 @@ export class PaymentsService {
           price_data: {
             currency: createPaymentDto.currency,
             product_data: {
-              name: `Vehicle Rental - ${createPaymentDto.vehicleId}`,
+              name: `Ride Share - ${createPaymentDto.vehicleId}`,
             },
-            unit_amount: Math.round(createPaymentDto.amount * 100),
+            unit_amount: amountInCents,
           },
           quantity: 1,
         },
@@ -168,56 +250,39 @@ export class PaymentsService {
           user: createPaymentDto.userId,
           vehicle: createPaymentDto.vehicleId,
         },
+        capture_method: 'automatic',
+        description: 'Vehicle rental payment',
       },
       success_url: `${this.configService.get('FRONTEND_URL')}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${this.configService.get('FRONTEND_URL')}/payment-cancel`,
-      expand: ['payment_intent'],
+      expand: ['payment_intent'], // make sure paymentIntent is expanded
     });
+
     console.log(session);
-
-    console.log(session.payment_intent);
-    // Destructure payment_intent from session
-    const { payment_intent: paymentIntent } = session;
-
-    if (!paymentIntent || typeof paymentIntent === 'string') {
-      throw new Error('payment_intent is null or not expanded');
-    }
-    if (!paymentIntent.client_secret) {
-      throw new Error('PaymentIntent client_secret is null');
-    }
 
     const payment = this.paymentRepo.create({
       amount: createPaymentDto.amount,
       method: PaymentMethod.STRIPE_CHECKOUT,
       status: PaymentStatus.PENDING,
       user: { id: createPaymentDto.userId },
+      ride: { id: createPaymentDto.rideId },
       vehicle: { id: createPaymentDto.vehicleId },
       currency: createPaymentDto.currency,
-      stripePaymentIntentId: paymentIntent.id,
+      stripeCheckoutSessionId: session.id,
       paidAt: new Date(),
     });
 
-    await this.paymentRepo.save(payment);
+    const savedPayment = await this.paymentRepo.save(payment);
 
     if (!session.url) {
       throw new Error('Stripe Checkout session URL is null');
     }
-
-    if (!paymentIntent.client_secret) {
-      throw new Error('PaymentIntent client_secret is null');
-    }
-
     return {
       url: session.url,
-      clientSecret: paymentIntent.client_secret,
-      payment,
+      clientSecret: session.client_secret!,
+      payment: savedPayment,
     };
   }
-
-  // async create(createPaymentDto: CreatePaymentDto) {
-  //   const payment = this.paymentRepo.create(createPaymentDto);
-  //   return await this.paymentRepo.save(payment);
-  // }
 
   async findAll(): Promise<Payment[]> {
     return await this.paymentRepo.find({
@@ -231,7 +296,7 @@ export class PaymentsService {
       relations: ['user', 'ride', 'vehicle'],
     });
     if (!payment) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+      throw new NotFoundException(`Payment with ID ${id} not found`);
     }
     return payment;
   }
@@ -245,8 +310,7 @@ export class PaymentsService {
   }
 
   async remove(id: string): Promise<void> {
-    const Payment = await this.findOne(id);
-    console.log(`the Payment with id: ${id}`);
-    await this.paymentRepo.delete(Payment);
+    const payment = await this.findOne(id);
+    await this.paymentRepo.delete(payment);
   }
 }

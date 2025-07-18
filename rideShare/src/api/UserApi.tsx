@@ -16,6 +16,7 @@ import type {
   Notification,
   userTypes,
   Vehicle,
+  Location,
   Wallet,
 } from '@/types/alltypes'
 import axios from 'axios'

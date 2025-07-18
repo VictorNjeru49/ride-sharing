@@ -98,9 +98,11 @@ POST {{url}}/payments/confirm
 Content-Type: application/json
 
 {
-  "paymentIntentId": "pi_3RlqCFBhAVCGhfBd1FiXbNns"
+  "paymentIntentId": "pi_3RlsABBhAVCGhfBd1QzfleHE"
 }
 
+### Get Checkout Session Details
+GET {{url}}/payments/session/cs_test_a1gtG4RSn7IZiNeYwTvxgjTTpYKGce9VHB9sfPwGbNAWK3fIC8jiR3VKAK
 
 ### Get payment by ID
 GET {{url}}/payments

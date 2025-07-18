@@ -128,8 +128,8 @@ export class User {
   ratingsReceived: Rating[];
 
   @OneToMany(() => Wallet, (wt) => wt.user, {
-    cascade: true,
     onDelete: 'CASCADE',
+    cascade: true,
   })
   walletTransactions: Wallet[];
 

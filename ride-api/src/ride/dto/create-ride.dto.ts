@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class CreateRideDto {
   @ApiProperty()
@@ -12,9 +12,9 @@ export class CreateRideDto {
   @IsNumber()
   distanceKm: number;
   @ApiProperty()
-  @IsDate()
+  @IsString()
   startTime: Date;
   @ApiProperty()
-  @IsDate()
+  @IsString()
   endTime: Date;
 }

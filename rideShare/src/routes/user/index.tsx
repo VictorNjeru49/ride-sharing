@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { MapPin, Star } from 'lucide-react'
 import { authStore } from '@/app/store'
 import { useQuery } from '@tanstack/react-query'
-import { getUserById } from '@/api/UserApi'
+import { createLocation, getUserById } from '@/api/UserApi'
 import MapDialog from '@/components/locations'
 import { ClipLoader, RingLoader } from 'react-spinners'
 
@@ -97,6 +97,7 @@ function RouteComponent() {
       return ''
     }
   }
+
 
   // -------------------------------------------------------------------------
   // Query user info
@@ -203,6 +204,7 @@ function RouteComponent() {
   const walletBalance = Number(user?.walletBalance ?? 0)
   const userName = user?.firstName ?? 'User'
 
+  
   return (
     <div className="p-6 space-y-6">
       {/* Header */}

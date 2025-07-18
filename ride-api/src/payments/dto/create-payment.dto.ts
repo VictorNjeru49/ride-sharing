@@ -27,10 +27,10 @@ export class CreatePaymentDto {
   @IsString()
   @IsOptional()
   userId: string;
-  // @ApiProperty()
-  // @IsString()
-  // @IsOptional()
-  // rideId: string;
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  rideId: string;
   @ApiProperty()
   @IsString()
   @IsOptional()

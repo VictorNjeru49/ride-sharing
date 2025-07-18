@@ -89,12 +89,18 @@ function RouteComponent() {
     return payments.filter((p) => {
       const matchesStatus =
         statusFilter === 'all' ? true : p.status === statusFilter
-      const matchesSearch = searchTerm
-        ? `${p.amount} ${p.currency}`
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          p.method.toLowerCase().includes(searchTerm.toLowerCase())
-        : true
+     const matchesSearch = searchTerm
+       ? `${p.amount} ${p.currency}`
+           .toLowerCase()
+           .includes(searchTerm.toLowerCase()) ||
+         (p.method
+           ? p.method
+               .replace('_', ' ')
+               .toLowerCase()
+               .includes(searchTerm.toLowerCase())
+           : false)
+       : true
+
       return matchesStatus && matchesSearch
     })
   }, [payments, statusFilter, searchTerm])
@@ -182,14 +188,20 @@ function RouteComponent() {
                     {p.id}
                   </TableCell>
                   <TableCell>
-                    {Number(p.amount).toFixed(2)} {String(p.currency).toUpperCase()}
+                    {Number(p.amount).toFixed(2)}{' '}
+                    {String(p.currency).toUpperCase()}
                   </TableCell>
                   <TableCell className="capitalize">
-                    {p.method.replace('_', ' ')}
+                    {p.method ? p.method.replace('_', ' ') : 'N/A'}
                   </TableCell>
                   <TableCell className="capitalize">{p.status}</TableCell>
                   <TableCell>
-                    {new Date(p.paidAt ?? p.createdAt).toLocaleDateString()}
+                    {(() => {
+                      const dateValue = p.paidAt ?? p.createdAt
+                      return dateValue
+                        ? new Date(dateValue).toLocaleDateString()
+                        : 'N/A'
+                    })()}
                   </TableCell>
                   <TableCell>
                     <Button

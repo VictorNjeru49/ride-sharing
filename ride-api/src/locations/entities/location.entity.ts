@@ -22,16 +22,32 @@ export class Location {
   @Column('decimal', { precision: 10, scale: 7 })
   longitude: number;
 
-  @OneToMany(() => Ride, (r) => r.pickupLocation)
+  @OneToMany(() => Ride, (r) => r.pickupLocation, {
+    onDelete: 'CASCADE',
+    cascade: true,
+    nullable: true,
+  })
   @JoinColumn()
   ridesPickup: Ride[];
-  @OneToMany(() => Ride, (r) => r.dropoffLocation)
+  @OneToMany(() => Ride, (r) => r.dropoffLocation, {
+    onDelete: 'CASCADE',
+    cascade: true,
+    nullable: true,
+  })
   @JoinColumn()
   ridesDropoff: Ride[];
-  @OneToMany(() => Riderequest, (rr) => rr.pickupLocation)
+  @OneToMany(() => Riderequest, (rr) => rr.pickupLocation, {
+    onDelete: 'CASCADE',
+    cascade: true,
+    nullable: true,
+  })
   @JoinColumn()
   requestsPickup: Riderequest[];
-  @OneToMany(() => Riderequest, (rr) => rr.dropoffLocation)
+  @OneToMany(() => Riderequest, (rr) => rr.dropoffLocation, {
+    onDelete: 'CASCADE',
+    cascade: true,
+    nullable: true,
+  })
   @JoinColumn()
   requestsDropoff: Riderequest[];
 }
