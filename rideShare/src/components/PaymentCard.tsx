@@ -8,7 +8,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Trash2 } from 'lucide-react'
-import { type Payment, PaymentMethod, PaymentStatus } from '@/types/alltypes'
+import { type Payment, PaymentStatus } from '@/types/alltypes'
 
 type PaymentCardProps = {
   payment: Payment
