@@ -3,6 +3,13 @@
 ###
 GET {{url}}/users/31511632-b063-4e4a-bcad-8a24954d1987
 
+
+####
+GET {{url}}/users?email=valentine@gmail.com
+
+
+
+
 ###
 GET  {{url}}/users/3980d420-6332-49ca-b1fb-48b27921df63
 ###

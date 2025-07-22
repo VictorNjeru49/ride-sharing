@@ -73,8 +73,8 @@ function Trips() {
          ? true
          : [
              r.id,
-             r.rider.user?.firstName + ' ' + r.rider.user?.lastName,
-             r.driver.user?.firstName + ' ' + r.driver.user?.lastName,
+             r?.rider?.user?.firstName + ' ' + r?.rider?.user?.lastName,
+             r?.driver?.user?.firstName + ' ' + r?.driver?.user?.lastName,
              r.pickupLocation.address,
              r.dropoffLocation.address,
            ]
@@ -188,12 +188,12 @@ function Trips() {
                      <Button
                        size="icon"
                        variant="ghost"
-                       //    onClick={() =>
-                       //      router.navigate({
-                       //        to: '/dashboard/trips/$tripId',
-                       //        params: { tripId: ride.id },
-                       //      })
-                       //    }
+                          onClick={() =>
+                            router.navigate({
+                              to: '/dashboard/trips/$tripId',
+                              params: { tripId: ride.id },
+                            })
+                          }
                      >
                        <Eye className="h-4 w-4" />
                      </Button>

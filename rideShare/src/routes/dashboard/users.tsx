@@ -147,7 +147,11 @@ useEffect(() => {
     const fullUser = await getUserById(newUser.id)
 
     if (fullUser.role === UserRole.RIDER) {
-      await createRiderProfile({ user: fullUser, rating: 5 })
+      await createRiderProfile({
+        user: fullUser,
+        rating: 5,
+        preferredPaymentMethod: 'card',
+      })
     } else if (fullUser.role === UserRole.DRIVER) {
       if (!selectedVehicleId) throw new Error('Please select a vehicle')
 
@@ -358,6 +362,108 @@ useEffect(() => {
             <Button onClick={() => setViewUser(null)} variant="outline">
               Close
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editId ? 'Edit User' : 'Create User'}</DialogTitle>
+            <DialogDescription>
+              Fill in the details to {editId ? 'update' : 'create'} the user.
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Form inputs */}
+          <div className="space-y-4">
+            <Input
+              placeholder="First Name"
+              value={formData.firstName ?? ''}
+              onChange={(e) =>
+                setFormData((f) => ({ ...f, firstName: e.target.value }))
+              }
+            />
+            <Input
+              placeholder="Last Name"
+              value={formData.lastName ?? ''}
+              onChange={(e) =>
+                setFormData((f) => ({ ...f, lastName: e.target.value }))
+              }
+            />
+            <Input
+              placeholder="Email"
+              type="email"
+              value={formData.email ?? ''}
+              onChange={(e) =>
+                setFormData((f) => ({ ...f, email: e.target.value }))
+              }
+            />
+            <Input
+              placeholder={
+                editId ? 'New Password (leave blank to keep)' : 'Password'
+              }
+              type="password"
+              value={formData.password ?? ''}
+              onChange={(e) =>
+                setFormData((f) => ({ ...f, password: e.target.value }))
+              }
+            />
+
+            <Select
+              value={formData.role ?? ''}
+              onValueChange={(value) =>
+                setFormData((f) => ({ ...f, role: value as UserRole }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select Role" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(UserRole).map((role) => (
+                  <SelectItem key={role} value={role}>
+                    {role}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Input
+              placeholder="Phone"
+              value={formData.phone ?? ''}
+              onChange={(e) =>
+                setFormData((f) => ({ ...f, phone: e.target.value }))
+              }
+            />
+
+            {/* Vehicle select only for drivers */}
+            {formData.role === UserRole.DRIVER && (
+              <Select
+                value={selectedVehicleId ?? ''}
+                onValueChange={(value) => {
+                  setSelectedVehicleId(value)
+                  // Optionally update formData if you want to track vehicle here too
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Vehicle" />
+                </SelectTrigger>
+                <SelectContent>
+                  {vehicles.map((v) => (
+                    <SelectItem key={v.id} value={v.id}>
+                      {v.make} {v.model} ({v.plateNumber})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="ghost" onClick={handleDialogClose}>
+              Cancel
+            </Button>
+            <Button onClick={handleSave}>{editId ? 'Update' : 'Create'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

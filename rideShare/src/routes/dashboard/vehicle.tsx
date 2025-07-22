@@ -93,7 +93,6 @@ function RouteComponent() {
   function onChange(field: keyof typeof formData, value: any) {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
-
   async function handleSubmit() {
     try {
       if (editingVehicle) {
@@ -174,10 +173,17 @@ function RouteComponent() {
             <TableRow key={vehicle.id}>
               <TableCell>{vehicle.id}</TableCell>
               <TableCell>
-                <img
-                  src={vehicle.vehicleImage}
-                  className="w-20 h-12 object-cover rounded"
-                />
+                {vehicle.vehicleImage ? (
+                  <img
+                    src={vehicle.vehicleImage}
+                    alt={`${vehicle.make} ${vehicle.model}`}
+                    className="w-20 h-12 object-cover rounded"
+                  />
+                ) : (
+                  <div className="w-20 h-12 bg-gray-200 rounded flex items-center justify-center text-gray-500 text-xs">
+                    No Image
+                  </div>
+                )}
               </TableCell>
               <TableCell>{vehicle.make}</TableCell>
               <TableCell>{vehicle.model}</TableCell>
@@ -211,27 +217,7 @@ function RouteComponent() {
         </TableBody>
       </Table>
 
-      <div className="flex justify-between items-center mt-4">
-        <p className="text-sm">Page {currentPage + 1}</p>
-        <div className="flex gap-2">
-          <Button
-            onClick={() => setCurrentPage((p) => Math.max(p - 1, 0))}
-            disabled={currentPage === 0}
-          >
-            Prev
-          </Button>
-          <Button
-            onClick={() =>
-              setCurrentPage((p) =>
-                (p + 1) * itemsPerPage < allData.length ? p + 1 : p,
-              )
-            }
-            disabled={(currentPage + 1) * itemsPerPage >= allData.length}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+      {/* Pagination and buttons */}
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="space-y-4">
@@ -251,7 +237,11 @@ function RouteComponent() {
             <Input
               key={key}
               placeholder={key}
-              value={String(formData[key as keyof typeof formData] ?? '')}
+              value={
+                formData[key as keyof typeof formData] !== undefined
+                  ? String(formData[key as keyof typeof formData])
+                  : ''
+              }
               onChange={(e) =>
                 onChange(key as keyof typeof formData, e.target.value)
               }
@@ -262,10 +252,18 @@ function RouteComponent() {
               key={key}
               placeholder={key}
               type="number"
-              value={Number(formData[key as keyof typeof formData] ?? 0)}
-              onChange={(e) =>
-                onChange(key as keyof typeof formData, Number(e.target.value))
+              value={
+                formData[key as keyof typeof formData] !== undefined
+                  ? String(formData[key as keyof typeof formData])
+                  : ''
               }
+              onChange={(e) => {
+                const val = e.target.value
+                onChange(
+                  key as keyof typeof formData,
+                  val === '' ? undefined : Number(val),
+                )
+              }}
             />
           ))}
 
@@ -288,7 +286,10 @@ function RouteComponent() {
             >
               Cancel
             </Button>
-            <Button onClick={handleSubmit}>
+            <Button
+              onClick={handleSubmit}
+              disabled={create.isPending || update.isPending}
+            >
               {editingVehicle ? 'Update' : 'Create'}
             </Button>
           </DialogFooter>

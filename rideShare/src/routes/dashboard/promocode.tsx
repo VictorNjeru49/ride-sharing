@@ -318,7 +318,7 @@ function PromoRow({
         <CollapsibleContent className="px-4 py-2 bg-muted/50">
           {/* Usages */}
           <h4 className="font-medium mb-1">Promo Code Usages</h4>
-          {promo.usages.length ? (
+          {promo.usages?.length ? (
             <ul className="list-disc list-inside space-y-1 text-sm">
               {promo.usages.map((u: UserPromoUsage) => (
                 <li key={u.id}>
@@ -333,9 +333,7 @@ function PromoRow({
             </p>
           )}
 
-          {/* Created By / Admins */}
-          <h4 className="font-medium mb-1 mt-4">Promo User</h4>
-          {promo.createdBy.length ? (
+          {promo.createdBy?.length ? (
             <ul className="list-disc list-inside space-y-1 text-sm">
               {promo.createdBy.map((c: userTypes) => (
                 <li key={c.id}>

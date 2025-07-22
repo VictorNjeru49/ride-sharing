@@ -15,8 +15,16 @@ import { useLogin } from '@/api/LoginApi'
 import { useRouter } from '@tanstack/react-router'
 import { toast, Toaster } from 'sonner'
 import { useForm } from '@tanstack/react-form'
-import { UserRole } from '@/types/alltypes'
+import { UserRole, type userTypes } from '@/types/alltypes'
 import { authActions } from '@/app/store'
+import { useEffect, useState } from 'react'
+import { Dialog } from '@radix-ui/react-dialog'
+import {
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { getUserByIdOrEmail } from '@/api/UserApi'
 
 export const Route = createFileRoute('/login')({
   component: RouteComponent,
@@ -42,50 +50,144 @@ const validateField = <T,>(value: T, schema: z.ZodType<T>) => {
 function RouteComponent() {
   const login = useLogin()
   const router = useRouter()
+  const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
+  const [selectForget, setSelectForget] = useState(false)
+  const [recoveryEmail, setRecoveryEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [isSending, setIsSending] = useState(false)
+  const [user, setUser] = useState<userTypes | null>(null)
 
   const form = useForm({
     defaultValues: { email: '', password: '' } as FormData,
     onSubmit: async ({ value }) => {
+      if (!selectedRole) {
+        toast.error('Please select a role before logging in.')
+        return
+      }
+
       const result = loginSchema.safeParse(value)
       if (!result.success) return
 
       try {
         const res = await login.mutateAsync(result.data)
+
+        // Check if backend role matches selected role
+        const backendRole = res.user.role ?? UserRole.RIDER
+        if (backendRole !== selectedRole) {
+          toast.error(
+            `Role mismatch: You selected "${selectedRole}", but your account role is "${backendRole}".`,
+          )
+          return
+        }
+
+        // Save user and proceed
         authActions.saveUser({
           isVerified: res.isVerified ?? false,
           tokens: res.tokens,
           user: {
             id: res.user.id,
             email: res.user.email,
-            role: res.user.role ?? UserRole.RIDER,
+            role: backendRole,
           },
         })
         toast.success(`Welcome, ${res.user.email}!`)
         form.reset()
 
-        const userRole = res.user?.role
-        const hasRole = (role: UserRole) =>
-          Array.isArray(userRole) ? userRole.includes(role) : userRole === role
-
-        if (hasRole(UserRole.ADMIN)) router.navigate({ to: '/dashboard' })
-        else if (hasRole(UserRole.RIDER)) router.navigate({ to: '/user' })
-        else if (hasRole(UserRole.DRIVER)) router.navigate({ to: '/driver' })
+        if (backendRole === UserRole.ADMIN)
+          router.navigate({ to: '/dashboard' })
+        else if (backendRole === UserRole.RIDER)
+          router.navigate({ to: '/user' })
+        else if (backendRole === UserRole.DRIVER)
+          router.navigate({ to: '/driver' })
         else {
           toast.error('User role not found. Please contact support.')
           router.navigate({ to: '/' })
         }
       } catch (error) {
-        let errorMessage = error instanceof Error ? error.message : 'Login failed. Please try again.'
+        let errorMessage =
+          error instanceof Error
+            ? error.message
+            : 'Login failed. Please try again.'
         if (errorMessage.toLowerCase().includes('not found'))
           toast.error('Account not found. Please check your email or register.')
-        else if (errorMessage.toLowerCase().includes('invalid') || errorMessage.toLowerCase().includes('password'))
-          toast.error('Invalid credentials. Please check your email and password.')
+        else if (
+          errorMessage.toLowerCase().includes('invalid') ||
+          errorMessage.toLowerCase().includes('password')
+        )
+          toast.error(
+            'Invalid credentials. Please check your email and password.',
+          )
         else if (errorMessage.toLowerCase().includes('network'))
           toast.error('Network error. Check your connection and try again.')
         else toast.error(errorMessage)
       }
     },
   })
+
+  useEffect(() => {
+    if (!selectForget) {
+      setRecoveryEmail('')
+      setPhone('')
+      setUser(null)
+    }
+  }, [selectForget])
+
+  const handleSend = async () => {
+    if (!recoveryEmail) {
+      alert('Please enter your email address.')
+      return
+    }
+
+    if (!phone) {
+      alert('Please enter your phone number.')
+      return
+    }
+
+    setIsSending(true)
+
+    try {
+      const response: userTypes = await getUserByIdOrEmail(recoveryEmail)
+
+      if (!response) {
+        toast.error('No account found with this email.')
+        return
+      }
+
+      const normalizePhone = (num: string) => num.replace(/\D/g, '')
+
+      if (!response.phone) {
+        toast.error('Phone number not found in our records.')
+        return
+      }
+
+      if (response.email !== recoveryEmail) {
+        toast.error('Email does not match any account.')
+        return
+      }
+
+      if (normalizePhone(response.phone) !== normalizePhone(phone)) {
+        toast.error('Phone number does not match our records.')
+        return
+      }
+
+      toast.success(
+        'Verification successful. Recovery instructions sent to your email.',
+      )
+
+      console.log('response', response)
+      console.log('recoveryEmail', recoveryEmail)
+      console.log('Phone match verified', response.phone)
+
+      setSelectForget(false)
+      setRecoveryEmail('')
+      setPhone('')
+    } catch (error) {
+      console.error('Failed to verify user', error)
+      toast.error('Failed to verify user. Please try again later.')
+    } finally {
+      setIsSending(false)
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-white dark:bg-gray-900">
@@ -106,7 +208,11 @@ function RouteComponent() {
                   strokeLinejoin="round"
                   d="M12 11c.943 0 1.815-.613 2-1.529V8.471C13.815 7.557 12.943 7 12 7s-1.815.557-2 1.471v1C10.185 10.387 11.057 11 12 11z"
                 />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 11v3m0 0H9m3 0h3" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 11v3m0 0H9m3 0h3"
+                />
               </svg>
             </div>
           </div>
@@ -116,6 +222,20 @@ function RouteComponent() {
           <CardDescription className="text-sm text-gray-500 dark:text-gray-300">
             Sign in to your account to continue
           </CardDescription>
+
+          {/* Role selection */}
+          <div className="mt-4 flex justify-center gap-4">
+            {Object.values(UserRole).map((role) => (
+              <Button
+                key={role}
+                variant={selectedRole === role ? 'default' : 'outline'}
+                onClick={() => setSelectedRole(role)}
+                className="capitalize"
+              >
+                {role}
+              </Button>
+            ))}
+          </div>
         </CardHeader>
 
         <form
@@ -128,13 +248,18 @@ function RouteComponent() {
             <form.Field
               name="email"
               validators={{
-                onChange: ({ value }) => validateField(value, loginSchema.shape.email),
-                onBlur: ({ value }) => validateField(value, loginSchema.shape.email),
+                onChange: ({ value }) =>
+                  validateField(value, loginSchema.shape.email),
+                onBlur: ({ value }) =>
+                  validateField(value, loginSchema.shape.email),
               }}
             >
               {(field) => (
                 <div className="grid gap-2">
-                  <Label htmlFor={field.name} className="text-gray-700 dark:text-gray-200">
+                  <Label
+                    htmlFor={field.name}
+                    className="text-gray-700 dark:text-gray-200"
+                  >
                     Email
                   </Label>
                   <Input
@@ -158,22 +283,28 @@ function RouteComponent() {
             <form.Field
               name="password"
               validators={{
-                onChange: ({ value }) => validateField(value, loginSchema.shape.password),
-                onBlur: ({ value }) => validateField(value, loginSchema.shape.password),
+                onChange: ({ value }) =>
+                  validateField(value, loginSchema.shape.password),
+                onBlur: ({ value }) =>
+                  validateField(value, loginSchema.shape.password),
               }}
             >
               {(field) => (
                 <div className="grid gap-2">
                   <div className="flex justify-between items-center">
-                    <Label htmlFor={field.name} className="text-gray-700 dark:text-gray-200">
+                    <Label
+                      htmlFor={field.name}
+                      className="text-gray-700 dark:text-gray-200"
+                    >
                       Password
                     </Label>
-                    <a
-                      href="#"
+                    <button
+                      type="button"
+                      onClick={() => setSelectForget(true)}
                       className="text-sm text-blue-600 hover:underline dark:text-blue-400"
                     >
                       Forgot?
-                    </a>
+                    </button>
                   </div>
                   <Input
                     type="password"
@@ -195,11 +326,13 @@ function RouteComponent() {
           </CardContent>
 
           <CardFooter className="flex flex-col gap-4 mt-4">
-            <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+            <form.Subscribe
+              selector={(state) => [state.canSubmit, state.isSubmitting]}
+            >
               {([canSubmit, isSubmitting]) => (
                 <Button
                   type="submit"
-                  disabled={!canSubmit}
+                  disabled={!canSubmit || !selectedRole}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   {isSubmitting ? 'Logging in...' : 'Login'}
@@ -214,7 +347,10 @@ function RouteComponent() {
 
         <div className="text-center text-sm mt-4 text-gray-600 dark:text-gray-300">
           Don’t have an account?{' '}
-          <Link to="/register" className="text-violet-600 hover:underline dark:text-violet-400">
+          <Link
+            to="/register"
+            className="text-violet-600 hover:underline dark:text-violet-400"
+          >
             Sign up for free
           </Link>
           <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
@@ -226,10 +362,45 @@ function RouteComponent() {
             <a href="#" className="underline">
               Privacy Policy
             </a>
-            .
+            .\
           </p>
         </div>
       </Card>
+
+      <Dialog open={selectForget} onOpenChange={setSelectForget}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Recovery Password</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Input
+                placeholder="Email Address"
+                type="email"
+                value={recoveryEmail}
+                onChange={(e) => setRecoveryEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <Input
+                placeholder="Phone Number"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </div>
+            <Button
+              onClick={handleSend}
+              disabled={isSending}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              {isSending ? 'Sending...' : 'Send'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
+
+export default RouteComponent

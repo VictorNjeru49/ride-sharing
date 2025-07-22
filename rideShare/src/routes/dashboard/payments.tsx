@@ -95,7 +95,7 @@ function RouteComponent() {
 
     // Filter by date
     if (dateFilter !== 'all') {
-      const createdAt = new Date(p.createdAt)
+      const createdAt = new Date(p?.createdAt ?? Date.now())
       const now = new Date()
       switch (dateFilter) {
         case 'today': {
@@ -138,13 +138,15 @@ function RouteComponent() {
     setDateFilter(value)
     setPage(1)
   }
-  const badgeColorClasses: Record<PaymentMethod, string> = {
-    credit_card: 'text-blue-600 bg-blue-100',
-    debit_card: 'text-blue-600 bg-blue-100',
-    paypal: 'text-blue-600 bg-blue-100',
-    bank_transfer: 'text-green-600 bg-green-100',
-    cash: 'text-green-600 bg-green-100',
-  }
+const badgeColorClasses: Record<PaymentMethod, string> = {
+  credit_card: 'text-blue-600 bg-blue-100',
+  debit_card: 'text-blue-600 bg-blue-100',
+  paypal: 'text-blue-600 bg-blue-100',
+  bank_transfer: 'text-green-600 bg-green-100',
+  cash: 'text-green-600 bg-green-100',
+  stripe_checkout: 'text-purple-600 bg-purple-100', // example color for STRIPE_CHECKOUT
+}
+
 
   const statusColorClasses: Record<PaymentStatus, string> = {
     completed: 'text-green-600',
@@ -409,17 +411,23 @@ function RouteComponent() {
             </thead>
             <tbody>
               {paginatedPayments.map((payment) => (
-                <tr key={payment.id} className="border-b hover:bg-gray-50">
+                <tr
+                  key={payment.id}
+                  className="border-b hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
                   <td className="py-3">{payment.id}</td>
                   <td>
                     <Badge
                       variant="secondary"
                       className={
-                        badgeColorClasses[payment.method] ??
-                        'text-gray-600 bg-gray-100'
+                        payment?.method && badgeColorClasses[payment.method]
+                          ? badgeColorClasses[payment.method]
+                          : 'text-gray-600 bg-gray-100'
                       }
                     >
-                      {payment.method.replace('_', ' ')}
+                      {payment?.method
+                        ? payment.method.replace('_', ' ')
+                        : 'Unknown'}
                     </Badge>
                   </td>
                   <td>
@@ -446,12 +454,14 @@ function RouteComponent() {
                   </td>
                   <td
                     className={
-                      statusColorClasses[payment.status] ?? 'text-gray-600'
+                      payment.status && statusColorClasses[payment.status]
+                        ? statusColorClasses[payment.status]
+                        : 'text-gray-600'
                     }
                   >
-                    {payment.status}
+                    {payment.status ?? 'Unknown'}
                   </td>
-                  <td>{new Date(payment.createdAt).toLocaleDateString()}</td>
+
                   <td>
                     <div className="flex gap-2">
                       <Button

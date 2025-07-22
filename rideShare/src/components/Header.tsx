@@ -64,7 +64,7 @@ export default function Header() {
           </Link>
         </div>
         {/* Center: Nav */}
-        <nav className="hidden md:flex space-x-6 text-sm font-medium text-gray-700 dark:text-gray-300">
+        <nav className="hidden md:hidden lg:flex space-x-6 text-sm font-medium text-gray-700 dark:text-gray-300">
           <Link
             to="/"
             className="hover:text-blue-600"
@@ -202,7 +202,7 @@ export default function Header() {
         {/* Mobile menu button */}
         <button
           onClick={() => setMobileMenuOpen(true)}
-          className="md:hidden text-gray-700 dark:text-gray-200"
+          className="md:flex lg:hidden text-gray-700 dark:text-gray-200"
         >
           <Menu className="h-6 w-6" />
         </button>
@@ -319,7 +319,7 @@ export default function Header() {
         </div>
       )}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 md:flex lg:hidden">
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 md:hidden lg:hidden">
           <div className="absolute top-0 right-0 w-64 h-full bg-white dark:bg-gray-900 shadow-lg p-6 space-y-4">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
@@ -329,7 +329,7 @@ export default function Header() {
                 <X className="h-5 w-5 text-gray-600 dark:text-gray-300" />
               </button>
             </div>
-            <nav className="flex flex-col space-y-4">
+            <nav className="flex flex-col space-y-4 ">
               <Link
                 to="/"
                 onClick={() => setMobileMenuOpen(false)}
@@ -365,13 +365,13 @@ export default function Header() {
                       <Link to="/login">
                         <Button
                           variant="ghost"
-                          className="text-sm dark:text-gray-200"
+                          className="text-sm dark:text-gray-200 dark:hover:bg-gray-700"
                         >
                           Sign In
                         </Button>
                       </Link>
                       <Link to="/register">
-                        <Button className=" text-sm dark:text-gray-200 bg-transparent">
+                        <Button className=" text-sm dark:text-gray-200 bg-transparent dark:hover:bg-gray-700">
                           Sign Up
                         </Button>
                       </Link>

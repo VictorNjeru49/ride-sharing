@@ -95,6 +95,8 @@ function PaymentsPage() {
       }
 
       window.location.href = url
+
+      console.log('url checkout', url)
     } catch (err: any) {
       setMessage(`Checkout failed: ${err.message || 'Something went wrong.'}`)
       setLoading(false)

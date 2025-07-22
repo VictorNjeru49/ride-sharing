@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { useCrudOperations } from '@/hooks/crudops'
 import { useQueryClient } from '@tanstack/react-query'
 import { UserRole, type userTypes } from '@/types/alltypes'
-import { createUser, deleteUser, getUsers, updateUser } from '@/api/UserApi'
+import { createRiderProfile, createUser, deleteUser, getUserById, getUsers, updateUser } from '@/api/UserApi'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { toast, Toaster } from 'sonner'
@@ -33,7 +33,7 @@ const formSchema = z.object({
   phone: z.string().min(10, 'phone number is required'),
   password: z
     .string()
-    .min(8, 'Password must be at least 8 characters')
+    .min(8, 'Password must be at least 15 characters')
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
     .regex(/\d/, 'Password must contain at least one number'),
@@ -99,7 +99,17 @@ function RouteComponent() {
       if (!result.success) return
 
       try {
-        await create.mutateAsync(result.data)
+        await create.mutateAsync(
+          { ...result.data, role: UserRole.RIDER },
+          {
+            onSuccess: async (newUser) => {
+              const fullUser = await getUserById(newUser.id)
+              if (fullUser.role === UserRole.RIDER) {
+                await createRiderProfile({ user: fullUser, rating: 5, preferredPaymentMethod: 'card' })
+              }
+            },
+          },
+        )
         toast.success('User created successfully!')
 
         queryClient.invalidateQueries({ queryKey: ['users'] })

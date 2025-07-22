@@ -1,6 +1,7 @@
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { useParams } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
+import { isLoggedIn } from '@/app/authPersistence';
 import {
   createLocation,
   getRiderProfileById,
@@ -41,6 +42,19 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
 }
 
 export const Route = createFileRoute('/Vehicles/$VehiclesId')({
+  //  beforeLoad: ({ location }) => {
+  //     const { isVerified } = authStore.state
+  //     console.log('isVerfied', isVerified)
+  //     console.log('user logged‑in?', isLoggedIn())
+  //     if (!isVerified || !isLoggedIn()) {
+  //       throw redirect({
+  //         to: '/login',
+  //         search: {
+  //           redirect: location.href,
+  //         },
+  //       })
+  //     }
+  //   },
   component: RouteComponentWrapper,
 })
 

@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { CreateAuthDto } from './dto';
+import { randomInt } from 'crypto';
 
 export interface JwtPayload {
   sub: string;
@@ -19,6 +20,10 @@ export interface JwtPayload {
 }
 @Injectable()
 export class AuthService {
+  private readonly otpStore = new Map<
+    string,
+    { code: string; expiresAt: Date }
+  >();
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
     private jwtService: JwtService,
@@ -107,6 +112,87 @@ export class AuthService {
     await this.userRepo.update(userId, {
       hashedRefreshToken: hashedRefreshToken,
     });
+  }
+
+  async forgetPassword(emailOrPhone: string) {
+    const user = await this.userRepo.findOne({
+      where: [{ email: emailOrPhone }, { phone: emailOrPhone }],
+    });
+
+    if (!user) {
+      throw new NotFoundException(
+        `User with email/phone ${emailOrPhone} not found`,
+      );
+    }
+
+    // ✅ Generate OTP
+    const otp = randomInt(100000, 999999).toString();
+
+    // ✅ Save OTP in memory
+    this.saveOtp(user.phone, otp, 5 * 60 * 1000); // 5 minutes
+
+    // ✅ Send OTP (log or integrate SMS provider)
+    await this.sendOtpSms(user.phone, otp);
+
+    return {
+      message: `OTP sent to phone ${user.phone}`,
+      user: {
+        id: user.id,
+        phone: user.phone,
+      },
+    };
+  }
+
+  private saveOtp(phone: string, code: string, expiresInMs: number) {
+    const expiresAt = new Date(Date.now() + expiresInMs);
+    this.otpStore.set(phone, { code, expiresAt });
+  }
+
+  private async sendOtpSms(phone: string, otp: string) {
+    // Replace this with your SMS provider (e.g. Twilio, Africa's Talking, etc.)
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    console.log(`📱 Sending OTP "${otp}" to phone number: ${phone}`);
+  }
+
+  private verifyOtp(phone: string, code: string): boolean {
+    const entry = this.otpStore.get(phone);
+    if (!entry) return false;
+
+    const { code: storedCode, expiresAt } = entry;
+
+    if (Date.now() > expiresAt.getTime()) {
+      this.otpStore.delete(phone);
+      return false;
+    }
+
+    return storedCode === code;
+  }
+
+  async verifyPhoneOtp(phone: string, otp: string) {
+    const isValid = this.verifyOtp(phone, otp);
+    if (!isValid) {
+      throw new UnauthorizedException('Invalid or expired OTP');
+    }
+
+    const user = await this.userRepo.findOne({ where: { phone } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const resetToken = await this.jwtService.signAsync(
+      { sub: user.id, email: user.email },
+      {
+        secret: this.configService.getOrThrow('RESET_FORGET_PASSWORD_SECRET'),
+        expiresIn: this.configService.getOrThrow(
+          'RESET_FORGET_PASSWORD_SECRET_EXPIRES_IN',
+        ),
+      },
+    );
+
+    return {
+      message: 'Phone verified successfully',
+      resetToken,
+    };
   }
 
   async logIn(createAuthDto: CreateAuthDto) {

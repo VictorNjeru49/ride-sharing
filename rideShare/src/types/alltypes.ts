@@ -125,7 +125,7 @@ export interface Vehicle extends GenericsType {
 export interface RiderProfile {
   id:string
   preferredPaymentMethod?: string
-  rating: number
+  rating?: number
   createdAt?: Date
   updatedAt?: Date
   user?: userTypes
@@ -135,12 +135,12 @@ export interface RiderProfile {
 }
 export interface DriverProfile extends GenericsType {
   user?: userTypes
-  licenseNumber: string
-  rating: number
-  isAvailable: boolean
-  createdAt: Date
-  updatedAt: Date
-  vehicle: Vehicle
+  licenseNumber?: string
+  rating?: number
+  isAvailable?: boolean
+  createdAt?: Date
+  updatedAt?: Date
+  vehicle?: Vehicle
   ridesOffered?: Ride[]
   ridesTaken?: Ride[]
   assignedRequests?: Riderequest[]
@@ -160,7 +160,7 @@ export interface Riderequest extends GenericsType {
   pickupLocation?: Location
   dropoffLocation?: Location
   status: string
-  preferredVehicleType: string
+  preferredVehicleType?: string
   requestedAt: Date
 }
 export interface Ride extends GenericsType {
@@ -246,9 +246,9 @@ export interface UserPromoUsage extends GenericsType {
   PromoCode: PromoCode
 }
 export interface Admin extends GenericsType {
-  role: superRole
-  permission: string[]
-  user: userTypes
+  role?: superRole
+  permission?: string[]
+  user?: userTypes
 }
 export interface PromoCode extends GenericsType {
   code: string

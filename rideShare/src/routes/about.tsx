@@ -73,11 +73,11 @@ function RouteComponent() {
         id="pricing"
         className="py-10 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg"
       >
-        <div className="max-w-5xl mx-auto px-5">
+        <div className="lg:max-w-5xl mx-auto px-5 md:flex-col md:w-full">
           <h2 className="text-3xl font-bold mb-10 text-center">
             Pricing Plans
           </h2>
-          <div className="grid gap-8 md:grid-cols-3">
+          <div className="grid gap-8 md:grid-cols-1 sm:w-full">
             {plans.map((plan) => (
               <div
                 key={plan.title}

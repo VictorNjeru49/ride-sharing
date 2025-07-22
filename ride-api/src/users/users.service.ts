@@ -5,6 +5,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class UsersService {
@@ -73,7 +74,7 @@ export class UsersService {
 
   async findOne(id: string): Promise<User> {
     const user = await this.userRepo.findOne({
-      where: { id },
+      where: [{ id }, { email: id }],
       relations: [
         'adminProfile',
         'riderProfile',
@@ -94,6 +95,64 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
+    return user;
+  }
+
+  async findByIdOrEmail(identifier: string): Promise<User> {
+    let user: User | null = null;
+
+    if (isUUID(identifier)) {
+      // If valid UUID, search by id
+      user = await this.userRepo.findOne({
+        where: { id: identifier },
+        relations: [
+          'adminProfile',
+          'riderProfile',
+          'driverProfile',
+          'payments',
+          'ratingsGiven',
+          'ratingsReceived',
+          'walletTransactions',
+          'rideFeedbacks',
+          'supportTickets',
+          'notifications',
+          'devices',
+          'promoUsages',
+          'createdPromoCodes',
+          'driverLocations',
+        ],
+      });
+    }
+
+    if (!user) {
+      // If not found by id or identifier is not UUID, search by email
+      user = await this.userRepo.findOne({
+        where: { email: identifier },
+        relations: [
+          'adminProfile',
+          'riderProfile',
+          'driverProfile',
+          'payments',
+          'ratingsGiven',
+          'ratingsReceived',
+          'walletTransactions',
+          'rideFeedbacks',
+          'supportTickets',
+          'notifications',
+          'devices',
+          'promoUsages',
+          'createdPromoCodes',
+          'driverLocations',
+        ],
+      });
+    }
+
+    if (!user) {
+      throw new NotFoundException(
+        `User with ID or email "${identifier}" not found`,
+      );
+    }
+
     return user;
   }
 
