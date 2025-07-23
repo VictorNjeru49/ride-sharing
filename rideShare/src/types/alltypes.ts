@@ -98,6 +98,7 @@ export interface userTypes extends GenericsType {
   promoUsages?: UserPromoUsage[]
   createdPromoCodes?: PromoCode[]
   driverLocations?: DriverLocation[]
+  cancel?: Ridecancel[]
 }
 
 export interface Notification extends GenericsType {
@@ -157,6 +158,10 @@ export interface Ridecancel extends GenericsType {
 export interface Riderequest extends GenericsType {
   rider?: RiderProfile
   assignedDriver?: DriverProfile
+  riderId: string
+  assignedDriverId: string
+  pickupLocationId: string
+  dropoffLocationId: string
   pickupLocation?: Location
   dropoffLocation?: Location
   status: string

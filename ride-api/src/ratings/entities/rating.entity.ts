@@ -21,12 +21,10 @@ export class Rating {
   ride: Ride;
 
   @ManyToOne(() => User, (u) => u.ratingsGiven, {
-    eager: true,
     onDelete: 'CASCADE',
   })
   rater: User;
   @ManyToOne(() => User, (u) => u.ratingsReceived, {
-    eager: true,
     onDelete: 'CASCADE',
   })
   ratee: User;

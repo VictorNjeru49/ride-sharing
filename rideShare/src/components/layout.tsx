@@ -20,6 +20,7 @@ import {
   PhoneCall,
   MonitorSmartphone,
   Inbox,
+  Columns4,
 } from 'lucide-react'
 import { Link, useRouterState, useNavigate } from '@tanstack/react-router'
 import { UserRole } from '@/types/alltypes'
@@ -236,6 +237,11 @@ function Layout({ role }: { role: UserRole }) {
       name: 'Ride Requests',
       path: '/driver/requests',
       icon: <ArrowRightLeft className="w-4 h-4" />,
+    },
+    {
+      name: 'All Requests',
+      path: '/driver/allrequest',
+      icon: <Columns4 className="w-4 h-4" />,
     },
     {
       name: 'Schedule',

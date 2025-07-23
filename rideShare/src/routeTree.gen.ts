@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UserRouteImport } from './routes/user'
+import { Route as RequestsRouteImport } from './routes/requests'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as PaymentSuccessRouteImport } from './routes/payment-success'
@@ -43,6 +44,7 @@ import { Route as DriverRequestsRouteImport } from './routes/driver/requests'
 import { Route as DriverInboxRouteImport } from './routes/driver/inbox'
 import { Route as DriverEarningsRouteImport } from './routes/driver/earnings'
 import { Route as DriverDriverprofileRouteImport } from './routes/driver/driverprofile'
+import { Route as DriverAllrequestRouteImport } from './routes/driver/allrequest'
 import { Route as DashboardVehicleRouteImport } from './routes/dashboard/vehicle'
 import { Route as DashboardUsersRouteImport } from './routes/dashboard/users'
 import { Route as DashboardTripsRouteImport } from './routes/dashboard/trips'
@@ -57,6 +59,11 @@ import { Route as DashboardTripsTripIdRouteImport } from './routes/dashboard/tri
 const UserRoute = UserRouteImport.update({
   id: '/user',
   path: '/user',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RequestsRoute = RequestsRouteImport.update({
+  id: '/requests',
+  path: '/requests',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterRoute = RegisterRouteImport.update({
@@ -224,6 +231,11 @@ const DriverDriverprofileRoute = DriverDriverprofileRouteImport.update({
   path: '/driverprofile',
   getParentRoute: () => DriverRoute,
 } as any)
+const DriverAllrequestRoute = DriverAllrequestRouteImport.update({
+  id: '/allrequest',
+  path: '/allrequest',
+  getParentRoute: () => DriverRoute,
+} as any)
 const DashboardVehicleRoute = DashboardVehicleRouteImport.update({
   id: '/vehicle',
   path: '/vehicle',
@@ -288,6 +300,7 @@ export interface FileRoutesByFullPath {
   '/payment-success': typeof PaymentSuccessRoute
   '/payments': typeof PaymentsRoute
   '/register': typeof RegisterRoute
+  '/requests': typeof RequestsRoute
   '/user': typeof UserRouteWithChildren
   '/Vehicles/$VehiclesId': typeof VehiclesVehiclesIdRoute
   '/dashboard/adminprofile': typeof DashboardAdminprofileRoute
@@ -298,6 +311,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/trips': typeof DashboardTripsRouteWithChildren
   '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard/vehicle': typeof DashboardVehicleRoute
+  '/driver/allrequest': typeof DriverAllrequestRoute
   '/driver/driverprofile': typeof DriverDriverprofileRoute
   '/driver/earnings': typeof DriverEarningsRoute
   '/driver/inbox': typeof DriverInboxRoute
@@ -330,6 +344,7 @@ export interface FileRoutesByTo {
   '/payment-success': typeof PaymentSuccessRoute
   '/payments': typeof PaymentsRoute
   '/register': typeof RegisterRoute
+  '/requests': typeof RequestsRoute
   '/Vehicles/$VehiclesId': typeof VehiclesVehiclesIdRoute
   '/dashboard/adminprofile': typeof DashboardAdminprofileRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
@@ -339,6 +354,7 @@ export interface FileRoutesByTo {
   '/dashboard/trips': typeof DashboardTripsRouteWithChildren
   '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard/vehicle': typeof DashboardVehicleRoute
+  '/driver/allrequest': typeof DriverAllrequestRoute
   '/driver/driverprofile': typeof DriverDriverprofileRoute
   '/driver/earnings': typeof DriverEarningsRoute
   '/driver/inbox': typeof DriverInboxRoute
@@ -376,6 +392,7 @@ export interface FileRoutesById {
   '/payment-success': typeof PaymentSuccessRoute
   '/payments': typeof PaymentsRoute
   '/register': typeof RegisterRoute
+  '/requests': typeof RequestsRoute
   '/user': typeof UserRouteWithChildren
   '/Vehicles/$VehiclesId': typeof VehiclesVehiclesIdRoute
   '/dashboard/adminprofile': typeof DashboardAdminprofileRoute
@@ -386,6 +403,7 @@ export interface FileRoutesById {
   '/dashboard/trips': typeof DashboardTripsRouteWithChildren
   '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard/vehicle': typeof DashboardVehicleRoute
+  '/driver/allrequest': typeof DriverAllrequestRoute
   '/driver/driverprofile': typeof DriverDriverprofileRoute
   '/driver/earnings': typeof DriverEarningsRoute
   '/driver/inbox': typeof DriverInboxRoute
@@ -424,6 +442,7 @@ export interface FileRouteTypes {
     | '/payment-success'
     | '/payments'
     | '/register'
+    | '/requests'
     | '/user'
     | '/Vehicles/$VehiclesId'
     | '/dashboard/adminprofile'
@@ -434,6 +453,7 @@ export interface FileRouteTypes {
     | '/dashboard/trips'
     | '/dashboard/users'
     | '/dashboard/vehicle'
+    | '/driver/allrequest'
     | '/driver/driverprofile'
     | '/driver/earnings'
     | '/driver/inbox'
@@ -466,6 +486,7 @@ export interface FileRouteTypes {
     | '/payment-success'
     | '/payments'
     | '/register'
+    | '/requests'
     | '/Vehicles/$VehiclesId'
     | '/dashboard/adminprofile'
     | '/dashboard/analytics'
@@ -475,6 +496,7 @@ export interface FileRouteTypes {
     | '/dashboard/trips'
     | '/dashboard/users'
     | '/dashboard/vehicle'
+    | '/driver/allrequest'
     | '/driver/driverprofile'
     | '/driver/earnings'
     | '/driver/inbox'
@@ -511,6 +533,7 @@ export interface FileRouteTypes {
     | '/payment-success'
     | '/payments'
     | '/register'
+    | '/requests'
     | '/user'
     | '/Vehicles/$VehiclesId'
     | '/dashboard/adminprofile'
@@ -521,6 +544,7 @@ export interface FileRouteTypes {
     | '/dashboard/trips'
     | '/dashboard/users'
     | '/dashboard/vehicle'
+    | '/driver/allrequest'
     | '/driver/driverprofile'
     | '/driver/earnings'
     | '/driver/inbox'
@@ -558,6 +582,7 @@ export interface RootRouteChildren {
   PaymentSuccessRoute: typeof PaymentSuccessRoute
   PaymentsRoute: typeof PaymentsRoute
   RegisterRoute: typeof RegisterRoute
+  RequestsRoute: typeof RequestsRoute
   UserRoute: typeof UserRouteWithChildren
 }
 
@@ -568,6 +593,13 @@ declare module '@tanstack/react-router' {
       path: '/user'
       fullPath: '/user'
       preLoaderRoute: typeof UserRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/requests': {
+      id: '/requests'
+      path: '/requests'
+      fullPath: '/requests'
+      preLoaderRoute: typeof RequestsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/register': {
@@ -801,6 +833,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DriverDriverprofileRouteImport
       parentRoute: typeof DriverRoute
     }
+    '/driver/allrequest': {
+      id: '/driver/allrequest'
+      path: '/allrequest'
+      fullPath: '/driver/allrequest'
+      preLoaderRoute: typeof DriverAllrequestRouteImport
+      parentRoute: typeof DriverRoute
+    }
     '/dashboard/vehicle': {
       id: '/dashboard/vehicle'
       path: '/vehicle'
@@ -940,6 +979,7 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 )
 
 interface DriverRouteChildren {
+  DriverAllrequestRoute: typeof DriverAllrequestRoute
   DriverDriverprofileRoute: typeof DriverDriverprofileRoute
   DriverEarningsRoute: typeof DriverEarningsRoute
   DriverInboxRoute: typeof DriverInboxRoute
@@ -952,6 +992,7 @@ interface DriverRouteChildren {
 }
 
 const DriverRouteChildren: DriverRouteChildren = {
+  DriverAllrequestRoute: DriverAllrequestRoute,
   DriverDriverprofileRoute: DriverDriverprofileRoute,
   DriverEarningsRoute: DriverEarningsRoute,
   DriverInboxRoute: DriverInboxRoute,
@@ -1005,6 +1046,7 @@ const rootRouteChildren: RootRouteChildren = {
   PaymentSuccessRoute: PaymentSuccessRoute,
   PaymentsRoute: PaymentsRoute,
   RegisterRoute: RegisterRoute,
+  RequestsRoute: RequestsRoute,
   UserRoute: UserRouteWithChildren,
 }
 export const routeTree = rootRouteImport

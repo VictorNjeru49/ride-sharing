@@ -1,23 +1,45 @@
 import { Driverprofile } from 'src/driverprofile/entities/driverprofile.entity';
 import { Location } from 'src/locations/entities/location.entity';
 import { Riderprofile } from 'src/riderprofile/entities/riderprofile.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity()
 export class Riderequest {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ nullable: true })
+  riderId: string;
+
+  @Column({ nullable: true })
+  assignedDriverId: string;
+
+  @Column({ nullable: true })
+  pickupLocationId: string;
+
+  @Column({ nullable: true })
+  dropoffLocationId: string;
+
   @ManyToOne(() => Riderprofile, (rp) => rp.rideRequests, {
     nullable: false,
     onDelete: 'CASCADE',
+    eager: true,
   })
+  @JoinColumn({ name: 'riderId' })
   rider: Riderprofile;
 
   @ManyToOne(() => Driverprofile, (dp) => dp.assignedRequests, {
     nullable: true,
+    eager: true,
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'assignedDriverId' })
   assignedDriver: Driverprofile;
 
   @ManyToOne(() => Location, (l) => l.requestsPickup, {
@@ -25,6 +47,7 @@ export class Riderequest {
     onDelete: 'CASCADE',
     eager: true,
   })
+  @JoinColumn({ name: 'pickupLocationId' })
   pickupLocation: Location;
 
   @ManyToOne(() => Location, (l) => l.requestsDropoff, {
@@ -32,6 +55,7 @@ export class Riderequest {
     eager: true,
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'dropoffLocationId' })
   dropoffLocation: Location;
 
   @Column()
@@ -40,6 +64,6 @@ export class Riderequest {
   @Column({ nullable: true })
   preferredVehicleType: string;
 
-  @Column('timestamp')
+  @Column('timestamp', { nullable: true })
   requestedAt: Date;
 }

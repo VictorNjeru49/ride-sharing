@@ -41,8 +41,8 @@ export class Promocode {
   usages: Userpromousage[];
   @ManyToOne(() => User, (user) => user.createdPromoCodes, {
     nullable: true,
-    onDelete: 'SET NULL',
+    onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'createdById' }) // optional but explicit
+  @JoinColumn({ name: 'createdById' })
   createdBy: User;
 }

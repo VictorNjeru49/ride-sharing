@@ -54,13 +54,13 @@ export class WalletsService {
   // Other methods remain unchanged...
 
   async findAll() {
-    return await this.walletRepo.find({ relations: ['user'] });
+    return await this.walletRepo.find({ relations: { user: true } });
   }
 
   async findOne(id: string): Promise<Wallet | null> {
     return await this.walletRepo.findOne({
       where: { id },
-      relations: ['user'],
+      relations: { user: true },
     });
   }
 

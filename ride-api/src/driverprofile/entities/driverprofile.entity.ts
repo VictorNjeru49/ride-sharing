@@ -25,7 +25,7 @@ export class Driverprofile {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @Column({ length: 50 })
+  @Column({ length: 50, nullable: true })
   licenseNumber: string;
 
   @Column('decimal', { precision: 2, scale: 1, default: 0 })
@@ -65,7 +65,6 @@ export class Driverprofile {
   @OneToMany(() => Riderequest, (rr) => rr.assignedDriver, {
     cascade: true,
     onDelete: 'CASCADE',
-    eager: true,
   })
   assignedRequests: Riderequest[];
 

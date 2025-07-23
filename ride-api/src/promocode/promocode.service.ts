@@ -19,14 +19,14 @@ export class PromocodeService {
 
   async findAll() {
     return await this.promocodeRepo.find({
-      relations: ['createdBy', 'usages'],
+      relations: { createdBy: true, usages: true },
     });
   }
 
   async findOne(id: string) {
     return await this.promocodeRepo.findOne({
       where: { id },
-      relations: ['createdBy', 'usages'],
+      relations: { createdBy: true, usages: true },
     });
   }
 

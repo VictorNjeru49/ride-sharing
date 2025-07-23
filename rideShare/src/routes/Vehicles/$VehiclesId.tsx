@@ -1,9 +1,12 @@
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { useParams } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { isLoggedIn } from '@/app/authPersistence';
+import { isLoggedIn } from '@/app/authPersistence'
 import {
   createLocation,
+  createRide,
+  createRideRequest,
+  getLocationById,
   getRiderProfileById,
   getUserById,
   getVehiclesById,
@@ -11,6 +14,7 @@ import {
 import {
   type GenericsType,
   type Ride,
+  type Riderequest,
   type userTypes,
   type Vehicle,
 } from '@/types/alltypes'
@@ -79,10 +83,18 @@ export interface RideInput {
   vehicle: string
 }
 
-export const createRides = async (rideData: RideInput): Promise<Ride> => {
-  const response = await axios.post(`${API_BASE_URL}/ride`, rideData)
-  return response.data
+interface RiderequestInput {
+  rider: string // rider ID
+  pickupLocation: string // location ID
+  dropoffLocation: string // location ID
+  status: string
+  preferredVehicleType: string
 }
+
+// export const createRides = async (rideData: RideInput): Promise<Ride> => {
+//   const response = await axios.post(`${API_BASE_URL}/ride`, rideData)
+//   return response.data
+// }
 
 function RouteComponent() {
   const { VehiclesId } = useParams({ from: '/Vehicles/$VehiclesId' })
@@ -101,15 +113,15 @@ function RouteComponent() {
   const userId = authStore.state.user.id
   console.log('user', userId)
 
- const {
-   data: riderProfile,
-   isLoading: isRiderLoading,
-   error: riderError,
- } = useQuery({
-   queryKey: ['riderProfile', userId],
-   queryFn: () => getUserById(userId),
-   enabled: !!userId,
- })
+  const {
+    data: riderProfile,
+    isLoading: isRiderLoading,
+    error: riderError,
+  } = useQuery({
+    queryKey: ['riderProfile', userId],
+    queryFn: () => getUserById(userId),
+    enabled: !!userId,
+  })
   console.log('riderProfile', riderProfile?.riderProfile)
 
   const pickupCoords = getCoords('pickupCoords')
@@ -193,23 +205,42 @@ function RouteComponent() {
       })
 
       const isoDateTime = new Date(`${date}`)
+      const fullRiderProfile = await getRiderProfileById(riderProfile)
+      const fullPickupLocation = await getLocationById(pickupLocation.id)
+      const fullDropoffLocation = await getLocationById(dropoffLocation.id)
+       const fullVehicle = await getVehiclesById(VehiclesId)
 
-      const ride = await createRides({
-        rider: riderProfile,
-        pickupLocation: pickupLocation.id,
-        dropoffLocation: dropoffLocation.id,
+      const ride: Partial<Ride> = {
+        rider: fullRiderProfile,
+        pickupLocation: fullPickupLocation,
+        dropoffLocation: fullDropoffLocation,
         fare: totalCost,
         distanceKm,
         status: 'schedule',
         startTime: isoDateTime,
         endTime: new Date(isoDateTime.getTime() + 30 * 60 * 1000),
-        vehicle: VehiclesId,
-      })
-      console.log('ride', ride)
+      }
+      const fullRide = await createRide(ride)
+      console.log('ride', fullRide)
+
+      const rideRequestData: Partial<Riderequest> = {
+        rider: fullRiderProfile,
+        pickupLocation: fullPickupLocation,
+        dropoffLocation: fullDropoffLocation,
+        status: 'waiting',
+        preferredVehicleType: vehicle.vehicleType,
+        requestedAt: ride.startTime,
+      }
+
+      const riderequest = await createRideRequest(rideRequestData)
+
+      console.log('Ride Request', riderequest)
 
       localStorage.setItem('vehicleId', VehiclesId)
       localStorage.setItem('Amount', totalCost.toString())
-      localStorage.setItem('rideId', ride.id)
+      localStorage.setItem('rideId', fullRide.id)
+      localStorage.setItem('RIde', JSON.stringify(fullRide))
+      localStorage.setItem('vehicle', JSON.stringify(vehicle))
 
       navigate({ to: '/payments' })
     } catch (error) {

@@ -19,14 +19,14 @@ export class RatingsService {
 
   async findAll() {
     return await this.ratingRepo.find({
-      relations: ['ride', 'rater', 'ratee'],
+      relations: { ride: true, rater: true, ratee: true },
     });
   }
 
   async findOne(id: string) {
     return await this.ratingRepo.findOne({
       where: { id },
-      relations: ['ride', 'rater', 'ratee'],
+      relations: { ride: true, rater: true, ratee: true },
     });
   }
 

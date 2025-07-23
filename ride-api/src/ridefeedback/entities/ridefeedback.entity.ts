@@ -22,7 +22,6 @@ export class Ridefeedback {
 
   @ManyToOne(() => User, (user) => user.rideFeedbacks, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   @JoinColumn({ name: 'userId' })
   user: User;

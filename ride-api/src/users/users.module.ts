@@ -17,6 +17,7 @@ import { Riderprofile } from 'src/riderprofile/entities/riderprofile.entity';
 import { Supportticket } from 'src/supportticket/entities/supportticket.entity';
 import { Userpromousage } from 'src/userpromousage/entities/userpromousage.entity';
 import { Wallet } from 'src/wallets/entities/wallet.entity';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { Wallet } from 'src/wallets/entities/wallet.entity';
       Userpromousage,
       Wallet,
     ]),
+    NotificationModule,
   ],
   controllers: [UsersController],
   providers: [UsersService],

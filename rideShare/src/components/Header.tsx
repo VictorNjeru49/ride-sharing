@@ -93,13 +93,25 @@ export default function Header() {
           >
             Contact
           </Link>
-          <Link
-            to="/dashboard"
-            className="hidden hover:text-blue-600"
-            activeProps={{ className: 'text-blue-600 font-bold' }}
-          >
-            Dashboard
-          </Link>
+          {/* Conditionally show Dashboard or Request link */}
+          {isLoggedIn && user.role === UserRole.ADMIN && (
+            <Link
+              to="/dashboard"
+              className="hover:text-blue-600"
+              activeProps={{ className: 'text-blue-600 font-bold' }}
+            >
+              Dashboard
+            </Link>
+          )}
+          {isLoggedIn && user.role === UserRole.DRIVER && (
+            <Link
+              to="/requests"
+              className="hover:text-blue-600"
+              activeProps={{ className: 'text-blue-600 font-bold' }}
+            >
+              Request
+            </Link>
+          )}
         </nav>
         {/* Right: Auth + Theme Toggle */}
         <div className="hidden  items-center space-x-3 md:hidden sm:hidden lg:flex">
@@ -169,7 +181,7 @@ export default function Header() {
                 <DropdownMenuItem
                   onSelect={() => {
                     authActions.deleteUser()
-                    navigate({ to: '/' })
+                    navigate({ to: '/login' })
                   }}
                   className="text-red-600 focus:text-red-600"
                 >
@@ -250,7 +262,7 @@ export default function Header() {
           </header>
 
           {/* messages */}
-          <div className="flex max-h-64 flex-col gap-2 overflow-y-auto px-3 py-2">
+          <div className="flex max-h-200 flex-col gap-2 overflow-y-auto px-3 py-2">
             <div className="flex justify-end">
               <Button
                 className="w-fit bg-red-500 text-white text-xs hover:bg-red-600"

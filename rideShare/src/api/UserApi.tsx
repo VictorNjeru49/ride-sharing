@@ -79,12 +79,6 @@ export const createUser = async (
   return response.data
 }
 
-// GET user by ID or Email
-export const getUserByIdOrEmail = async (identifier: string): Promise<userTypes> => {
-  const response = await axios.get(`${API_BASE_URL}/users?email=${identifier}`)
-  return response.data
-}
-
 
 
 // UPDATE user

@@ -5,7 +5,6 @@ import { PaymentMethod } from '@/types/alltypes'
 
 interface PaymentReportProps {
   userId: string
-  vehicleId: string
   rideId: string
   amount: number
   currency: string
@@ -13,11 +12,12 @@ interface PaymentReportProps {
 
 const PaymentReport: React.FC<PaymentReportProps> = ({
   userId,
-  vehicleId,
   rideId,
   amount,
   currency,
 }) => {
+
+  const vehicle = localStorage.getItem('vehicle')
   return (
     <div className="border rounded p-4 mb-6 max-w-md mx-auto bg-gray-50">
       <h2 className="text-xl font-bold mb-2">Payment Details</h2>
@@ -26,7 +26,7 @@ const PaymentReport: React.FC<PaymentReportProps> = ({
           <strong>User ID:</strong> {userId}
         </li>
         <li>
-          <strong>Vehicle ID:</strong> {vehicleId}
+          <strong>Vehicle</strong> {vehicle}
         </li>
         <li>
           <strong>Ride ID:</strong> {rideId}
@@ -44,7 +44,6 @@ function PaymentsPage() {
   const [message, setMessage] = useState<string | null>(null)
   const [paymentData, setPaymentData] = useState<{
     userId: string
-    vehicleId: string
     rideId: string
     amount: number
     currency: string
@@ -62,7 +61,6 @@ function PaymentsPage() {
       if (!isNaN(amount) && amount > 0) {
         setPaymentData({
           userId: user.id,
-          vehicleId,
           rideId,
           amount,
           currency: 'USD',
@@ -83,7 +81,6 @@ function PaymentsPage() {
     try {
       const { url } = await createCheckoutSession({
         userId: paymentData.userId,
-        vehicleId: paymentData.vehicleId,
         rideId: paymentData.rideId,
         amount: paymentData.amount,
         method: PaymentMethod.STRIPE_CHECKOUT,

@@ -36,7 +36,6 @@ export class Driverlocation {
 
   @ManyToOne(() => User, (user) => user.driverLocations, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   @JoinColumn({ name: 'driverId' })
   driver: User;

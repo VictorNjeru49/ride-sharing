@@ -18,13 +18,13 @@ export class SupportticketService {
   }
 
   async findAll() {
-    return await this.supportticketRepo.find({ relations: ['user'] });
+    return await this.supportticketRepo.find({ relations: { user: true } });
   }
 
   async findOne(id: string) {
     return await this.supportticketRepo.findOne({
       where: { id },
-      relations: ['user'],
+      relations: { user: true },
     });
   }
 

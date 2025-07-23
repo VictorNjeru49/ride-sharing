@@ -8,7 +8,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto';
+import { CreateAuthDto, ResetPasswordDto } from './dto';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from './decorators/public.decorator';
 
@@ -28,6 +28,18 @@ export class AuthController {
   SignIn(@Body() createAuthDto: CreateAuthDto) {
     return this.authService.logIn(createAuthDto);
   }
+
+  @Public()
+  @Post('forgot-password')
+  async forgotPassword(@Body('emailOrPhone') emailOrPhone: string) {
+    return await this.authService.forgetPassword(emailOrPhone);
+  }
+  @Public()
+  @Post('verify-opt')
+  async verifyOtp(@Body('phone') phone: string, @Body('otp') otp: string) {
+    return await this.authService.verifyPhoneOtp(phone, otp);
+  }
+
   @Public()
   @Get('logout/:id')
   SignOut(@Param('id') id: string) {
@@ -41,5 +53,11 @@ export class AuthController {
       throw new UnauthorizedException("userId doesn't match");
     }
     return this.authService.saveRefreshTokens(id, user.refreshToken);
+  }
+  @Public()
+  @Post('reset-password')
+  async resetPassword(@Body() resetpass: ResetPasswordDto) {
+    const { token, newPassword } = resetpass;
+    return await this.authService.resetPassword(token, newPassword);
   }
 }

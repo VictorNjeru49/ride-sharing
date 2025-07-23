@@ -46,14 +46,24 @@ export class RiderprofileService {
 
   async findAll() {
     return await this.riderprofileRepo.find({
-      relations: ['user', 'rideRequests', 'ridesTaken'],
+      relations: {
+        user: true,
+        rideRequests: true,
+        ridesTaken: true,
+        riderHistory: true,
+      },
     });
   }
 
   async findOne(id: string) {
     return await this.riderprofileRepo.findOne({
       where: { id },
-      relations: ['user', 'rideRequests', 'ridesTaken', 'riderHistory'],
+      relations: {
+        user: true,
+        rideRequests: true,
+        ridesTaken: true,
+        riderHistory: true,
+      },
     });
   }
 

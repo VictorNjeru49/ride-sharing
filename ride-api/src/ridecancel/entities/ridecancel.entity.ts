@@ -35,7 +35,10 @@ export class Ridecancel {
   @JoinColumn({ name: 'rideId' })
   ride: Ride;
 
-  @ManyToOne(() => User, { onDelete: 'SET NULL', nullable: true })
+  @ManyToOne(() => User, (user) => user.cancel, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
   @JoinColumn({ name: 'userId' })
   user: User;
 }

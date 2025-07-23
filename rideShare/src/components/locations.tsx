@@ -1,7 +1,7 @@
 // components/MapDialog.tsx
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import {
   MapContainer,
   TileLayer,
@@ -132,7 +132,7 @@ export default function MapDialog({
           )}
         </div>
 
-        <div className="w-full h-[400px]">
+        <div className="w-full h-[600px]">
           <MapContainer
             center={currentCoords ?? [0, 0]}
             zoom={13}

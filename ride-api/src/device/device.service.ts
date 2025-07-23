@@ -19,14 +19,14 @@ export class DeviceService {
 
   async findAll() {
     return await this.deviceRepo.find({
-      relations: ['user'],
+      relations: { user: true },
     });
   }
 
   async findOne(id: string) {
     return await this.deviceRepo.findOne({
       where: { id },
-      relations: ['user'],
+      relations: { user: true },
     });
   }
 

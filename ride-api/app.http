@@ -5,7 +5,12 @@ GET {{url}}/users/31511632-b063-4e4a-bcad-8a24954d1987
 
 
 ####
-GET {{url}}/users?email=valentine@gmail.com
+GET {{url}}/users?search=1234567899
+
+
+
+####
+GET {{url}}/users/identifier?phone=1234567899
 
 
 
@@ -148,4 +153,35 @@ Content-Type: application/json
 
 {
   "message": "help"
+}
+
+
+### 1. Send OTP to phone/email for password reset
+POST {{url}}/auth/forgot-password
+Content-Type: application/json
+
+{
+  "emailOrPhone": "+1999888778"
+}
+
+### 2. Verify OTP and get password reset token
+POST {{url}}/auth/verify-opt
+Content-Type: application/json
+
+{
+  "phone": "+1999888778",
+  "otp": "738708"
+}
+
+### 3. Change password if verification is successful
+@resetToken= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3NzhkYzgyMS1iOTBmLTRkZDktOGYwOS00YjkwN2U3ZGIwMGYiLCJlbWFpbCI6ImdyYWNlLnJvYmluc29uMUBleGFtcGxlLmNvbSIsImlhdCI6MTc1MzE3OTAzOCwiZXhwIjoxNzUzMTc5NjM4fQ.nzkVjSJ8RAN6f0LIykBXE4d5PWRb7EHyU9JyeMKLkgw
+
+
+#######
+POST {{url}}/auth/reset-password
+Content-Type: application/json
+
+{
+  "token": "{{resetToken}}",
+  "newPassword": "new_secure_password"
 }

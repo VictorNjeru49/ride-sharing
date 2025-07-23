@@ -5,6 +5,23 @@ import { API_BASE_URL } from './BaseUrl'
 import type { LoginPayload, LoginResponse } from '@/types/alltypes'
 import { authStore } from '@/app/store'
 
+interface ForgotPasswordResponse {
+  message: string
+}
+
+interface VerifyOtpResponse {
+  verified: boolean
+  resetToken?: string // assuming your backend returns this for password reset
+}
+
+interface ResetPasswordResponse {
+  message: string
+  token: string
+}
+
+interface RegisterResponse {
+  message: string
+}
 const loginFn = async (payload: LoginPayload): Promise<LoginResponse> => {
   const response = await axios.post<LoginResponse>(
     `${API_BASE_URL}/auth/login`,
@@ -73,4 +90,78 @@ export const getNewToken = async () => {
 
     const result = await response.data
     return result
+}
+
+
+
+
+export const authApi = {
+  // Send email or phone to initiate password reset
+  forgotPassword: async (
+    emailOrPhone: string,
+  ): Promise<ForgotPasswordResponse> => {
+    const response = await axios.post<ForgotPasswordResponse>(
+      `${API_BASE_URL}/auth/forgot-password`,
+      {
+        emailOrPhone,
+      },
+    )
+    return response.data
+  },
+
+  // Verify OTP sent to phone
+  verifyOtp: async (phone: string, otp: string): Promise<VerifyOtpResponse> => {
+    const response = await axios.post<VerifyOtpResponse>(
+      `${API_BASE_URL}/auth/verify-opt`,
+      {
+        phone,
+        otp,
+      },
+    )
+    return response.data
+  },
+
+  // Reset password using token
+  resetPassword: async (
+    token: string,
+    newPassword: string,
+  ): Promise<ResetPasswordResponse> => {
+    const response = await axios.post<ResetPasswordResponse>(
+      `${API_BASE_URL}/auth/reset-password`,
+      {
+        token,
+        newPassword,
+      },
+    )
+    return response.data
+  },
+
+  // Optional: Login
+  login: async (email: string, password: string): Promise<LoginResponse> => {
+    const response = await axios.post<LoginResponse>(
+      `${API_BASE_URL}/auth/login`,
+      {
+        email,
+        password,
+      },
+    )
+    return response.data
+  },
+
+  // Optional: Register
+  register: async (
+    userData: Record<string, any>,
+  ): Promise<RegisterResponse> => {
+    const response = await axios.post<RegisterResponse>(
+      `${API_BASE_URL}/auth/register`,
+      userData,
+    )
+    return response.data
+  },
+
+  // Optional logout placeholder if needed
+  logout: async (): Promise<void> => {
+    // If your backend supports logout
+    await axios.post('/auth/logout')
+  },
 }

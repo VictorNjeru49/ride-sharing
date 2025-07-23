@@ -51,16 +51,12 @@ export class AdminService {
     return await this.adminRepo.findOne({ where: { id }, relations: ['user'] });
   }
 
-  async update(id: string, updateAdminDto: UpdateAdminDto): Promise<Admin> {
-    const admin = await this.adminRepo.findOne({ where: { id } });
-    if (!admin) {
-      throw new NotFoundException(`Admin with id ${id} not found`);
-    }
-
-    // Update fields
-    Object.assign(admin, updateAdminDto);
-
-    return this.adminRepo.save(admin);
+  async update(
+    id: string,
+    updateAdminDto: UpdateAdminDto,
+  ): Promise<Admin | null> {
+    await this.adminRepo.update(id, updateAdminDto);
+    return this.findOne(id);
   }
 
   async remove(id: string): Promise<void> {

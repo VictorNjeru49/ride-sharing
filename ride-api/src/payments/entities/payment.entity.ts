@@ -1,6 +1,5 @@
 import { Ride } from 'src/ride/entities/ride.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Vehicle } from 'src/vehicle/entities/vehicle.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -43,7 +42,6 @@ export class Payment {
   @ManyToOne(() => User, (u) => u.payments, {
     onDelete: 'CASCADE',
     nullable: true,
-    eager: true,
   })
   user: User;
 
@@ -59,14 +57,6 @@ export class Payment {
     default: PaymentMethod.CREDIT_CARD,
   })
   method: PaymentMethod;
-
-  @ManyToOne(() => Vehicle, (vehicle) => vehicle.payments, {
-    cascade: true,
-    onDelete: 'CASCADE',
-    nullable: true,
-    eager: true,
-  })
-  vehicle: Vehicle;
 
   @Column({ nullable: true })
   stripeCheckoutSessionId: string;

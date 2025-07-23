@@ -19,24 +19,24 @@ export class RiderequestService {
 
   async findAll() {
     return await this.riderequestRepo.find({
-      relations: [
-        'rider',
-        'assignedDriver',
-        'pickupLocation',
-        'dropoffLocation',
-      ],
+      relations: {
+        rider: { user: true },
+        assignedDriver: { user: true },
+        pickupLocation: true,
+        dropoffLocation: true,
+      },
     });
   }
 
   async findOne(id: string) {
     return await this.riderequestRepo.findOne({
       where: { id },
-      relations: [
-        'rider',
-        'assignedDriver',
-        'pickupLocation',
-        'dropoffLocation',
-      ],
+      relations: {
+        rider: { user: true },
+        assignedDriver: { user: true },
+        pickupLocation: true,
+        dropoffLocation: true,
+      },
     });
   }
 

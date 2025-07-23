@@ -19,32 +19,32 @@ export class RideService {
 
   async findAll() {
     return await this.rideRepo.find({
-      relations: [
-        'rider',
-        'driver',
-        'pickupLocation',
-        'dropoffLocation',
-        'payment',
-        'ratings',
-        'cancellation',
-        'feedbacks',
-      ],
+      relations: {
+        rider: true,
+        driver: true,
+        pickupLocation: true,
+        dropoffLocation: true,
+        payment: true,
+        ratings: true,
+        cancellation: true,
+        feedbacks: true,
+      },
     });
   }
 
   async findOne(id: string) {
     return await this.rideRepo.findOne({
       where: { id },
-      relations: [
-        'rider',
-        'driver',
-        'pickupLocation',
-        'dropoffLocation',
-        'payment',
-        'ratings',
-        'cancellation',
-        'feedbacks',
-      ],
+      relations: {
+        rider: true,
+        driver: true,
+        pickupLocation: true,
+        dropoffLocation: true,
+        payment: true,
+        ratings: true,
+        cancellation: true,
+        feedbacks: true,
+      },
     });
   }
 

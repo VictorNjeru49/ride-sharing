@@ -67,7 +67,6 @@ export class PaymentsService {
       method: createPaymentDto.method,
       status: PaymentStatus.PENDING,
       user: { id: createPaymentDto.userId },
-      vehicle: { id: createPaymentDto.vehicleId },
       stripePaymentIntentId: paymentIntent.id,
     });
 
@@ -185,9 +184,8 @@ export class PaymentsService {
     }
 
     const userId = paymentIntent.metadata.user;
-    const vehicleId = paymentIntent.metadata.vehicle;
 
-    if (!userId || !vehicleId) {
+    if (!userId) {
       throw new BadRequestException('Missing metadata in payment intent');
     }
 
@@ -198,7 +196,6 @@ export class PaymentsService {
       method: PaymentMethod.STRIPE_CHECKOUT,
       status: PaymentStatus.COMPLETED,
       user: { id: userId },
-      vehicle: { id: vehicleId },
       currency: paymentIntent.currency,
       stripePaymentIntentId: paymentIntent.id,
       paidAt: new Date(),
@@ -243,12 +240,10 @@ export class PaymentsService {
       ],
       metadata: {
         user: createPaymentDto.userId,
-        vehicle: createPaymentDto.vehicleId,
       },
       payment_intent_data: {
         metadata: {
           user: createPaymentDto.userId,
-          vehicle: createPaymentDto.vehicleId,
         },
         capture_method: 'automatic',
         description: 'Vehicle rental payment',
@@ -266,7 +261,6 @@ export class PaymentsService {
       status: PaymentStatus.PENDING,
       user: { id: createPaymentDto.userId },
       ride: { id: createPaymentDto.rideId },
-      vehicle: { id: createPaymentDto.vehicleId },
       currency: createPaymentDto.currency,
       stripeCheckoutSessionId: session.id,
       paidAt: new Date(),
@@ -286,14 +280,14 @@ export class PaymentsService {
 
   async findAll(): Promise<Payment[]> {
     return await this.paymentRepo.find({
-      relations: ['user', 'ride', 'vehicle'],
+      relations: { user: true, ride: true },
     });
   }
 
   async findOne(id: string): Promise<Payment> {
     const payment = await this.paymentRepo.findOne({
       where: { id },
-      relations: ['user', 'ride', 'vehicle'],
+      relations: { user: true, ride: true },
     });
     if (!payment) {
       throw new NotFoundException(`Payment with ID ${id} not found`);

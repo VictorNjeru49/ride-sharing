@@ -17,13 +17,15 @@ export class RidefeedbackService {
   }
 
   async findAll() {
-    return await this.ridefeedbackRepo.find({ relations: ['user', 'ride'] });
+    return await this.ridefeedbackRepo.find({
+      relations: { user: true, ride: true },
+    });
   }
 
   async findOne(id: string) {
     return await this.ridefeedbackRepo.findOne({
       where: { id },
-      relations: ['user', 'ride'],
+      relations: { user: true, ride: true },
     });
   }
 

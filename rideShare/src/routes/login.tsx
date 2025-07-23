@@ -11,20 +11,36 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useLogin } from '@/api/LoginApi'
+import { authApi, useLogin } from '@/api/LoginApi'
 import { useRouter } from '@tanstack/react-router'
 import { toast, Toaster } from 'sonner'
 import { useForm } from '@tanstack/react-form'
 import { UserRole, type userTypes } from '@/types/alltypes'
 import { authActions } from '@/app/store'
 import { useEffect, useState } from 'react'
-import { Dialog } from '@radix-ui/react-dialog'
+
+import { API_BASE_URL } from '@/api/BaseUrl'
+import axios from 'axios'
+import { OtpDialog, ResetDialog, VerifyDialog } from '@/components/Otpsms'
 import {
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { getUserByIdOrEmail } from '@/api/UserApi'
+  createAdmin,
+  createDriverProfile,
+  createRiderProfile,
+  getAdminById,
+  getDriverProfileById,
+  getRiderProfileById,
+  getUserById,
+} from '@/api/UserApi'
+
+export const getUsers = async ({
+  search,
+}: {
+  search?: string
+}): Promise<userTypes[]> => {
+  const query = search ? `?search=${encodeURIComponent(search)}` : ''
+  const response = await axios.get(`${API_BASE_URL}/users${query}`)
+  return response.data
+}
 
 export const Route = createFileRoute('/login')({
   component: RouteComponent,
@@ -55,7 +71,10 @@ function RouteComponent() {
   const [recoveryEmail, setRecoveryEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [isSending, setIsSending] = useState(false)
-  const [user, setUser] = useState<userTypes | null>(null)
+  const [step, setStep] = useState<'verify' | 'otp' | 'reset'>('verify')
+  const [otp, setOtp] = useState('')
+  const [resetToken, setResetToken] = useState('')
+  const [newPassword, setNewPassword] = useState('')
 
   const form = useForm({
     defaultValues: { email: '', password: '' } as FormData,
@@ -69,7 +88,41 @@ function RouteComponent() {
       if (!result.success) return
 
       try {
-        const res = await login.mutateAsync(result.data)
+        const res = await login.mutateAsync(result.data, {
+          onSuccess: async (newUser) => {
+            try {
+              const fullUser = await getUserById(newUser.user.id)
+
+              if (fullUser.role === UserRole.RIDER) {
+                const riderProfile = await getRiderProfileById(fullUser.id)
+                if (!riderProfile) {
+                  await createRiderProfile({
+                    user: fullUser,
+                    rating: 5,
+                    preferredPaymentMethod: 'card',
+                  })
+                }
+              } else if (fullUser.role === UserRole.DRIVER) {
+                const driverProfile = await getDriverProfileById(fullUser.id)
+                if (!driverProfile) {
+                  await createDriverProfile({
+                    user: fullUser,
+                    rating: 5,
+                    isAvailable: true,
+                    licenseNumber: 'somedefault licences'
+                  })
+                }
+              } else if (fullUser.role === UserRole.ADMIN) {
+                const adminProfile = await getAdminById(fullUser.id)
+                if (!adminProfile) {
+                  await createAdmin({ user: fullUser })
+                }
+              }
+            } catch (profileErr) {
+              console.error('Profile creation failed:', profileErr)
+            }
+          },
+        })
 
         // Check if backend role matches selected role
         const backendRole = res.user.role ?? UserRole.RIDER
@@ -126,9 +179,12 @@ function RouteComponent() {
 
   useEffect(() => {
     if (!selectForget) {
+      setStep('verify')
       setRecoveryEmail('')
       setPhone('')
-      setUser(null)
+      setOtp('')
+      setNewPassword('')
+      setResetToken('')
     }
   }, [selectForget])
 
@@ -146,27 +202,17 @@ function RouteComponent() {
     setIsSending(true)
 
     try {
-      const response: userTypes = await getUserByIdOrEmail(recoveryEmail)
+      const users: userTypes[] = await getUsers({ search: recoveryEmail })
+      const response = users.find(
+        (u) => u.email === recoveryEmail && u.phone === phone,
+      )
+
+      console.log('response', response)
+      console.log('recoveryEmail', recoveryEmail)
+      console.log('Phone match verified', phone)
 
       if (!response) {
-        toast.error('No account found with this email.')
-        return
-      }
-
-      const normalizePhone = (num: string) => num.replace(/\D/g, '')
-
-      if (!response.phone) {
-        toast.error('Phone number not found in our records.')
-        return
-      }
-
-      if (response.email !== recoveryEmail) {
-        toast.error('Email does not match any account.')
-        return
-      }
-
-      if (normalizePhone(response.phone) !== normalizePhone(phone)) {
-        toast.error('Phone number does not match our records.')
+        toast.error('No matching account found with provided email and phone.')
         return
       }
 
@@ -174,18 +220,55 @@ function RouteComponent() {
         'Verification successful. Recovery instructions sent to your email.',
       )
 
-      console.log('response', response)
-      console.log('recoveryEmail', recoveryEmail)
-      console.log('Phone match verified', response.phone)
-
-      setSelectForget(false)
-      setRecoveryEmail('')
-      setPhone('')
+      await authApi.forgotPassword(phone)
+      toast.success(`OTP sent to your phone ${phone}`)
+      setStep('otp')
+      setSelectForget(true)
     } catch (error) {
       console.error('Failed to verify user', error)
       toast.error('Failed to verify user. Please try again later.')
+      toast.error('Failed to send OTP.')
     } finally {
       setIsSending(false)
+    }
+  }
+
+  const handleVerifyOtp = async () => {
+    if (!otp || !phone) return toast.error('Enter OTP and phone number')
+
+    try {
+      const response = await authApi.verifyOtp(phone, otp)
+      console.log('OTP verify response:', response)
+
+      const { resetToken } = response
+
+      if (resetToken) {
+        toast.success('OTP verified. You can now reset password.')
+        setResetToken(resetToken)
+        setStep('reset')
+      } else {
+        toast.error('Invalid OTP')
+      }
+    } catch {
+      toast.error('OTP verification failed.')
+    }
+  }
+
+  const handleResetPassword = async () => {
+    if (!newPassword || newPassword.length < 15) {
+      toast.error('Password too short')
+      return
+    }
+
+    try {
+      const result = await authApi.resetPassword(resetToken, newPassword)
+
+      toast.success('Password reset successfully.')
+      toast.success(result.message)
+      setSelectForget(false)
+      setStep('verify')
+    } catch {
+      toast.error('Failed to reset password.')
     }
   }
 
@@ -217,7 +300,13 @@ function RouteComponent() {
             </div>
           </div>
           <CardTitle className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-            Welcome User
+            {selectedRole === UserRole.RIDER
+              ? 'Welcome User'
+              : selectedRole === UserRole.DRIVER
+                ? 'Welcome Driver'
+                : selectedRole === UserRole.ADMIN
+                  ? 'Welcome Admin'
+                  : 'Select Your Role'}
           </CardTitle>
           <CardDescription className="text-sm text-gray-500 dark:text-gray-300">
             Sign in to your account to continue
@@ -362,45 +451,44 @@ function RouteComponent() {
             <a href="#" className="underline">
               Privacy Policy
             </a>
-            .\
           </p>
         </div>
       </Card>
 
-      <Dialog open={selectForget} onOpenChange={setSelectForget}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Recovery Password</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Input
-                placeholder="Email Address"
-                type="email"
-                value={recoveryEmail}
-                onChange={(e) => setRecoveryEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <Input
-                placeholder="Phone Number"
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-            </div>
-            <Button
-              onClick={handleSend}
-              disabled={isSending}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              {isSending ? 'Sending...' : 'Send'}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Render dialogs conditionally based on step */}
+      <VerifyDialog
+        open={selectForget && step === 'verify'}
+        onOpenChange={(open) => {
+          if (!open) setSelectForget(false)
+        }}
+        recoveryEmail={recoveryEmail}
+        setRecoveryEmail={setRecoveryEmail}
+        phone={phone}
+        setPhone={setPhone}
+        isSending={isSending}
+        onSend={handleSend}
+      />
+
+      <OtpDialog
+        open={selectForget && step === 'otp'}
+        onOpenChange={(open) => {
+          if (!open) setSelectForget(false)
+        }}
+        otp={otp}
+        setOtp={setOtp}
+        onVerifyOtp={handleVerifyOtp}
+        phone={phone}
+      />
+
+      <ResetDialog
+        open={selectForget && step === 'reset'}
+        onOpenChange={(open) => {
+          if (!open) setSelectForget(false)
+        }}
+        newPassword={newPassword}
+        setNewPassword={setNewPassword}
+        onResetPassword={handleResetPassword}
+      />
     </div>
   )
 }
-
-export default RouteComponent

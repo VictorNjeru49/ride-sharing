@@ -22,12 +22,12 @@ export class LocationsService {
       return this.locationRepo.find({
         where: { address: search },
         order: { address: 'ASC' },
-        relations: [
-          'ridesPickup',
-          'ridesDropoff',
-          'requestsPickup',
-          'requestsDropoff',
-        ],
+        relations: {
+          ridesPickup: true,
+          ridesDropoff: true,
+          requestsPickup: true,
+          requestsDropoff: true,
+        },
       });
     }
     return this.locationRepo.find({ order: { address: 'ASC' } });
@@ -38,12 +38,12 @@ export class LocationsService {
       where: {
         id,
       },
-      relations: [
-        'ridesPickup',
-        'ridesDropoff',
-        'requestsPickup',
-        'requestsDropoff',
-      ],
+      relations: {
+        ridesPickup: true,
+        ridesDropoff: true,
+        requestsPickup: true,
+        requestsDropoff: true,
+      },
     });
     if (!location) {
       throw new NotFoundException(`Location with ID ${id} not found`);

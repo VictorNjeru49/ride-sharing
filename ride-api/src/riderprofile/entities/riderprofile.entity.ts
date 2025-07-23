@@ -37,7 +37,6 @@ export class Riderprofile {
   user: User;
 
   @OneToMany(() => Riderequest, (rr) => rr.rider, {
-    eager: true,
     onDelete: 'CASCADE',
   })
   rideRequests: Riderequest[];

@@ -5,13 +5,15 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
-import { isUUID } from 'class-validator';
+import { Notification } from 'src/notification/entities/notification.entity';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
+    private readonly notifyRepo: NotificationService,
   ) {}
   private async hashData(data: string): Promise<string> {
     const salt = await bcrypt.genSalt(10);
@@ -35,6 +37,8 @@ export class UsersService {
     });
     const savedProfile = await this.userRepo.save(user);
 
+    await this.notifyRepo.createWelcomeNotification(savedProfile);
+
     return savedProfile;
   }
 
@@ -45,27 +49,32 @@ export class UsersService {
         `This action returns all users matching the search term: ${search}`,
       );
       users = await this.userRepo.find({
-        where: [{ firstName: search }, { lastName: search }, { email: search }],
+        where: [
+          { firstName: search },
+          { lastName: search },
+          { email: search },
+          { phone: search },
+        ],
       });
     } else {
       console.log(`This action returns all users`);
       users = await this.userRepo.find({
-        relations: [
-          'adminProfile',
-          'riderProfile',
-          'driverProfile',
-          'payments',
-          'ratingsGiven',
-          'ratingsReceived',
-          'walletTransactions',
-          'rideFeedbacks',
-          'supportTickets',
-          'notifications',
-          'devices',
-          'promoUsages',
-          'createdPromoCodes',
-          'driverLocations',
-        ],
+        relations: {
+          adminProfile: true,
+          riderProfile: true,
+          driverProfile: true,
+          payments: true,
+          ratingsGiven: true,
+          ratingsReceived: true,
+          walletTransactions: true,
+          rideFeedbacks: true,
+          supportTickets: true,
+          notifications: true,
+          devices: true,
+          promoUsages: true,
+          createdPromoCodes: true,
+          driverLocations: true,
+        },
       });
     }
 
@@ -75,84 +84,26 @@ export class UsersService {
   async findOne(id: string): Promise<User> {
     const user = await this.userRepo.findOne({
       where: [{ id }, { email: id }],
-      relations: [
-        'adminProfile',
-        'riderProfile',
-        'driverProfile',
-        'payments',
-        'ratingsGiven',
-        'ratingsReceived',
-        'walletTransactions',
-        'rideFeedbacks',
-        'supportTickets',
-        'notifications',
-        'devices',
-        'promoUsages',
-        'createdPromoCodes',
-        'driverLocations',
-      ],
+      relations: {
+        adminProfile: true,
+        riderProfile: true,
+        driverProfile: true,
+        payments: true,
+        ratingsGiven: true,
+        ratingsReceived: true,
+        walletTransactions: true,
+        rideFeedbacks: true,
+        supportTickets: true,
+        notifications: true,
+        devices: true,
+        promoUsages: true,
+        createdPromoCodes: true,
+        driverLocations: true,
+      },
     });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-    return user;
-  }
-
-  async findByIdOrEmail(identifier: string): Promise<User> {
-    let user: User | null = null;
-
-    if (isUUID(identifier)) {
-      // If valid UUID, search by id
-      user = await this.userRepo.findOne({
-        where: { id: identifier },
-        relations: [
-          'adminProfile',
-          'riderProfile',
-          'driverProfile',
-          'payments',
-          'ratingsGiven',
-          'ratingsReceived',
-          'walletTransactions',
-          'rideFeedbacks',
-          'supportTickets',
-          'notifications',
-          'devices',
-          'promoUsages',
-          'createdPromoCodes',
-          'driverLocations',
-        ],
-      });
-    }
-
-    if (!user) {
-      // If not found by id or identifier is not UUID, search by email
-      user = await this.userRepo.findOne({
-        where: { email: identifier },
-        relations: [
-          'adminProfile',
-          'riderProfile',
-          'driverProfile',
-          'payments',
-          'ratingsGiven',
-          'ratingsReceived',
-          'walletTransactions',
-          'rideFeedbacks',
-          'supportTickets',
-          'notifications',
-          'devices',
-          'promoUsages',
-          'createdPromoCodes',
-          'driverLocations',
-        ],
-      });
-    }
-
-    if (!user) {
-      throw new NotFoundException(
-        `User with ID or email "${identifier}" not found`,
-      );
-    }
-
     return user;
   }
 

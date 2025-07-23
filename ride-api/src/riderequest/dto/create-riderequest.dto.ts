@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class CreateRiderequestDto {
   @ApiProperty()
@@ -9,6 +9,6 @@ export class CreateRiderequestDto {
   @IsString()
   preferredVehicleType: string;
   @ApiProperty()
-  @IsDate()
+  @IsString()
   requestedAt: Date;
 }

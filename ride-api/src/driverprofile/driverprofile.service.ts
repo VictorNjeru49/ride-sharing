@@ -48,28 +48,28 @@ export class DriverprofileService {
 
   async findAll() {
     return await this.driverprofileRepo.find({
-      relations: [
-        'user',
-        'vehicle',
-        'ridesOffered',
-        'ridesTaken',
-        'assignedRequests',
-        'locationHistory',
-      ],
+      relations: {
+        user: true,
+        vehicle: true,
+        ridesOffered: true,
+        ridesTaken: true,
+        assignedRequests: true,
+        locationHistory: true,
+      },
     });
   }
 
   async findOne(id: string) {
     return await this.driverprofileRepo.findOne({
       where: { id },
-      relations: [
-        'user',
-        'vehicle',
-        'ridesOffered',
-        'ridesTaken',
-        'assignedRequests',
-        'locationHistory',
-      ],
+      relations: {
+        user: true,
+        vehicle: true,
+        ridesOffered: true,
+        ridesTaken: true,
+        assignedRequests: true,
+        locationHistory: true,
+      },
     });
   }
 

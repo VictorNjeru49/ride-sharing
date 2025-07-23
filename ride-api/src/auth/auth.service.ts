@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -71,7 +72,6 @@ export class AuthService {
       where: { email: socialData.email },
     });
 
-    // If user doesn't exist, create one
     if (!user) {
       user = this.userRepo.create({
         email: socialData.email,
@@ -125,17 +125,15 @@ export class AuthService {
       );
     }
 
-    // ✅ Generate OTP
     const otp = randomInt(100000, 999999).toString();
 
-    // ✅ Save OTP in memory
-    this.saveOtp(user.phone, otp, 5 * 60 * 1000); // 5 minutes
+    this.saveOtp(user.phone, otp, 5 * 60 * 1000);
 
-    // ✅ Send OTP (log or integrate SMS provider)
     await this.sendOtpSms(user.phone, otp);
 
     return {
       message: `OTP sent to phone ${user.phone}`,
+      otp: otp,
       user: {
         id: user.id,
         phone: user.phone,
@@ -149,9 +147,9 @@ export class AuthService {
   }
 
   private async sendOtpSms(phone: string, otp: string) {
-    // Replace this with your SMS provider (e.g. Twilio, Africa's Talking, etc.)
     await new Promise((resolve) => setTimeout(resolve, 100));
     console.log(`📱 Sending OTP "${otp}" to phone number: ${phone}`);
+    return otp;
   }
 
   private verifyOtp(phone: string, code: string): boolean {
@@ -192,6 +190,35 @@ export class AuthService {
     return {
       message: 'Phone verified successfully',
       resetToken,
+    };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    let payload: JwtPayload;
+    try {
+      payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
+        secret: this.configService.getOrThrow<string>(
+          'RESET_FORGET_PASSWORD_SECRET',
+        ),
+      });
+    } catch {
+      throw new BadRequestException(`Invalid or expired token`);
+    }
+    const user = await this.userRepo.findOne({
+      where: { id: payload.sub },
+      select: ['id', 'email'],
+    });
+    if (!user) {
+      throw new NotFoundException(`User not found`);
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await this.userRepo.save(user);
+    return {
+      message: `The new password is successfully phone: ${user.phone} email: ${user.email}`,
+      user: {
+        id: user.id,
+      },
     };
   }
 
