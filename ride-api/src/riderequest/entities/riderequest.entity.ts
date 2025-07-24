@@ -29,14 +29,14 @@ export class Riderequest {
   @ManyToOne(() => Riderprofile, (rp) => rp.rideRequests, {
     nullable: false,
     onDelete: 'CASCADE',
-    eager: true,
+    // eager: true,
   })
   @JoinColumn({ name: 'riderId' })
   rider: Riderprofile;
 
   @ManyToOne(() => Driverprofile, (dp) => dp.assignedRequests, {
     nullable: true,
-    eager: true,
+    // eager: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'assignedDriverId' })

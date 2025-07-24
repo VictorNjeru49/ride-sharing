@@ -124,7 +124,7 @@ export interface Vehicle extends GenericsType {
   driver?: DriverProfile
 }
 export interface RiderProfile {
-  id:string
+  id: string
   preferredPaymentMethod?: string
   rating?: number
   createdAt?: Date
@@ -159,7 +159,7 @@ export interface Riderequest extends GenericsType {
   rider?: RiderProfile
   assignedDriver?: DriverProfile
   riderId: string
-  assignedDriverId: string
+  assignedDriverId: string | null
   pickupLocationId: string
   dropoffLocationId: string
   pickupLocation?: Location
@@ -189,11 +189,11 @@ export interface Payment extends GenericsType {
   user: userTypes
   userId?: string
   rideId?: string
-  vehicleId: string
-  amount: number
+  amount?: number
   clientSecret?: string
   currency: string
   method?: PaymentMethod
+  stripeCheckoutSessionId?: string
   stripePaymentIntentId?: string
   status?: PaymentStatus
   paidAt?: Date
@@ -252,14 +252,15 @@ export interface UserPromoUsage extends GenericsType {
 }
 export interface Admin extends GenericsType {
   role?: superRole
-  permission?: string[]
+  userId?: string
+  permission?: string | string[]
   user?: userTypes
 }
 export interface PromoCode extends GenericsType {
   code: string
   discountAmount: number
   usageLimit: number
-  expirationDate: Date
+  expirationDate: number
   isActive: boolean
   createdAt: Date
   updatedAt: Date

@@ -115,7 +115,10 @@ function RouteComponent() {
               } else if (fullUser.role === UserRole.ADMIN) {
                 const adminProfile = await getAdminById(fullUser.id)
                 if (!adminProfile) {
-                  await createAdmin({ user: fullUser })
+                  await createAdmin({
+                    userId: fullUser.id,
+                    permission: ['read', 'write'],
+                  })
                 }
               }
             } catch (profileErr) {

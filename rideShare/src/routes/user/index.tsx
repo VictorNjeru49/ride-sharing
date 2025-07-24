@@ -4,18 +4,169 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { MapPin, Star } from 'lucide-react'
 import { authStore } from '@/app/store'
-import { useQuery } from '@tanstack/react-query'
-import { createRideCancel, deleteRideRequest, getRideById, getUserById } from '@/api/UserApi'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  createRideCancel,
+  deleteRideRequest,
+  createRideFeedback,
+  createRating,
+  getUserById,
+  updateRideRequest,
+} from '@/api/UserApi'
+import { Textarea } from '@/components/ui/textarea'
+import { Select } from '@/components/ui/select'
+import { Label } from '@/components/ui/label'
 import MapDialog from '@/components/locations'
 import { ClipLoader } from 'react-spinners'
-import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog'
-import { RideCancelBy, type Ridecancel, type Riderequest } from '@/types/alltypes'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
+import {
+  RideCancelBy,
+  type Ridecancel,
+  type Riderequest,
+  type userTypes,
+} from '@/types/alltypes'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/user/')({
   component: RouteComponent,
 })
 
+interface CompleteRideDialogProps {
+  open: boolean
+  onClose: () => void
+  rideRequest: Riderequest | null
+  user: userTypes | undefined
+}
+
+export function CompleteRideDialog({
+  open,
+  onClose,
+  rideRequest,
+  user,
+}: CompleteRideDialogProps) {
+  const [feedbackText, setFeedbackText] = useState('')
+  const [ratingScore, setRatingScore] = useState<number | undefined>()
+  const [comment, setComment] = useState('')
+
+  const queryClient = useQueryClient()
+
+  const completeMutation = useMutation({
+    mutationFn: async () => {
+      if (!rideRequest || !user) throw new Error('Missing ride or user')
+      await updateRideRequest(rideRequest.id, { status: 'completed' })
+
+      await createRideFeedback({
+        feedbackText,
+        submittedAt: new Date(),
+        user,
+      })
+
+      await createRating({
+        rater: user ? user : undefined,
+        score: ratingScore || 0,
+        comment,
+        createdAt: new Date(),
+      })
+
+      queryClient.invalidateQueries({ queryKey: ['riders', user.id] })
+    },
+    onSuccess: () => {
+      toast.success('Ride completed and feedback submitted!')
+      onClose()
+    },
+    onError: (error: unknown) => {
+      const message =
+        error instanceof Error ? error.message : 'Unknown error occurred'
+      toast.error('Failed to complete ride: ' + message)
+    },
+  })
+
+  const handleSubmit = () => {
+    if (!feedbackText.trim()) {
+      toast.error('Please enter feedback text')
+      return
+    }
+    if (!ratingScore) {
+      toast.error('Please select a rating score')
+      return
+    }
+    completeMutation.mutate()
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Complete Ride & Provide Feedback</DialogTitle>
+          <DialogDescription>
+            Please provide your feedback and rating for this ride.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 mt-4">
+          <div>
+            <Label htmlFor="feedbackText">Feedback</Label>
+            <Textarea
+              id="feedbackText"
+              value={feedbackText}
+              onChange={(e) => setFeedbackText(e.target.value)}
+              placeholder="Write your feedback here..."
+              rows={4}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="ratingScore">Rating</Label>
+            <Select
+              value={ratingScore?.toString() || ''}
+              onValueChange={(value: string) => setRatingScore(Number(value))}
+            >
+              <option value="">Select rating</option>
+              {[1, 2, 3, 4, 5].map((score) => (
+                <option key={score} value={score.toString()}>
+                  {score} Star{score > 1 ? 's' : ''}
+                </option>
+              ))}
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="comment">Comment</Label>
+            <Textarea
+              id="comment"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Additional comments (optional)"
+              rows={3}
+            />
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              disabled={completeMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={completeMutation.isPending}
+            >
+              {completeMutation.isPending ? 'Submitting...' : 'Submit'}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
 // -----------------------------------------------------------
 // Helpers
 // -----------------------------------------------------------
@@ -41,6 +192,62 @@ function saveCoords(
   localStorage.setItem(key, JSON.stringify(coords))
 }
 
+function RideListDialog({
+  open,
+  onClose,
+  title,
+  rides,
+}: {
+  open: boolean
+  onClose: () => void
+  title: string
+  rides: Riderequest[]
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>
+            List of rides with status "{title.toLowerCase()}".
+          </DialogDescription>
+        </DialogHeader>
+        <div className="mt-4 space-y-4 max-h-96 overflow-y-auto">
+          {rides.length === 0 ? (
+            <p className="text-center text-gray-500">No rides found.</p>
+          ) : (
+            rides.map((ride) => (
+              <div
+                key={ride.id}
+                className="border rounded p-3 bg-gray-50 dark:bg-gray-800"
+              >
+                <p>
+                  <strong>Pickup:</strong>{' '}
+                  {ride.pickupLocation?.address || 'Not specified'}
+                </p>
+                <p>
+                  <strong>Destination:</strong>{' '}
+                  {ride.dropoffLocation?.address || 'Not specified'}
+                </p>
+                <p>
+                  <strong>Requested At:</strong>{' '}
+                  {ride.requestedAt
+                    ? new Date(ride.requestedAt).toLocaleString()
+                    : 'Not specified'}
+                </p>
+              </div>
+            ))
+          )}
+        </div>
+        <div className="mt-6 flex justify-end">
+          <Button variant="outline" onClick={onClose}>
+            Close
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
 export function CancelDialog({
   open,
   onClose,
@@ -85,6 +292,17 @@ function RouteComponent() {
   const userId = authStore.state.user?.id
   const [cancelOpen, setCancelOpen] = useState(false)
   const [cancelTarget, setCancelTarget] = useState<Riderequest | null>(null)
+  const [viewAllOpen, setViewAllOpen] = useState(false)
+  const [viewAllRides, setViewAllRides] = useState<Riderequest[]>([])
+  const [viewAllTitle, setViewAllTitle] = useState('')
+   const [completeDialogOpen, setCompleteDialogOpen] = useState(false)
+   const [selectedRideRequest, setSelectedRideRequest] =
+     useState<Riderequest | null>(null)
+
+   const openCompleteDialog = (rideRequest: Riderequest) => {
+     setSelectedRideRequest(rideRequest)
+     setCompleteDialogOpen(true)
+   }
 
   // -------------------------------------------------------------------------
   // Location states
@@ -112,7 +330,18 @@ function RouteComponent() {
       return null
     }
   })
+  // Filter rides by status helper
+  const getRidesByStatus = (status: string) =>
+    user?.riderProfile?.rideRequests?.filter((r) => r.status === status) || []
 
+  // Open dialog helper
+  const openViewAll = (status: 'waiting' | 'Taken') => {
+    setViewAllRides(getRidesByStatus(status))
+    setViewAllTitle(
+      status === 'waiting' ? 'Waiting Rides' : 'Rides in Progress',
+    )
+    setViewAllOpen(true)
+  }
   const [currentAddress, setCurrentAddress] = useState('')
   const [pickupAddress, setPickupAddress] = useState(
     localStorage.getItem('pickupAddress') || '',
@@ -244,37 +473,36 @@ function RouteComponent() {
       </div>
     )
 
-  
-const handleCancelRide = async (reason: string) => {
-  if (!cancelTarget) return
+  const handleCancelRide = async (reason: string) => {
+    if (!cancelTarget) return
 
-  // Assuming `ridesTaken` is an array of Ride and you want the one matching cancelTarget.id
-  const fullRide = user?.riderProfile?.ridesTaken?.find(
-    (ride) => ride.id === cancelTarget.id,
-  )
+    // Assuming `ridesTaken` is an array of Ride and you want the one matching cancelTarget.id
+    const fullRide = user?.riderProfile?.ridesTaken?.find(
+      (ride) => ride.id === cancelTarget.id,
+    )
 
-  try {
-    // First delete the ride request
-    await deleteRideRequest(cancelTarget.id)
+    try {
+      // First delete the ride request
+      await deleteRideRequest(cancelTarget.id)
 
-    const ridecancel: Partial<Ridecancel> = {
-      cancelledBy: RideCancelBy.RIDER,
-      reason,
-      cancelledAt: new Date(),
-      ride: fullRide, // must be of type Ride
-      user: user, // assuming user is of type User
+      const ridecancel: Partial<Ridecancel> = {
+        cancelledBy: RideCancelBy.RIDER,
+        reason,
+        cancelledAt: new Date(),
+        ride: fullRide, // must be of type Ride
+        user: user, // assuming user is of type User
+      }
+
+      await createRideCancel(ridecancel)
+
+      toast.success('Ride cancelled.')
+      setCancelTarget(null)
+      setCancelOpen(false)
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to cancel ride.')
     }
-
-    await createRideCancel(ridecancel)
-
-    toast.success('Ride cancelled.')
-    setCancelTarget(null)
-    setCancelOpen(false)
-  } catch (err) {
-    console.error(err)
-    toast.error('Failed to cancel ride.')
   }
-}
 
   const walletBalance = Number(user?.walletBalance ?? 0)
   const userName = user?.firstName ?? 'User'
@@ -402,7 +630,7 @@ const handleCancelRide = async (reason: string) => {
         </Card>
       </div>
 
-      {user?.riderProfile?.rideRequests?.some(
+      {/* {user?.riderProfile?.rideRequests?.some(
         (req) => req.status === 'waiting',
       ) && (
         <Card className="mb-6 border-yellow-400 bg-yellow-50 dark:bg-gray-900">
@@ -415,7 +643,6 @@ const handleCancelRide = async (reason: string) => {
               confirmation.
             </p>
 
-            {/* Show the first waiting ride request details */}
             {(() => {
               const waitingRequest = user.riderProfile.rideRequests.find(
                 (req) => req.status === 'waiting',
@@ -424,26 +651,97 @@ const handleCancelRide = async (reason: string) => {
                 <>
                   <p>
                     <strong>Pickup:</strong>{' '}
-                    {waitingRequest.pickupLocation
-                      ? `${waitingRequest.pickupLocation.address}`
-                      : 'Not specified'}
+                    {waitingRequest.pickupLocation?.address || 'Not specified'}
                   </p>
                   <p>
                     <strong>Destination:</strong>{' '}
-                    {waitingRequest.dropoffLocation
-                      ? `${waitingRequest.dropoffLocation.address}`
-                      : 'Not specified'}
+                    {waitingRequest.dropoffLocation?.address || 'Not specified'}
                   </p>
+                  <div className="flex gap-2 mt-2">
+                    <button
+                      className="px-4 py-2 bg-yellow-400 text-yellow-900 rounded hover:bg-yellow-500"
+                      onClick={() => alert('Feature coming soon')}
+                    >
+                      View Ride Request
+                    </button>
+                    <button
+                      className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                      onClick={() => {
+                        setCancelTarget(waitingRequest)
+                        setCancelOpen(true)
+                      }}
+                    >
+                      Cancel Ride
+                    </button>
+                  </div>
                 </>
               ) : null
             })()}
+          </CardContent>
+        </Card>
+      )} */}
 
-            <button
-              className="mt-2 px-4 py-2 bg-yellow-400 text-yellow-900 rounded hover:bg-yellow-500"
-              onClick={() => alert('Feature coming soon')}
-            >
-              View Ride Request
-            </button>
+      <RideListDialog
+        open={viewAllOpen}
+        onClose={() => setViewAllOpen(false)}
+        title={viewAllTitle}
+        rides={viewAllRides}
+      />
+      <button
+        className="text-sm font-medium text-blue-600 hover:underline justify-end"
+        onClick={() => openViewAll('waiting')}
+      >
+        View All
+      </button>
+      {user?.riderProfile?.rideRequests?.some(
+        (req) => req.status === 'waiting',
+      ) && (
+        <Card className="mb-6 border-yellow-400 bg-yellow-50 dark:bg-gray-900 relative">
+          <CardContent>
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-lg font-semibold text-yellow-800">
+                Ride Request Pending
+              </h3>
+            </div>
+            <p>
+              Your ride request is currently waiting. Please wait for
+              confirmation.
+            </p>
+
+            {(() => {
+              const waitingRequest = user.riderProfile.rideRequests.find(
+                (req) => req.status === 'waiting',
+              )
+              return waitingRequest ? (
+                <>
+                  <p>
+                    <strong>Pickup:</strong>{' '}
+                    {waitingRequest.pickupLocation?.address || 'Not specified'}
+                  </p>
+                  <p>
+                    <strong>Destination:</strong>{' '}
+                    {waitingRequest.dropoffLocation?.address || 'Not specified'}
+                  </p>
+                  <div className="flex gap-2 mt-2">
+                    <button
+                      className="px-4 py-2 bg-yellow-400 text-yellow-900 rounded hover:bg-yellow-500"
+                      onClick={() => alert('Feature coming soon')}
+                    >
+                      View Ride Request
+                    </button>
+                    <button
+                      className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                      onClick={() => {
+                        setCancelTarget(waitingRequest)
+                        setCancelOpen(true)
+                      }}
+                    >
+                      Cancel Ride
+                    </button>
+                  </div>
+                </>
+              ) : null
+            })()}
           </CardContent>
         </Card>
       )}
@@ -451,11 +749,19 @@ const handleCancelRide = async (reason: string) => {
       {user?.riderProfile?.rideRequests?.some(
         (req) => req.status === 'Taken',
       ) && (
-        <Card className="mb-6 border-yellow-400 bg-yellow-50 dark:bg-gray-900">
+        <Card className="mb-6 border-yellow-400 bg-yellow-50 dark:bg-gray-900 relative">
           <CardContent>
-            <h3 className="text-lg font-semibold text-yellow-800">
-              Ride in Progress
-            </h3>
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-lg font-semibold text-yellow-800">
+                Ride in Progress
+              </h3>
+              <button
+                className="text-sm font-medium text-blue-600 hover:underline"
+                onClick={() => openViewAll('Taken')}
+              >
+                View All
+              </button>
+            </div>
             <p>Your ride is currently in progress. See the details below:</p>
 
             {(() => {
@@ -484,23 +790,48 @@ const handleCancelRide = async (reason: string) => {
                   </p>
                   <p>
                     <strong>Requested At:</strong>{' '}
-                    {activeRequest.requestedAt
+                    {activeRequest.requestedAt          
                       ? new Date(activeRequest.requestedAt).toLocaleString()
                       : 'Not specified'}
                   </p>
 
-                  <button
-                    className="mt-3 px-4 py-2 bg-yellow-400 text-yellow-900 rounded hover:bg-yellow-500"
-                    onClick={() => alert('Tracking coming soon')}
-                  >
-                    Track Ride
-                  </button>
+                  <div className="flex gap-2 mt-3">
+                    <button
+                      className="px-4 py-2 bg-yellow-400 text-yellow-900 rounded hover:bg-yellow-500"
+                      onClick={() => alert('Tracking coming soon')}
+                    >
+                      Track Ride
+                    </button>
+                    <button
+                      className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                      onClick={() => openCompleteDialog(activeRequest)}
+                    >
+                      Complete
+                    </button>
+                    <button
+                      className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                      onClick={() => {
+                        setCancelTarget(activeRequest)
+                        setCancelOpen(true)
+                      }}
+                    >
+                      Cancel Ride
+                    </button>
+                  </div>
                 </div>
               ) : null
             })()}
           </CardContent>
         </Card>
       )}
+
+      {/* Complete Ride Feedback Dialog */}
+      <CompleteRideDialog
+        open={completeDialogOpen}
+        onClose={() => setCompleteDialogOpen(false)}
+        rideRequest={selectedRideRequest}
+        user={user}
+      />
     </div>
   )
 }

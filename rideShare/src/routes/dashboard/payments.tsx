@@ -138,15 +138,14 @@ function RouteComponent() {
     setDateFilter(value)
     setPage(1)
   }
-const badgeColorClasses: Record<PaymentMethod, string> = {
-  credit_card: 'text-blue-600 bg-blue-100',
-  debit_card: 'text-blue-600 bg-blue-100',
-  paypal: 'text-blue-600 bg-blue-100',
-  bank_transfer: 'text-green-600 bg-green-100',
-  cash: 'text-green-600 bg-green-100',
-  stripe_checkout: 'text-purple-600 bg-purple-100', // example color for STRIPE_CHECKOUT
-}
-
+  const badgeColorClasses: Record<PaymentMethod, string> = {
+    credit_card: 'text-blue-600 bg-blue-100',
+    debit_card: 'text-blue-600 bg-blue-100',
+    paypal: 'text-blue-600 bg-blue-100',
+    bank_transfer: 'text-green-600 bg-green-100',
+    cash: 'text-green-600 bg-green-100',
+    stripe_checkout: 'text-purple-600 bg-purple-100', // example color for STRIPE_CHECKOUT
+  }
 
   const statusColorClasses: Record<PaymentStatus, string> = {
     completed: 'text-green-600',
@@ -155,14 +154,19 @@ const badgeColorClasses: Record<PaymentMethod, string> = {
     cancelled: 'text-gray-600',
     refunded: 'text-red-600',
   }
-    
-
-
 
   // Open modal for new payment
   function openCreateModal() {
     setEditingPayment(null)
-    setFormData({})
+    setFormData({
+      amount: 0,
+      clientSecret: '',
+      currency: '',
+      method: PaymentMethod.STRIPE_CHECKOUT,
+      stripePaymentIntentId: '',
+      stripeCheckoutSessionId: '',
+      status: PaymentStatus.PENDING,
+    })
     setIsModalOpen(true)
   }
 
@@ -174,22 +178,33 @@ const badgeColorClasses: Record<PaymentMethod, string> = {
   }
 
   // Handle form input changes
-  function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+  function handleInputChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  // Submit handler for create/update
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+
     try {
-      if (editingPayment) {
-        // Update existing payment
-        await update.mutateAsync({id: editingPayment.id, payload: formData})
-      } else {
-        // Create new payment
-        await create.mutateAsync(formData)
+      const payload: Partial<Payment> = {
+        amount: Number(formData.amount),
+        clientSecret: formData.clientSecret,
+        currency: formData.currency,
+        method: formData.method,
+        stripePaymentIntentId: formData.stripePaymentIntentId,
+        stripeCheckoutSessionId: formData.stripeCheckoutSessionId,
+        status: formData.status
       }
+
+      if (editingPayment) {
+        await update.mutateAsync({ id: editingPayment.id, payload })
+      } else {
+        await create.mutateAsync(payload)
+      }
+
       setIsModalOpen(false)
     } catch (error) {
       console.error('Failed to save payment:', error)
@@ -528,26 +543,26 @@ const badgeColorClasses: Record<PaymentMethod, string> = {
 
       {/* Modal for Create / Update */}
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 dark:bg-opacity-80">
           <form
             onSubmit={handleSubmit}
-            className="bg-white p-6 rounded shadow-md w-full max-w-md"
+            className="bg-white p-6 rounded shadow-md w-full max-w-md dark:bg-gray-900 dark:text-gray-100"
           >
             <h2 className="text-xl font-bold mb-4">
               {editingPayment ? 'Edit Payment' : 'New Payment'}
             </h2>
 
             {/* Example form fields */}
-            <label className="block mb-2">
+            <label className="block mb-4">
               Method:
               <select
                 name="method"
                 value={formData.method || ''}
                 onChange={handleInputChange}
                 required
-                className="w-full border p-2 rounded"
+                className="w-full border border-gray-300 p-2 rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
               >
-                <option value="" disabled>
+                <option value="" disabled className="dark:text-gray-400">
                   Select method
                 </option>
                 {Object.values(PaymentMethod).map((method) => (
@@ -558,16 +573,16 @@ const badgeColorClasses: Record<PaymentMethod, string> = {
               </select>
             </label>
 
-            <label className="block mb-2">
+            <label className="block mb-4">
               Status:
               <select
                 name="status"
                 value={formData.status || ''}
                 onChange={handleInputChange}
                 required
-                className="w-full border p-2 rounded"
+                className="w-full border border-gray-300 p-2 rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
               >
-                <option value="" disabled>
+                <option value="" disabled className="dark:text-gray-400">
                   Select status
                 </option>
                 {Object.values(PaymentStatus).map((status) => (
@@ -578,7 +593,7 @@ const badgeColorClasses: Record<PaymentMethod, string> = {
               </select>
             </label>
 
-            <label className="block mb-2">
+            <label className="block mb-4">
               Amount:
               <input
                 type="number"
@@ -588,17 +603,19 @@ const badgeColorClasses: Record<PaymentMethod, string> = {
                 step="0.01"
                 min="0"
                 required
-                className="w-full border p-2 rounded"
+                className="w-full border border-gray-300 p-2 rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
+                placeholder="Enter amount"
               />
             </label>
 
-            {/* Add other fields as needed, e.g. currency, user, createdAt... */}
+            {/* Add other fields as needed */}
 
             <div className="flex justify-end gap-2 mt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsModalOpen(false)}
+                className="dark:text-gray-200 dark:border-gray-600"
               >
                 Cancel
               </Button>

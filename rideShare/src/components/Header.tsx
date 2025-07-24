@@ -246,7 +246,7 @@ export default function Header() {
 
       {/* ▶︎ Chat window (visible only when open) */}
       {open && (
-        <div className="fixed bottom-6 right-6 z-50 flex w-108 max-w-full flex-col rounded-xl border bg-white shadow-lg dark:bg-gray-900">
+        <div className="fixed bottom-6 right-6 z-50 flex w-150 max-w-full flex-col rounded-xl border bg-white shadow-lg dark:bg-gray-900">
           {/* header */}
           <header className="flex items-center justify-between rounded-t-xl bg-blue-600 px-3 py-2">
             <h2 className="flex items-center text-sm font-semibold text-white">

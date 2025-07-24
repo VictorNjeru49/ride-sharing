@@ -20,8 +20,8 @@ export class RiderequestService {
   async findAll() {
     return await this.riderequestRepo.find({
       relations: {
-        rider: { user: true },
-        assignedDriver: { user: true },
+        rider: true,
+        assignedDriver: true,
         pickupLocation: true,
         dropoffLocation: true,
       },

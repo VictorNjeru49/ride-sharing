@@ -65,7 +65,6 @@ export class Ride {
   createdAt: Date;
 
   @OneToOne(() => Payment, (p) => p.ride, {
-    cascade: true,
     nullable: true,
     onDelete: 'CASCADE',
   })

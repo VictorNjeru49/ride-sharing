@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { createCheckoutSession } from '@/api/UserApi' // Make sure this returns { url }
+import { createCheckoutSession, getUserById } from '@/api/UserApi' // Make sure this returns { url }
 import { authStore } from '@/app/store'
 import { PaymentMethod } from '@/types/alltypes'
+import { useQuery } from '@tanstack/react-query'
 
 interface PaymentReportProps {
   userId: string
@@ -16,25 +17,96 @@ const PaymentReport: React.FC<PaymentReportProps> = ({
   amount,
   currency,
 }) => {
+  // Parse vehicle JSON safely
+  const vehicleJson = localStorage.getItem('vehicle')
+  const user = authStore.state.user.id
 
-  const vehicle = localStorage.getItem('vehicle')
+  const {data: userLog} = useQuery({
+    queryKey: ['userset', user],
+    queryFn: () => getUserById(user)
+  })
+  let vehicleObj: any = null
+  try {
+    vehicleObj = vehicleJson ? JSON.parse(vehicleJson) : null
+  } catch {
+    vehicleObj = null
+  }
+
   return (
-    <div className="border rounded p-4 mb-6 max-w-md mx-auto bg-gray-50">
-      <h2 className="text-xl font-bold mb-2">Payment Details</h2>
-      <ul className="text-left space-y-1">
-        <li>
-          <strong>User ID:</strong> {userId}
-        </li>
-        <li>
-          <strong>Vehicle</strong> {vehicle}
-        </li>
-        <li>
-          <strong>Ride ID:</strong> {rideId}
-        </li>
-        <li>
-          <strong>Amount to Pay:</strong> {amount.toFixed(2)} {currency}
-        </li>
-      </ul>
+    <div className="border rounded-lg p-6 max-w-md mx-auto bg-white dark:bg-gray-800 shadow-md">
+      <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+        Payment Details
+      </h2>
+
+      {/* User Info */}
+      <section className="mb-6">
+        <h3 className="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">
+          User Information
+        </h3>
+        <ul className="space-y-1 text-gray-800 dark:text-gray-200">
+          <li className="hidden">
+            <span className="font-semibold hidden">User ID:</span> {userId}
+          </li>
+          <li>
+            <span className="font-semibold">User Name:</span>{' '}
+            {userLog?.firstName} {userLog?.lastName}
+          </li>
+        </ul>
+      </section>
+
+      {/* Vehicle Details */}
+      <section className="mb-6">
+        <h3 className="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">
+          Vehicle Details
+        </h3>
+        {vehicleObj ? (
+          <ul className="space-y-1 text-gray-800 dark:text-gray-200 text-left">
+            <li>
+              <span className="font-semibold">Make:</span> {vehicleObj.make}
+            </li>
+            <li>
+              <span className="font-semibold">Model:</span> {vehicleObj.model}
+            </li>
+            <li>
+              <span className="font-semibold">Plate Number:</span>{' '}
+              {vehicleObj.plateNumber}
+            </li>
+            <li>
+              <span className="font-semibold">Color:</span> {vehicleObj.color}
+            </li>
+            <li>
+              <span className="font-semibold">Rental Rate:</span> Ksh{' '}
+              {vehicleObj.rentalrate}
+            </li>
+          </ul>
+        ) : (
+          <p className="text-gray-600 dark:text-gray-400">
+            Vehicle info not available.
+          </p>
+        )}
+      </section>
+
+      {/* Ride Info */}
+      <section className="mb-6">
+        <h3 className="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">
+          Ride Information
+        </h3>
+        <ul className="space-y-1 text-gray-800 dark:text-gray-200 text-left">
+          <li>
+            <span className="font-semibold">Ride ID:</span> {rideId}
+          </li>
+        </ul>
+      </section>
+
+      {/* Amount */}
+      <section className="pt-4 border-t border-gray-300 dark:border-gray-700 text-center">
+        <p className="text-xl font-bold text-blue-700 dark:text-blue-400">
+          Amount to Pay:
+        </p>
+        <p className="text-3xl font-extrabold mt-1 text-gray-900 dark:text-gray-100">
+          {amount.toFixed(2)} {currency}
+        </p>
+      </section>
     </div>
   )
 }
@@ -101,13 +173,15 @@ function PaymentsPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto p-4 text-center">
-      <h1 className="text-2xl mb-4 font-semibold">Pay for your ride</h1>
+    <div className="max-w-md mx-auto p-6 bg-gray-100 dark:bg-gray-900 min-h-screen flex flex-col justify-center">
+      <h1 className="text-3xl font-semibold mb-8 text-center text-gray-900 dark:text-gray-100">
+        Pay for your ride
+      </h1>
 
       {paymentData ? (
         <PaymentReport {...paymentData} />
       ) : (
-        <p className="mb-4 text-red-600">
+        <p className="mb-6 text-center text-red-600 dark:text-red-400">
           Payment details are missing or invalid.
         </p>
       )}
@@ -115,12 +189,16 @@ function PaymentsPage() {
       <button
         onClick={handleCheckout}
         disabled={loading || !paymentData}
-        className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
+        className="mt-8 w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-lg font-semibold transition-colors"
       >
         {loading ? 'Redirecting...' : 'Proceed to Checkout'}
       </button>
 
-      {message && <div className="mt-4 text-red-600">{message}</div>}
+      {message && (
+        <div className="mt-4 text-center text-red-600 dark:text-red-400">
+          {message}
+        </div>
+      )}
     </div>
   )
 }

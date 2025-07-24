@@ -152,7 +152,7 @@ POST {{url}}/chatbot
 Content-Type: application/json
 
 {
-  "message": "help"
+  "message": "hello"
 }
 
 
@@ -185,3 +185,16 @@ Content-Type: application/json
   "token": "{{resetToken}}",
   "newPassword": "new_secure_password"
 }
+
+
+#####
+PATCH {{url}}/riderequest/c560d723-68aa-4a84-825e-3785714ba7d9
+Content-Type: application/json
+
+{
+  "assignedDriver": null,
+  "status": "waiting"
+}
+
+######
+DELETE {{url}}/payments/d03fcb63-b32b-4781-8dda-b863617e9564

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useCrudOperations } from '@/hooks/crudops'
 import {
@@ -84,19 +84,32 @@ function RouteComponent() {
   // ───────────────────────────── CRUD helpers
   const handleClose = () => {
     setDialogOpen(false)
-    setFormData({})
+    setFormData({
+      code: '',
+      discountAmount: 0,
+      expirationDate: 0,
+      isActive: true,
+      usageLimit: 0
+    })
     setEditId(null)
   }
 
   const handleSave = () => {
+    const payload: Partial<PromoCode> = {
+      code: formData.code,
+      discountAmount: formData.discountAmount,
+      usageLimit: formData.usageLimit,
+      expirationDate: formData.expirationDate,
+      isActive: formData.isActive,
+    }
     if (!formData.code || !formData.discountAmount) return
     if (editId) {
       update.mutate(
-        { id: editId, payload: formData },
+        { id: editId, payload },
         { onSuccess: handleClose },
       )
     } else {
-      create.mutate(formData, { onSuccess: handleClose })
+      create.mutate(payload, { onSuccess: handleClose })
     }
   }
 

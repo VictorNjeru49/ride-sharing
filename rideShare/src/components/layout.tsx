@@ -21,6 +21,8 @@ import {
   MonitorSmartphone,
   Inbox,
   Columns4,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import { Link, useRouterState, useNavigate } from '@tanstack/react-router'
 import { UserRole } from '@/types/alltypes'
@@ -47,6 +49,7 @@ function Layout({ role }: { role: UserRole }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const navigate = useNavigate()
   const logout = useLogout()
+  const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>(
     {},
   )
@@ -239,11 +242,6 @@ function Layout({ role }: { role: UserRole }) {
       icon: <ArrowRightLeft className="w-4 h-4" />,
     },
     {
-      name: 'All Requests',
-      path: '/driver/allrequest',
-      icon: <Columns4 className="w-4 h-4" />,
-    },
-    {
       name: 'Schedule',
       path: '/driver/schedule',
       icon: <CalendarDays className="w-4 h-4" />,
@@ -322,15 +320,43 @@ function Layout({ role }: { role: UserRole }) {
       {/* Main Wrapper */}
       <div className="flex">
         {/* Desktop Sidebar */}
-        <aside className="w-64 bg-white dark:bg-gray-800 shadow-md border-r border-gray-200 dark:border-gray-700 hidden md:flex flex-col min-h-screen">
-          <div className="p-4 font-bold text-xl border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-            <Link to="/" className="text-gray-900 dark:text-white">
+        <aside
+          className={`bg-white dark:bg-gray-800 shadow-md border-r border-gray-200 dark:border-gray-700 hidden md:flex flex-col min-h-screen
+  transition-width duration-300 ease-in-out
+  ${sidebarExpanded ? 'w-64' : 'w-16'}
+  `}
+        >
+          {/* header with toggle button here */}
+          {/* Desktop Header with Toggle */}
+          <div className="hidden md:flex items-center justify-between bg-white dark:bg-gray-900 p-4 border-b border-gray-200 dark:border-gray-700">
+            <button
+              onClick={() => setSidebarExpanded((prev) => !prev)}
+              aria-label={
+                sidebarExpanded ? 'Collapse sidebar' : 'Expand sidebar'
+              }
+              className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+            >
+              {sidebarExpanded ? (
+                <>
+                <ChevronLeft className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+            <div>
+            <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                🚗 RideShare
+              </span>
+            </div>
+                </>
+              ) : (
+                <ChevronRight className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+              )}
+            </button>
+            {/* <span className="text-lg font-semibold text-gray-900 dark:text-white">
               🚗 RideShare
-            </Link>
+            </span> */}
+            <div>{/* You can add other header elements here */}</div>
           </div>
 
           {/* Navigation */}
-          <nav className="flex flex-col flex-grow p-4 space-y-2 text-sm font-medium">
+          <nav className="flex flex-col flex-grow p-2 space-y-2 text-sm font-medium">
             {navItems.map((item) => {
               if ('label' in item) {
                 const isOpen = openDropdowns[item.label] ?? false
@@ -340,19 +366,25 @@ function Layout({ role }: { role: UserRole }) {
                       type="button"
                       onClick={() => toggleDropdown(item.label)}
                       aria-expanded={isOpen}
-                      className="flex items-center justify-between w-full px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 dark:text-white dark:hover:bg-gray-700"
+                      className={`flex items-center justify-between w-full px-2 py-2 rounded-md hover:bg-gray-100 text-gray-700 dark:text-white dark:hover:bg-gray-700 ${
+                        sidebarExpanded ? '' : 'justify-center'
+                      }`}
+                      title={!sidebarExpanded ? item.label : undefined}
                     >
-                      <span className="flex items-center gap-2 font-medium">
+                      <span
+                        className={`flex items-center gap-2 font-medium ${sidebarExpanded ? '' : 'justify-center w-full'}`}
+                      >
                         {item.icon || <Users className="w-4 h-4" />}
-                        {item.label}
+                        {sidebarExpanded && item.label}
                       </span>
-                      {isOpen ? (
-                        <ChevronUp className="w-4 h-4" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4" />
-                      )}
+                      {sidebarExpanded &&
+                        (isOpen ? (
+                          <ChevronUp className="w-4 h-4" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4" />
+                        ))}
                     </button>
-                    {isOpen && (
+                    {isOpen && sidebarExpanded && (
                       <div className="ml-6 mt-2 flex flex-col space-y-1">
                         {item.children.map((sub) => {
                           if (sub.name === 'Logout') {
@@ -360,7 +392,7 @@ function Layout({ role }: { role: UserRole }) {
                               <button
                                 key="logout-button"
                                 onClick={handleLogout}
-                                className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-700 text-gray-700 w-full text-left dark:text-white"
+                                className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 w-full text-left dark:text-white"
                                 type="button"
                               >
                                 {sub.icon}
@@ -376,7 +408,7 @@ function Layout({ role }: { role: UserRole }) {
                               to={sub.path}
                               className={`flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white ${
                                 isActive
-                                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 font-semibold'
+                                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-600  dark:text-blue-400 font-semibold'
                                   : 'text-gray-700 dark:text-gray-300'
                               }`}
                             >
@@ -396,11 +428,14 @@ function Layout({ role }: { role: UserRole }) {
                   <button
                     key="logout-button"
                     onClick={handleLogout}
-                    className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 w-full text-left dark:text-white"
+                    className={`flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 text-gray-700 w-full text-left dark:text-white ${
+                      sidebarExpanded ? '' : 'justify-center'
+                    }`}
                     type="button"
+                    title={!sidebarExpanded ? item.name : undefined}
                   >
                     {item.icon}
-                    {item.name}
+                    {sidebarExpanded && item.name}
                   </button>
                 )
               }
@@ -410,39 +445,43 @@ function Layout({ role }: { role: UserRole }) {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-700 ${
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 ${
                     isActive
                       ? 'bg-blue-200 text-blue-600 font-semibold'
                       : 'text-gray-700 dark:text-white'
-                  }`}
+                  } ${sidebarExpanded ? '' : 'justify-center'}`}
+                  title={!sidebarExpanded ? item.name : undefined}
                 >
                   {item.icon}
-                  {item.name}
+                  {sidebarExpanded && item.name}
                 </Link>
               )
             })}
           </nav>
 
           {/* Footer */}
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex items-center gap-3">
-            <img
-              src={
-                authStore.state.avatar?.profilePicture ||
-                'https://ui-avatars.com/api/?name=User'
-              }
-              alt="Avatar"
-              className="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-gray-700"
-            />
-            <div className="text-sm leading-tight text-gray-800 dark:text-gray-200">
-              <p className="font-medium">
-                {authStore.state.user?.email || 'Unknown'}
-              </p>
-              <p className="text-xs capitalize">
-                {authStore.state.user?.role || 'N/A'}
-              </p>
+          {sidebarExpanded && (
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex items-center gap-3">
+              <img
+                src={
+                  authStore.state.avatar?.profilePicture ||
+                  'https://ui-avatars.com/api/?name=User'
+                }
+                alt="Avatar"
+                className="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-gray-700"
+              />
+              <div className="text-sm leading-tight text-gray-800 dark:text-gray-200">
+                <p className="font-medium">
+                  {authStore.state.user?.email || 'Unknown'}
+                </p>
+                <p className="text-xs capitalize">
+                  {authStore.state.user?.role || 'N/A'}
+                </p>
+              </div>
             </div>
-          </div>
+          )}
         </aside>
+
         {/* Main Content (placeholder) */}
         <div className="flex-1 p-4 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
           {/* Your outlet or main children goes here */}

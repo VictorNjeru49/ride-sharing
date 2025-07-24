@@ -7,6 +7,7 @@ import {
   CreateDateColumn,
   ManyToOne,
   OneToOne,
+  UpdateDateColumn,
 } from 'typeorm';
 
 // Define enum for payment methods
@@ -36,6 +37,7 @@ export class Payment {
   @OneToOne(() => Ride, (r) => r.payment, {
     nullable: true,
     onDelete: 'CASCADE',
+    cascade: true,
   })
   ride: Ride;
 
@@ -71,7 +73,7 @@ export class Payment {
   })
   status: PaymentStatus;
 
-  @Column('timestamp', { nullable: true })
+  @UpdateDateColumn()
   paidAt: Date;
 
   @CreateDateColumn()

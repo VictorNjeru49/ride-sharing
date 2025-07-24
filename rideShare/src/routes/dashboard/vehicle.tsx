@@ -1,5 +1,5 @@
 // ✅ Converted to shadcn/ui
-import React, { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card'
 import {
@@ -82,7 +82,18 @@ function RouteComponent() {
   function openDialog(vehicle?: Vehicle) {
     if (vehicle) {
       setEditingVehicle(vehicle)
-      setFormData(vehicle)
+       setFormData({
+         available: vehicle.available,
+         capacity: vehicle.capacity,
+         color: vehicle.color,
+         make: vehicle.make,
+         model: vehicle.model,
+         plateNumber: vehicle.plateNumber,
+         rentalrate: vehicle.rentalrate,
+         vehicleImage: vehicle.vehicleImage,
+         vehicleType: vehicle.vehicleType,
+         year: vehicle.year,
+       })
     } else {
       setEditingVehicle(null)
       setFormData({})
@@ -95,11 +106,26 @@ function RouteComponent() {
   }
   async function handleSubmit() {
     try {
+      // Explicitly convert numeric fields to numbers before sending
+
+
+      const payload: Partial<Vehicle> = {
+        available: formData.available,
+        capacity: formData.capacity,
+        color: formData.color,
+        make: formData.make,
+        model: formData.model,
+        plateNumber: formData.plateNumber,
+        rentalrate: formData.rentalrate,
+        vehicleImage: formData.vehicleImage,
+        vehicleType: formData.vehicleType,
+        year: formData.year,
+      }
       if (editingVehicle) {
-        await update.mutateAsync({ id: editingVehicle.id, payload: formData })
+        await update.mutateAsync({ id: editingVehicle.id, payload })
         toast.success('Vehicle updated successfully')
       } else {
-        await create.mutateAsync(formData)
+        await create.mutateAsync(payload)
         toast.success('Vehicle created successfully')
       }
       await queryClient.invalidateQueries({ queryKey: ['vehicle'] })

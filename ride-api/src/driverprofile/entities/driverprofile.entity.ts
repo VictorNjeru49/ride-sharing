@@ -65,6 +65,7 @@ export class Driverprofile {
   @OneToMany(() => Riderequest, (rr) => rr.assignedDriver, {
     cascade: true,
     onDelete: 'CASCADE',
+    eager: true,
   })
   assignedRequests: Riderequest[];
 

@@ -12,10 +12,8 @@ import {
   getVehiclesById,
 } from '@/api/UserApi'
 import {
-  type GenericsType,
   type Ride,
   type Riderequest,
-  type userTypes,
   type Vehicle,
 } from '@/types/alltypes'
 import { Button } from '@/components/ui/button'
@@ -31,8 +29,6 @@ import {
 import { Sun, Moon, CarTaxiFrontIcon } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { toast, Toaster } from 'sonner'
-import axios from 'axios'
-import { API_BASE_URL } from '@/api/BaseUrl'
 
 const toRad = (d: number) => (d * Math.PI) / 180
 function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -212,8 +208,8 @@ function RouteComponent() {
 
       const ride: Partial<Ride> = {
         rider: fullRiderProfile,
-        pickupLocation: fullPickupLocation,
-        dropoffLocation: fullDropoffLocation,
+        pickupLocation: pickupLocation,
+        dropoffLocation: dropoffLocation,
         fare: totalCost,
         distanceKm,
         status: 'schedule',

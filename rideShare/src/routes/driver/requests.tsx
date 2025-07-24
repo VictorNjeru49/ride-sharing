@@ -32,7 +32,7 @@ function RideRequestsPage() {
 
 const cancelRequestMutation = useMutation({
   mutationFn: ({ id }: { id: string }) =>
-    updateRideRequest(id, { assignedDriverId: undefined }),
+    updateRideRequest(id, { assignedDriverId: null, status: 'waiting' }),
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['driver-requests', userId] })
   },
@@ -122,7 +122,7 @@ function StatusPill({ status }: { status?: string }) {
     <span
       className={`text-xs font-semibold capitalize px-3 py-1 rounded-full ${className}`}
     >
-      {status ?? 'unknown'}
+      {status ?? 'waiting'}
     </span>
   )
 }

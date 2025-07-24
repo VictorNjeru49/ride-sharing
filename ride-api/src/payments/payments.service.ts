@@ -57,7 +57,6 @@ export class PaymentsService {
       payment_method_types: ['card'],
       metadata: {
         user: createPaymentDto.userId,
-        vehicle: createPaymentDto.vehicleId,
       },
     });
 
@@ -91,7 +90,6 @@ export class PaymentsService {
 
     if (paymentIntent.status === 'succeeded') {
       payment.status = PaymentStatus.COMPLETED;
-      payment.paidAt = new Date();
     } else if (paymentIntent.status === 'requires_payment_method') {
       payment.status = PaymentStatus.FAILED;
     }
@@ -119,7 +117,6 @@ export class PaymentsService {
     switch (paymentIntent.status) {
       case 'succeeded':
         payment.status = PaymentStatus.COMPLETED;
-        payment.paidAt = payment.paidAt || new Date();
         break;
 
       case 'requires_payment_method':
@@ -198,7 +195,6 @@ export class PaymentsService {
       user: { id: userId },
       currency: paymentIntent.currency,
       stripePaymentIntentId: paymentIntent.id,
-      paidAt: new Date(),
     });
 
     return await this.paymentRepo.save(payment);
@@ -230,9 +226,6 @@ export class PaymentsService {
         {
           price_data: {
             currency: createPaymentDto.currency,
-            product_data: {
-              name: `Ride Share - ${createPaymentDto.vehicleId}`,
-            },
             unit_amount: amountInCents,
           },
           quantity: 1,
@@ -260,10 +253,8 @@ export class PaymentsService {
       method: PaymentMethod.STRIPE_CHECKOUT,
       status: PaymentStatus.PENDING,
       user: { id: createPaymentDto.userId },
-      ride: { id: createPaymentDto.rideId },
       currency: createPaymentDto.currency,
       stripeCheckoutSessionId: session.id,
-      paidAt: new Date(),
     });
 
     const savedPayment = await this.paymentRepo.save(payment);
@@ -305,6 +296,9 @@ export class PaymentsService {
 
   async remove(id: string): Promise<void> {
     const payment = await this.findOne(id);
-    await this.paymentRepo.delete(payment);
+    if (!payment) {
+      throw new NotFoundException('Payment not found');
+    }
+    await this.paymentRepo.remove(payment);
   }
 }

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsNumber, IsString, IsOptional } from 'class-validator';
+import { IsNumber, IsString, IsOptional } from 'class-validator';
 import { PaymentMethod, PaymentStatus } from '../entities/payment.entity';
 
 export class CreatePaymentDto {
@@ -20,21 +20,9 @@ export class CreatePaymentDto {
   @IsOptional()
   status: PaymentStatus;
   @ApiProperty()
-  @IsDate()
-  @IsOptional()
-  paidAt: Date;
-  @ApiProperty()
   @IsString()
   @IsOptional()
   userId: string;
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  rideId: string;
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  vehicleId: string;
   @ApiProperty()
   @IsString()
   @IsOptional()

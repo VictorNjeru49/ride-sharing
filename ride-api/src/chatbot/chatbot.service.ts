@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserRole } from 'src/users/entities/user.entity';
 import { ChatResponseDto } from './dto/chat-response.dto';
-
 @Injectable()
 export class ChatbotService {
   async getReply(message: string, role: UserRole): Promise<string> {
@@ -48,6 +47,7 @@ export class ChatbotService {
 
     return { reply };
   }
+
   private userReply(normalizedMsg: string, originalMsg: string): string {
     if (normalizedMsg.includes('book')) {
       return 'To book a ride, please tell me your pickup and drop-off locations.';
