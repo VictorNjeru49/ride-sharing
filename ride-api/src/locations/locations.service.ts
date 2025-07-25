@@ -27,6 +27,7 @@ export class LocationsService {
           ridesDropoff: true,
           requestsPickup: true,
           requestsDropoff: true,
+          driverlocation: true,
         },
       });
     }
@@ -43,6 +44,7 @@ export class LocationsService {
         ridesDropoff: true,
         requestsPickup: true,
         requestsDropoff: true,
+        driverlocation: true,
       },
     });
     if (!location) {

@@ -1,4 +1,5 @@
 import { Driverprofile } from 'src/driverprofile/entities/driverprofile.entity';
+import { Location } from 'src/locations/entities/location.entity';
 import { Riderprofile } from 'src/riderprofile/entities/riderprofile.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
@@ -7,6 +8,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -53,5 +55,14 @@ export class Driverlocation {
     eager: true,
   })
   @JoinColumn({ name: 'RiderProfileeId' })
-  riderProfile: Driverprofile;
+  riderProfile: Riderprofile;
+  // New relation to Location entity representing the driver's current or requested location
+  @OneToOne(() => Location, (location) => location.driverlocation, {
+    onDelete: 'CASCADE',
+    nullable: true,
+    cascade: true,
+    eager: true,
+  })
+  @JoinColumn({ name: 'locationId' })
+  location: Location;
 }

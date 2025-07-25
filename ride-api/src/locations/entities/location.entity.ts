@@ -1,3 +1,4 @@
+import { Driverlocation } from 'src/driverlocation/entities/driverlocation.entity';
 import { Ride } from 'src/ride/entities/ride.entity';
 import { Riderequest } from 'src/riderequest/entities/riderequest.entity';
 import {
@@ -5,6 +6,7 @@ import {
   Entity,
   JoinColumn,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -50,4 +52,10 @@ export class Location {
   })
   @JoinColumn()
   requestsDropoff: Riderequest[];
+  @OneToOne(() => Driverlocation, (driverlocation) => driverlocation.location, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
+  @JoinColumn({ name: 'driverLocationId' })
+  driverlocation: Driverlocation;
 }

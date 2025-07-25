@@ -41,6 +41,7 @@ import { Route as DriverTripsRouteImport } from './routes/driver/trips'
 import { Route as DriverSupportRouteImport } from './routes/driver/support'
 import { Route as DriverScheduleRouteImport } from './routes/driver/schedule'
 import { Route as DriverRequestsRouteImport } from './routes/driver/requests'
+import { Route as DriverLocationRouteImport } from './routes/driver/location'
 import { Route as DriverInboxRouteImport } from './routes/driver/inbox'
 import { Route as DriverEarningsRouteImport } from './routes/driver/earnings'
 import { Route as DriverDriverprofileRouteImport } from './routes/driver/driverprofile'
@@ -216,6 +217,11 @@ const DriverRequestsRoute = DriverRequestsRouteImport.update({
   path: '/requests',
   getParentRoute: () => DriverRoute,
 } as any)
+const DriverLocationRoute = DriverLocationRouteImport.update({
+  id: '/location',
+  path: '/location',
+  getParentRoute: () => DriverRoute,
+} as any)
 const DriverInboxRoute = DriverInboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
@@ -315,6 +321,7 @@ export interface FileRoutesByFullPath {
   '/driver/driverprofile': typeof DriverDriverprofileRoute
   '/driver/earnings': typeof DriverEarningsRoute
   '/driver/inbox': typeof DriverInboxRoute
+  '/driver/location': typeof DriverLocationRoute
   '/driver/requests': typeof DriverRequestsRoute
   '/driver/schedule': typeof DriverScheduleRoute
   '/driver/support': typeof DriverSupportRoute
@@ -358,6 +365,7 @@ export interface FileRoutesByTo {
   '/driver/driverprofile': typeof DriverDriverprofileRoute
   '/driver/earnings': typeof DriverEarningsRoute
   '/driver/inbox': typeof DriverInboxRoute
+  '/driver/location': typeof DriverLocationRoute
   '/driver/requests': typeof DriverRequestsRoute
   '/driver/schedule': typeof DriverScheduleRoute
   '/driver/support': typeof DriverSupportRoute
@@ -407,6 +415,7 @@ export interface FileRoutesById {
   '/driver/driverprofile': typeof DriverDriverprofileRoute
   '/driver/earnings': typeof DriverEarningsRoute
   '/driver/inbox': typeof DriverInboxRoute
+  '/driver/location': typeof DriverLocationRoute
   '/driver/requests': typeof DriverRequestsRoute
   '/driver/schedule': typeof DriverScheduleRoute
   '/driver/support': typeof DriverSupportRoute
@@ -457,6 +466,7 @@ export interface FileRouteTypes {
     | '/driver/driverprofile'
     | '/driver/earnings'
     | '/driver/inbox'
+    | '/driver/location'
     | '/driver/requests'
     | '/driver/schedule'
     | '/driver/support'
@@ -500,6 +510,7 @@ export interface FileRouteTypes {
     | '/driver/driverprofile'
     | '/driver/earnings'
     | '/driver/inbox'
+    | '/driver/location'
     | '/driver/requests'
     | '/driver/schedule'
     | '/driver/support'
@@ -548,6 +559,7 @@ export interface FileRouteTypes {
     | '/driver/driverprofile'
     | '/driver/earnings'
     | '/driver/inbox'
+    | '/driver/location'
     | '/driver/requests'
     | '/driver/schedule'
     | '/driver/support'
@@ -812,6 +824,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DriverRequestsRouteImport
       parentRoute: typeof DriverRoute
     }
+    '/driver/location': {
+      id: '/driver/location'
+      path: '/location'
+      fullPath: '/driver/location'
+      preLoaderRoute: typeof DriverLocationRouteImport
+      parentRoute: typeof DriverRoute
+    }
     '/driver/inbox': {
       id: '/driver/inbox'
       path: '/inbox'
@@ -983,6 +1002,7 @@ interface DriverRouteChildren {
   DriverDriverprofileRoute: typeof DriverDriverprofileRoute
   DriverEarningsRoute: typeof DriverEarningsRoute
   DriverInboxRoute: typeof DriverInboxRoute
+  DriverLocationRoute: typeof DriverLocationRoute
   DriverRequestsRoute: typeof DriverRequestsRoute
   DriverScheduleRoute: typeof DriverScheduleRoute
   DriverSupportRoute: typeof DriverSupportRoute
@@ -996,6 +1016,7 @@ const DriverRouteChildren: DriverRouteChildren = {
   DriverDriverprofileRoute: DriverDriverprofileRoute,
   DriverEarningsRoute: DriverEarningsRoute,
   DriverInboxRoute: DriverInboxRoute,
+  DriverLocationRoute: DriverLocationRoute,
   DriverRequestsRoute: DriverRequestsRoute,
   DriverScheduleRoute: DriverScheduleRoute,
   DriverSupportRoute: DriverSupportRoute,

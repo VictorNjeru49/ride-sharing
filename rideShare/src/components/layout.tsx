@@ -23,6 +23,7 @@ import {
   Columns4,
   ChevronLeft,
   ChevronRight,
+  LocateIcon,
 } from 'lucide-react'
 import { Link, useRouterState, useNavigate } from '@tanstack/react-router'
 import { UserRole } from '@/types/alltypes'
@@ -270,6 +271,11 @@ function Layout({ role }: { role: UserRole }) {
           name: 'Devices',
           icon: <MonitorSmartphone className="w-4 h-4" />,
           path: '',
+        },
+        {
+          name: 'Location',
+          path: '/driver/location',
+          icon: <LocateIcon className="w-4 h-4" />,
         },
         {
           name: 'Logout',

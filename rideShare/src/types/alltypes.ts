@@ -217,6 +217,7 @@ export interface Location {
   ridesDropoff: Ride[]
   requestsPickup: Riderequest[]
   requestsDropoff: Riderequest[]
+  driverlocation: DriverLocation
 }
 export interface Wallet extends GenericsType {
   type: WalletTransactionType
@@ -273,6 +274,7 @@ export interface DriverLocation extends GenericsType {
   requestedAt: Date
   driver: userTypes
   driverProfile: DriverProfile
+  location: Location
 }
 export interface LoginPayload {
   email: string

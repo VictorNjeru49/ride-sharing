@@ -21,14 +21,24 @@ export class DriverlocationService {
 
   async findAll() {
     return await this.driverlocationRepo.find({
-      relations: { driver: true, driverProfile: true, riderProfile: true },
+      relations: {
+        driver: true,
+        driverProfile: true,
+        riderProfile: true,
+        location: true,
+      },
     });
   }
 
   async findOne(id: string) {
     return await this.driverlocationRepo.findOne({
       where: { id },
-      relations: { driver: true, driverProfile: true, riderProfile: true },
+      relations: {
+        driver: true,
+        driverProfile: true,
+        riderProfile: true,
+        location: true,
+      },
     });
   }
 
