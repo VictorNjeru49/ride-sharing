@@ -34,6 +34,7 @@ export function PaymentCard({
     failed: 'bg-red-100 text-red-800',
     refunded: 'bg-blue-100 text-blue-800',
     cancelled: 'bg-gray-200 text-gray-700',
+    session_retrieved: 'bg-gray-100 text-white'
   }
 
   return (
