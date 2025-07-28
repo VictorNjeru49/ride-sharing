@@ -89,7 +89,7 @@ function RouteComponent() {
          make: vehicle.make,
          model: vehicle.model,
          plateNumber: vehicle.plateNumber,
-         rentalrate: vehicle.rentalrate,
+         rentalrate: Number(vehicle.rentalrate),
          vehicleImage: vehicle.vehicleImage,
          vehicleType: vehicle.vehicleType,
          year: vehicle.year,
