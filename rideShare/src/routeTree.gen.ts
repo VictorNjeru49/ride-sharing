@@ -45,6 +45,7 @@ import { Route as DriverLocationRouteImport } from './routes/driver/location'
 import { Route as DriverInboxRouteImport } from './routes/driver/inbox'
 import { Route as DriverEarningsRouteImport } from './routes/driver/earnings'
 import { Route as DriverDriverprofileRouteImport } from './routes/driver/driverprofile'
+import { Route as DriverDevicesRouteImport } from './routes/driver/devices'
 import { Route as DriverAllrequestRouteImport } from './routes/driver/allrequest'
 import { Route as DashboardVehicleRouteImport } from './routes/dashboard/vehicle'
 import { Route as DashboardUsersRouteImport } from './routes/dashboard/users'
@@ -52,6 +53,7 @@ import { Route as DashboardTripsRouteImport } from './routes/dashboard/trips'
 import { Route as DashboardPromocodeRouteImport } from './routes/dashboard/promocode'
 import { Route as DashboardPaymentsRouteImport } from './routes/dashboard/payments'
 import { Route as DashboardInboxRouteImport } from './routes/dashboard/inbox'
+import { Route as DashboardDevicesRouteImport } from './routes/dashboard/devices'
 import { Route as DashboardAnalyticsRouteImport } from './routes/dashboard/analytics'
 import { Route as DashboardAdminprofileRouteImport } from './routes/dashboard/adminprofile'
 import { Route as VehiclesVehiclesIdRouteImport } from './routes/Vehicles/$VehiclesId'
@@ -237,6 +239,11 @@ const DriverDriverprofileRoute = DriverDriverprofileRouteImport.update({
   path: '/driverprofile',
   getParentRoute: () => DriverRoute,
 } as any)
+const DriverDevicesRoute = DriverDevicesRouteImport.update({
+  id: '/devices',
+  path: '/devices',
+  getParentRoute: () => DriverRoute,
+} as any)
 const DriverAllrequestRoute = DriverAllrequestRouteImport.update({
   id: '/allrequest',
   path: '/allrequest',
@@ -270,6 +277,11 @@ const DashboardPaymentsRoute = DashboardPaymentsRouteImport.update({
 const DashboardInboxRoute = DashboardInboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardDevicesRoute = DashboardDevicesRouteImport.update({
+  id: '/devices',
+  path: '/devices',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardAnalyticsRoute = DashboardAnalyticsRouteImport.update({
@@ -311,6 +323,7 @@ export interface FileRoutesByFullPath {
   '/Vehicles/$VehiclesId': typeof VehiclesVehiclesIdRoute
   '/dashboard/adminprofile': typeof DashboardAdminprofileRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
+  '/dashboard/devices': typeof DashboardDevicesRoute
   '/dashboard/inbox': typeof DashboardInboxRoute
   '/dashboard/payments': typeof DashboardPaymentsRoute
   '/dashboard/promocode': typeof DashboardPromocodeRoute
@@ -318,6 +331,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard/vehicle': typeof DashboardVehicleRoute
   '/driver/allrequest': typeof DriverAllrequestRoute
+  '/driver/devices': typeof DriverDevicesRoute
   '/driver/driverprofile': typeof DriverDriverprofileRoute
   '/driver/earnings': typeof DriverEarningsRoute
   '/driver/inbox': typeof DriverInboxRoute
@@ -355,6 +369,7 @@ export interface FileRoutesByTo {
   '/Vehicles/$VehiclesId': typeof VehiclesVehiclesIdRoute
   '/dashboard/adminprofile': typeof DashboardAdminprofileRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
+  '/dashboard/devices': typeof DashboardDevicesRoute
   '/dashboard/inbox': typeof DashboardInboxRoute
   '/dashboard/payments': typeof DashboardPaymentsRoute
   '/dashboard/promocode': typeof DashboardPromocodeRoute
@@ -362,6 +377,7 @@ export interface FileRoutesByTo {
   '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard/vehicle': typeof DashboardVehicleRoute
   '/driver/allrequest': typeof DriverAllrequestRoute
+  '/driver/devices': typeof DriverDevicesRoute
   '/driver/driverprofile': typeof DriverDriverprofileRoute
   '/driver/earnings': typeof DriverEarningsRoute
   '/driver/inbox': typeof DriverInboxRoute
@@ -405,6 +421,7 @@ export interface FileRoutesById {
   '/Vehicles/$VehiclesId': typeof VehiclesVehiclesIdRoute
   '/dashboard/adminprofile': typeof DashboardAdminprofileRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
+  '/dashboard/devices': typeof DashboardDevicesRoute
   '/dashboard/inbox': typeof DashboardInboxRoute
   '/dashboard/payments': typeof DashboardPaymentsRoute
   '/dashboard/promocode': typeof DashboardPromocodeRoute
@@ -412,6 +429,7 @@ export interface FileRoutesById {
   '/dashboard/users': typeof DashboardUsersRoute
   '/dashboard/vehicle': typeof DashboardVehicleRoute
   '/driver/allrequest': typeof DriverAllrequestRoute
+  '/driver/devices': typeof DriverDevicesRoute
   '/driver/driverprofile': typeof DriverDriverprofileRoute
   '/driver/earnings': typeof DriverEarningsRoute
   '/driver/inbox': typeof DriverInboxRoute
@@ -456,6 +474,7 @@ export interface FileRouteTypes {
     | '/Vehicles/$VehiclesId'
     | '/dashboard/adminprofile'
     | '/dashboard/analytics'
+    | '/dashboard/devices'
     | '/dashboard/inbox'
     | '/dashboard/payments'
     | '/dashboard/promocode'
@@ -463,6 +482,7 @@ export interface FileRouteTypes {
     | '/dashboard/users'
     | '/dashboard/vehicle'
     | '/driver/allrequest'
+    | '/driver/devices'
     | '/driver/driverprofile'
     | '/driver/earnings'
     | '/driver/inbox'
@@ -500,6 +520,7 @@ export interface FileRouteTypes {
     | '/Vehicles/$VehiclesId'
     | '/dashboard/adminprofile'
     | '/dashboard/analytics'
+    | '/dashboard/devices'
     | '/dashboard/inbox'
     | '/dashboard/payments'
     | '/dashboard/promocode'
@@ -507,6 +528,7 @@ export interface FileRouteTypes {
     | '/dashboard/users'
     | '/dashboard/vehicle'
     | '/driver/allrequest'
+    | '/driver/devices'
     | '/driver/driverprofile'
     | '/driver/earnings'
     | '/driver/inbox'
@@ -549,6 +571,7 @@ export interface FileRouteTypes {
     | '/Vehicles/$VehiclesId'
     | '/dashboard/adminprofile'
     | '/dashboard/analytics'
+    | '/dashboard/devices'
     | '/dashboard/inbox'
     | '/dashboard/payments'
     | '/dashboard/promocode'
@@ -556,6 +579,7 @@ export interface FileRouteTypes {
     | '/dashboard/users'
     | '/dashboard/vehicle'
     | '/driver/allrequest'
+    | '/driver/devices'
     | '/driver/driverprofile'
     | '/driver/earnings'
     | '/driver/inbox'
@@ -852,6 +876,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DriverDriverprofileRouteImport
       parentRoute: typeof DriverRoute
     }
+    '/driver/devices': {
+      id: '/driver/devices'
+      path: '/devices'
+      fullPath: '/driver/devices'
+      preLoaderRoute: typeof DriverDevicesRouteImport
+      parentRoute: typeof DriverRoute
+    }
     '/driver/allrequest': {
       id: '/driver/allrequest'
       path: '/allrequest'
@@ -899,6 +930,13 @@ declare module '@tanstack/react-router' {
       path: '/inbox'
       fullPath: '/dashboard/inbox'
       preLoaderRoute: typeof DashboardInboxRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/devices': {
+      id: '/dashboard/devices'
+      path: '/devices'
+      fullPath: '/dashboard/devices'
+      preLoaderRoute: typeof DashboardDevicesRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/analytics': {
@@ -972,6 +1010,7 @@ const DashboardTripsRouteWithChildren = DashboardTripsRoute._addFileChildren(
 interface DashboardRouteChildren {
   DashboardAdminprofileRoute: typeof DashboardAdminprofileRoute
   DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
+  DashboardDevicesRoute: typeof DashboardDevicesRoute
   DashboardInboxRoute: typeof DashboardInboxRoute
   DashboardPaymentsRoute: typeof DashboardPaymentsRoute
   DashboardPromocodeRoute: typeof DashboardPromocodeRoute
@@ -984,6 +1023,7 @@ interface DashboardRouteChildren {
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAdminprofileRoute: DashboardAdminprofileRoute,
   DashboardAnalyticsRoute: DashboardAnalyticsRoute,
+  DashboardDevicesRoute: DashboardDevicesRoute,
   DashboardInboxRoute: DashboardInboxRoute,
   DashboardPaymentsRoute: DashboardPaymentsRoute,
   DashboardPromocodeRoute: DashboardPromocodeRoute,
@@ -999,6 +1039,7 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 
 interface DriverRouteChildren {
   DriverAllrequestRoute: typeof DriverAllrequestRoute
+  DriverDevicesRoute: typeof DriverDevicesRoute
   DriverDriverprofileRoute: typeof DriverDriverprofileRoute
   DriverEarningsRoute: typeof DriverEarningsRoute
   DriverInboxRoute: typeof DriverInboxRoute
@@ -1013,6 +1054,7 @@ interface DriverRouteChildren {
 
 const DriverRouteChildren: DriverRouteChildren = {
   DriverAllrequestRoute: DriverAllrequestRoute,
+  DriverDevicesRoute: DriverDevicesRoute,
   DriverDriverprofileRoute: DriverDriverprofileRoute,
   DriverEarningsRoute: DriverEarningsRoute,
   DriverInboxRoute: DriverInboxRoute,

@@ -145,7 +145,7 @@ function Layout({ role }: { role: UserRole }) {
         {
           name: 'Devices',
           icon: <MonitorSmartphone className="w-4 h-4" />,
-          path: '',
+          path: '/dashboard/devices',
         },
         {
           name: 'Logout',
@@ -269,7 +269,7 @@ function Layout({ role }: { role: UserRole }) {
         {
           name: 'Devices',
           icon: <MonitorSmartphone className="w-4 h-4" />,
-          path: '',
+          path: '/driver/devices',
         },
         {
           name: 'Location',

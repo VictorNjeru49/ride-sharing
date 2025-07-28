@@ -48,7 +48,18 @@ function RouteComponent() {
   }, [user])
 
   const totalTrips = user?.driverProfile?.ridesOffered?.length ?? 8
-  const avgRating = user?.driverProfile?.rating ?? '4.9'
+  const avgRating = React.useMemo(() => {
+    const ratings = user?.driverProfile?.rating
+    if (!Array.isArray(ratings) || ratings.length === 0) return '4.9'
+
+    const numericRatings = ratings
+      .map((r) => Number(r.rating))
+      .filter((n) => !isNaN(n))
+    const avg =
+      numericRatings.reduce((acc, r) => acc + r, 0) / numericRatings.length
+    return avg.toFixed(1)
+  }, [user])
+
 
   if (isLoading) {
     return (
