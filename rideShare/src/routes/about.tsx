@@ -1,7 +1,3 @@
-// import { getPromoCodeById, getPromoCodes } from '@/api/UserApi'
-// import type { PromoCode } from '@/types/alltypes'
-// import { useQuery } from '@tanstack/react-query'
-// import { useParams } from '@tanstack/react-router'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/about')({
@@ -9,23 +5,14 @@ export const Route = createFileRoute('/about')({
 })
 
 function RouteComponent() {
-  // // const { id } = useParams({ strict: false }) as { id?: string }
-
-  // const {
-  //   data: promos,
-  //   isPending,
-  //   isError,
-  // } = useQuery<PromoCode[]>({
-  //   queryKey: ['promo'],
-  //   queryFn: getPromoCodes,
-  // })
-
   return (
-    <main className="max-w-[80%] mx-auto px-6 py-12 space-y-12">
+    <main className="max-w-7xl mx-auto px-6 py-16 space-y-20">
       {/* Hero Section */}
-      <section>
-        <h1 className="text-4xl font-bold mb-4">About Our Platform</h1>
-        <p className="text-gray-700 dark:text-gray-300">
+      <section className="max-w-4xl mx-auto text-center">
+        <h1 className="text-5xl font-extrabold mb-6 text-gray-900 dark:text-white">
+          About Our Platform
+        </h1>
+        <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
           Welcome to our Ride-Share & Investment Platform — where mobility meets
           opportunity. We aim to revolutionize the way people move and invest,
           all from one seamless platform.
@@ -33,9 +20,11 @@ function RouteComponent() {
       </section>
 
       {/* Why Ride */}
-      <section>
-        <h2 className="text-2xl font-semibold mb-3">Why Ride with Us?</h2>
-        <ul className="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-1">
+      <section className="max-w-3xl mx-auto">
+        <h2 className="text-3xl font-semibold mb-5 text-gray-900 dark:text-white">
+          Why Ride with Us?
+        </h2>
+        <ul className="list-disc pl-6 space-y-3 text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
           <li>Reliable and safe rides across cities and towns</li>
           <li>Real-time tracking and secure digital payments</li>
           <li>Verified drivers and 24/7 support</li>
@@ -43,16 +32,16 @@ function RouteComponent() {
       </section>
 
       {/* Investment */}
-      <section>
-        <h2 className="text-2xl font-semibold mb-3">
+      <section className="max-w-3xl mx-auto">
+        <h2 className="text-3xl font-semibold mb-5 text-gray-900 dark:text-white">
           Investment Opportunities
         </h2>
-        <p className="text-gray-700 dark:text-gray-300 mb-2">
+        <p className="mb-4 text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
           Join our community of investors who are fueling the next generation of
           transportation. Whether you're a driver looking to grow your fleet or
           an investor seeking returns, we offer:
         </p>
-        <ul className="list-disc pl-5 text-gray-700 dark:text-gray-300 space-y-1">
+        <ul className="list-disc pl-6 space-y-3 text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
           <li>Vehicle leasing and partnership programs</li>
           <li>Profit-sharing models with real-time reporting</li>
           <li>Flexible investment plans for individuals and groups</li>
@@ -60,9 +49,11 @@ function RouteComponent() {
       </section>
 
       {/* Mission */}
-      <section>
-        <h2 className="text-2xl font-semibold mb-3">Our Mission</h2>
-        <p className="text-gray-700 dark:text-gray-300">
+      <section className="max-w-3xl mx-auto">
+        <h2 className="text-3xl font-semibold mb-5 text-gray-900 dark:text-white">
+          Our Mission
+        </h2>
+        <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
           We’re building a smarter, greener, and more inclusive future — one
           ride and one investment at a time.
         </p>
@@ -71,43 +62,44 @@ function RouteComponent() {
       {/* Pricing Plans */}
       <section
         id="pricing"
-        className="py-10 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg"
+        className="py-16 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg shadow-md"
       >
-        <div className="lg:max-w-5xl lg:flex-row mx-auto px-5 md:flex-col md:w-full">
-          <h2 className="text-3xl font-bold mb-10 text-center">
+        <div className="max-w-6xl mx-auto px-6 sm:px-12 lg:px-16">
+          <h2 className="text-4xl font-extrabold mb-12 text-center">
             Pricing Plans
           </h2>
-          <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-3 w-full">
+          <div className="grid gap-10 sm:grid-cols-1 md:grid-cols-3">
             {plans.map((plan) => (
               <div
                 key={plan.title}
-                className={`bg-white dark:bg-gray-800 rounded-lg shadow py-28 px-6 flex flex-col ${
+                className={`relative bg-white dark:bg-gray-800 rounded-xl shadow-lg p-10 flex flex-col hover:shadow-2xl transition-shadow duration-300 ${
                   plan.popular
-                    ? 'border-2 border-indigo-600 dark:border-indigo-400 relative'
-                    : ''
+                    ? 'border-4 border-indigo-600 dark:border-indigo-400'
+                    : 'border border-transparent'
                 }`}
               >
                 {plan.popular && (
-                  <span className="absolute top-0 right-0 bg-indigo-600 text-white text-sm px-3 py-1 rounded-bl-md rounded-tr-md">
+                  <span className="absolute top-0 right-0 bg-indigo-600 text-white text-sm px-4 py-1 rounded-bl-lg font-semibold select-none">
                     Most Popular
                   </span>
                 )}
-                <h3 className="text-xl font-semibold mb-4 text-center">
+                <h3 className="text-2xl font-semibold mb-6 text-center">
                   {plan.title}
                 </h3>
-                <p className="text-4xl font-bold text-center mb-4">
+                <p className="text-center text-5xl font-extrabold mb-8">
                   {plan.price}
-                  <span className="text-lg font-normal text-gray-700 dark:text-gray-300">
+                  <span className="text-xl font-normal text-gray-600 dark:text-gray-400">
                     /trip
                   </span>
                 </p>
-                <ul className="text-gray-700 dark:text-gray-300 mb-6 flex-1 space-y-2">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-center">
+                <ul className="flex-1 space-y-4 text-gray-700 dark:text-gray-300 mb-10">
+                  {plan.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-center">
                       <svg
-                        className="w-5 h-5 mr-2 text-indigo-600"
+                        className="w-6 h-6 mr-3 text-indigo-600 flex-shrink-0"
                         fill="currentColor"
                         viewBox="0 0 20 20"
+                        aria-hidden="true"
                       >
                         <path
                           fillRule="evenodd"
@@ -121,7 +113,7 @@ function RouteComponent() {
                 </ul>
                 <a
                   href="#contact"
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-md font-medium text-center transition"
+                  className="block text-center bg-indigo-600 hover:bg-indigo-700 focus-visible:ring-4 focus-visible:ring-indigo-400 text-white font-semibold py-3 rounded-lg transition"
                 >
                   Choose Plan
                 </a>
@@ -130,43 +122,6 @@ function RouteComponent() {
           </div>
         </div>
       </section>
-
-      {/* Promo Section
-      <section className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mt-12 hidden">
-        <h2 className="text-2xl font-semibold mb-4">Promo Code Info</h2>
-
-        {isPending ? (
-          <p>Loading promo codes...</p>
-        ) : isError || !promos || promos.length === 0 ? (
-          <p className="text-red-500">No promo codes found or error loading.</p>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2">
-            {promos.map((promo) => (
-              <div
-                key={promo.code}
-                className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg"
-              >
-                <p>
-                  <strong>Code:</strong> {promo.code}
-                </p>
-                <p>
-                  <strong>Discount:</strong> ${promo.discountAmount}
-                </p>
-                <p>
-                  <strong>Usage Limit:</strong> {promo.usageLimit}
-                </p>
-                <p>
-                  <strong>Active:</strong> {promo.isActive ? 'Yes' : 'No'}
-                </p>
-                <p>
-                  <strong>Expires:</strong>{' '}
-                  {new Date(promo.expirationDate).toLocaleDateString()}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-      </section> */}
     </main>
   )
 }

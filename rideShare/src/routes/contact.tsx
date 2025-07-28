@@ -5,139 +5,163 @@ export const Route = createFileRoute('/contact')({
 })
 
 function RouteComponent() {
-return (
-  <div className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
-    {/* Hero Section */}
-    <header className="bg-blue-700 text-white text-center py-16">
-      <h1 className="text-4xl font-bold">Ride Bookings & Support</h1>
-      <p className="mt-2 text-lg">
-        Need help with a booking? We're here for you.
-      </p>
-    </header>
+  return (
+    <div className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex flex-col">
+      {/* Hero Section */}
+      <header className="bg-blue-700 text-white text-center py-20 px-4 sm:px-6 lg:px-8">
+        <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl">
+          Ride Bookings & Support
+        </h1>
+        <p className="mt-4 text-lg sm:text-xl max-w-3xl mx-auto">
+          Need help with a booking? We're here for you.
+        </p>
+      </header>
 
-    {/* Contact Options */}
-    <section className="text-center py-12 px-4">
-      <h2 className="text-2xl font-bold">Quick Support</h2>
-      <p className="mt-4 max-w-2xl mx-auto">
-        Reach out to our support team for any issues or inquiries related to
-        your ride bookings.
-      </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-10 dark:text-black">
-        <div className="p-6 shadow-md rounded-lg bg-blue-50 hover:bg-blue-100 transition">
-          <h3 className="text-lg font-semibold">📞 Call Support</h3>
-          <p className="mt-2 text-gray-600 ">
-            +254 700 123 456
-          </p>
-        </div>
-        <div className="p-6 shadow-md rounded-lg bg-blue-50 hover:bg-blue-100 transition">
-          <h3 className="text-lg font-semibold">📧 Email Support</h3>
-          <p className="mt-2 text-gray-600">
-            support@rideshare.co.ke
-          </p>
-        </div>
-        <div className="p-6 shadow-md rounded-lg bg-blue-50 hover:bg-blue-100 transition">
-          <h3 className="text-lg font-semibold">📍 Office Visit</h3>
-          <p className="mt-2 text-gray-600 ">
-            1st Floor, Highway Plaza, Nairobi
-          </p>
-        </div>
-      </div>
-    </section>
+      {/* Contact Options */}
+      <section className="text-center py-16 px-6 sm:px-12 lg:px-24">
+        <h2 className="text-3xl font-bold mb-6">Quick Support</h2>
+        <p className="mx-auto max-w-3xl text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
+          Reach out to our support team for any issues or inquiries related to
+          your ride bookings.
+        </p>
 
-    {/* Booking Issue Form */}
-    <section className="bg-gray-100 dark:bg-gray-800 py-12 px-4">
-      <h2 className="text-2xl font-bold text-center">Report a Booking Issue</h2>
-      <form className="max-w-2xl mx-auto mt-10 space-y-8">
-        <div>
-          <label htmlFor="name" className="block font-semibold">
-            Full Name
-          </label>
-          <input
-            type="text"
-            id="name"
-            className="w-full mt-2 p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:border-gray-700"
-            required
-          />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-12">
+          {[
+            {
+              title: '📞 Call Support',
+              detail: '+254 700 123 456',
+            },
+            {
+              title: '📧 Email Support',
+              detail: 'support@rideshare.co.ke',
+            },
+            {
+              title: '📍 Office Visit',
+              detail: '1st Floor, Highway Plaza, Nairobi',
+            },
+          ].map(({ title, detail }) => (
+            <div
+              key={title}
+              className="p-8 bg-blue-50 dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+              role="button"
+              tabIndex={0}
+              aria-label={title}
+            >
+              <h3 className="text-xl font-semibold mb-3">{title}</h3>
+              <p className="text-gray-700 dark:text-gray-300 text-lg">
+                {detail}
+              </p>
+            </div>
+          ))}
         </div>
-        <div>
-          <label htmlFor="email" className="block font-semibold">
-            Email Address
-          </label>
-          <input
-            type="email"
-            id="email"
-            className="w-full mt-2 p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:border-gray-700"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="rideId" className="block font-semibold">
-            Ride Booking ID
-          </label>
-          <input
-            type="text"
-            id="rideId"
-            placeholder="#RB123456"
-            className="w-full mt-2 p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:border-gray-700"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="message" className="block font-semibold">
-            Message
-          </label>
-          <textarea
-            id="message"
-            rows={4}
-            className="w-full mt-2 p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:border-gray-700"
-            placeholder="Describe the issue with your ride..."
-            required
-          ></textarea>
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-700 hover:bg-blue-800 text-white py-3 rounded-lg font-semibold transition"
+      </section>
+
+      {/* Booking Issue Form */}
+      <section className="bg-gray-100 dark:bg-gray-800 py-16 px-6 sm:px-12 lg:px-24 flex-grow">
+        <h2 className="text-3xl font-bold text-center mb-10">
+          Report a Booking Issue
+        </h2>
+        <form
+          className="max-w-3xl mx-auto space-y-8"
+          onSubmit={(e) => e.preventDefault()}
         >
-          Submit Issue
-        </button>
-      </form>
-    </section>
+          {[
+            { id: 'name', label: 'Full Name', type: 'text', placeholder: '' },
+            {
+              id: 'email',
+              label: 'Email Address',
+              type: 'email',
+              placeholder: '',
+            },
+            {
+              id: 'rideId',
+              label: 'Ride Booking ID',
+              type: 'text',
+              placeholder: '#RB123456',
+            },
+          ].map(({ id, label, type, placeholder }) => (
+            <div key={id}>
+              <label
+                htmlFor={id}
+                className="block font-semibold text-gray-900 dark:text-gray-100 mb-2"
+              >
+                {label}
+              </label>
+              <input
+                type={type}
+                id={id}
+                placeholder={placeholder}
+                required
+                className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-4 focus:ring-blue-500 transition"
+              />
+            </div>
+          ))}
 
-    {/* FAQ Section */}
-    <section className="text-center py-12 px-4">
-      <h2 className="text-2xl font-bold">FAQs</h2>
-      <div className="mt-8 space-y-6 max-w-3xl mx-auto text-left">
-        <div className="p-4 border rounded-lg shadow-sm">
-          <h3 className="font-semibold">❓ How do I cancel a ride?</h3>
-          <p className="mt-1 text-gray-700 dark:text-gray-300">
-            Go to your ride history and click on the cancel button before the
-            driver is dispatched.
-          </p>
-        </div>
-        <div className="p-4 border rounded-lg shadow-sm">
-          <h3 className="font-semibold">
-            ❓ What if my driver didn’t show up?
-          </h3>
-          <p className="mt-1 text-gray-700 dark:text-gray-300">
-            Contact us immediately via phone or form above. We’ll investigate
-            and issue a refund where necessary.
-          </p>
-        </div>
-        <div className="p-4 border rounded-lg shadow-sm">
-          <h3 className="font-semibold">❓ Can I reschedule my ride?</h3>
-          <p className="mt-1 text-gray-700 dark:text-gray-300">
-            Yes. Use the booking dashboard to reschedule at least 1 hour before
-            the ride.
-          </p>
-        </div>
-      </div>
-    </section>
+          <div>
+            <label
+              htmlFor="message"
+              className="block font-semibold text-gray-900 dark:text-gray-100 mb-2"
+            >
+              Message
+            </label>
+            <textarea
+              id="message"
+              rows={5}
+              placeholder="Describe the issue with your ride..."
+              required
+              className="w-full p-4 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-4 focus:ring-blue-500 transition resize-none"
+            ></textarea>
+          </div>
 
-    {/* Footer */}
-    <footer className="bg-blue-700 text-white text-center py-6 mt-12">
-      <p className="text-sm">
-        &copy; {new Date().getFullYear()} RideShare. All rights reserved.
-      </p>
-    </footer>
-  </div>
-)}
+          <button
+            type="submit"
+            className="w-full py-4 bg-blue-700 hover:bg-blue-800 focus-visible:ring-4 focus-visible:ring-blue-400 text-white font-semibold rounded-lg transition"
+          >
+            Submit Issue
+          </button>
+        </form>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="text-center py-16 px-6 sm:px-12 lg:px-24">
+        <h2 className="text-3xl font-bold mb-10">FAQs</h2>
+        <div className="max-w-4xl mx-auto space-y-8 text-left">
+          {[
+            {
+              question: '❓ How do I cancel a ride?',
+              answer:
+                'Go to your ride history and click on the cancel button before the driver is dispatched.',
+            },
+            {
+              question: '❓ What if my driver didn’t show up?',
+              answer:
+                'Contact us immediately via phone or form above. We’ll investigate and issue a refund where necessary.',
+            },
+            {
+              question: '❓ Can I reschedule my ride?',
+              answer:
+                'Yes. Use the booking dashboard to reschedule at least 1 hour before the ride.',
+            },
+          ].map(({ question, answer }) => (
+            <div
+              key={question}
+              className="p-6 border border-gray-300 dark:border-gray-700 rounded-xl shadow-sm hover:shadow-md transition"
+            >
+              <h3 className="font-semibold text-lg">{question}</h3>
+              <p className="mt-2 text-gray-700 dark:text-gray-300 leading-relaxed">
+                {answer}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-blue-700 text-white text-center py-6 mt-auto">
+        <p className="text-sm select-none">
+          &copy; {new Date().getFullYear()} RideShare. All rights reserved.
+        </p>
+      </footer>
+    </div>
+  )
+}
