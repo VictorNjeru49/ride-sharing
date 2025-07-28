@@ -246,7 +246,7 @@ function RouteComponent() {
       {/* Pagination and buttons */}
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="space-y-4">
+        <DialogContent className="space-y-4 overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {editingVehicle ? 'Edit Vehicle' : 'Create Vehicle'}

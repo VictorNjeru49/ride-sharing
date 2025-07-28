@@ -226,6 +226,9 @@ export class PaymentsService {
           price_data: {
             currency: createPaymentDto.currency,
             unit_amount: amountInCents,
+            product_data: {
+              name: 'Vehicle Rate System',
+            },
           },
           quantity: 1,
         },
