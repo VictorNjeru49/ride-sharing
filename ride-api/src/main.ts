@@ -23,20 +23,7 @@ async function bootstrap() {
     .setTitle('Inventory Api')
     .setDescription('To check inventory')
     .setVersion('1.0')
-    .addTag('Inventory', 'Inventory Endpoints')
     .addTag('Users', 'User Management Endpoints')
-    .addTag('Warehouse', 'Warehouse Management Endpoints')
-    .addTag('Products', 'Product Management Endpoints')
-    .addTag('Orders', 'Order Management Endpoints')
-    .addTag('Order Items', 'Order Item Management Endpoints')
-    .addTag('Categories', 'Category Management Endpoints')
-    .addTag('Transactions', 'Transaction Management Endpoints')
-    .addTag('Payments', 'Payment Processing Endpoints')
-    .addTag('Suppliers', 'Supplier Management Endpoints')
-    .addTag('Shipping', 'Shipping Management Endpoints')
-    .addTag('Returnee', 'Returns Management Endpoints')
-    .addTag('Seed', 'Seeding data Endpoints')
-    .addTag('Register', 'User Registration Endpoints')
     .addTag('Auth', 'Auth Endpoints')
     .addServer(`http://localhost:8000`, 'Local Development Server')
     .addServer(
@@ -73,7 +60,7 @@ async function bootstrap() {
     customSiteTitle: 'Inventory Documentation Api',
   });
   const configService = app.get(ConfigService);
-  const PORT = configService.getOrThrow<number>('PORT');
+  const PORT = configService.getOrThrow<number>('PORT') || 8000;
   await app.listen(PORT, () => {
     console.log(`The Serve is Listening at Port: http://localhost:${PORT}/api`);
   });

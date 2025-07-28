@@ -15,7 +15,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
           type: 'postgres',
           url: connectionString,
           autoLoadEntities: true,
-          synchronize: configService.getOrThrow<boolean>('DB_SYNC', true),
+          synchronize: configService.getOrThrow<boolean>('DB_SYNC', false),
           logging: configService.getOrThrow<boolean>('DB_LOGGING', false),
           migrations: [__dirname + '/../migrations/**/*{.ts,.js}'],
         };
