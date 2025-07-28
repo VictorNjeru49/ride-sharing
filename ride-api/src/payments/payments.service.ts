@@ -184,10 +184,10 @@ export class PaymentsService {
 
     if (paymentIntent.status === 'succeeded') {
       // Delete createCheckoutSession and getSession payments for this user
-      await this.deletePayments(userId, [
-        PaymentStatus.PENDING,
-        PaymentStatus.SESSION_RETRIEVED,
-      ]);
+      // await this.deletePayments(userId, [
+      //   PaymentStatus.PENDING,
+      //   PaymentStatus.SESSION_RETRIEVED,
+      // ]);
 
       // Save only confirmPayment record with COMPLETED status
       const payment = this.paymentRepo.create({

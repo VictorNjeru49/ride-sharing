@@ -116,7 +116,7 @@ function RouteComponent() {
         make: formData.make,
         model: formData.model,
         plateNumber: formData.plateNumber,
-        rentalrate: formData.rentalrate,
+        rentalrate: Number(formData.rentalrate),
         vehicleImage: formData.vehicleImage,
         vehicleType: formData.vehicleType,
         year: formData.year,
