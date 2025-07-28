@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
 
 export const Route = createFileRoute('/dashboard/users')({
   component: RouteComponent,
@@ -87,7 +88,15 @@ function RouteComponent() {
 
   const handleDialogClose = () => {
     setOpenDialog(false)
-    setFormData({})
+    setFormData({
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      role: UserRole.RIDER,
+      phone: '',
+      isVerified: false
+    })
     setEditId(null)
      setSelectedVehicleId(null)
      setVehicles([])
@@ -101,6 +110,7 @@ function RouteComponent() {
       password: '',
       role: user.role,
       phone: user.phone || '',
+      isVerified: user.isVerified,
     })
     setEditId(user.id)
     setOpenDialog(true)
@@ -453,6 +463,12 @@ useEffect(() => {
               value={formData.phone ?? ''}
               onChange={(e) =>
                 setFormData((f) => ({ ...f, phone: e.target.value }))
+              }
+            />
+            <Checkbox
+              checked={formData.isVerified ?? false}
+              onCheckedChange={(checked) =>
+                setFormData((f) => ({ ...f, isVerified: Boolean(checked) }))
               }
             />
 
