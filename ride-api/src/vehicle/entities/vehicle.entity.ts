@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToOne,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity()
@@ -13,6 +14,7 @@ export class Vehicle {
   @PrimaryGeneratedColumn('uuid')
   id: string;
   @OneToOne(() => Driverprofile, (dp) => dp.vehicle)
+  @JoinColumn({ name: 'driverId' })
   driver: Driverprofile;
 
   @Column()

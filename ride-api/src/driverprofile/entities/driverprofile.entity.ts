@@ -45,7 +45,7 @@ export class Driverprofile {
     eager: true,
     nullable: true,
   })
-  @JoinColumn()
+  @JoinColumn({ name: 'vehicleId' })
   vehicle: Vehicle;
 
   @OneToMany(() => Ride, (ride) => ride.driver, {
