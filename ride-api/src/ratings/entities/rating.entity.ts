@@ -13,7 +13,6 @@ export class Rating {
   id: string;
 
   @ManyToOne(() => Ride, (r) => r.ratings, {
-    eager: true,
     onDelete: 'CASCADE',
     nullable: true,
     cascade: true,

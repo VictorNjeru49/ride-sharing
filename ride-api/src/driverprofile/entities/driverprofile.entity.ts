@@ -42,7 +42,7 @@ export class Driverprofile {
 
   @OneToOne(() => Vehicle, (vehicle) => vehicle.driver, {
     onDelete: 'CASCADE',
-    eager: true,
+
     nullable: true,
   })
   @JoinColumn()
@@ -50,14 +50,14 @@ export class Driverprofile {
 
   @OneToMany(() => Ride, (ride) => ride.driver, {
     cascade: true,
-    eager: true,
+
     onDelete: 'CASCADE',
   })
   ridesOffered: Ride[];
 
   @OneToMany(() => Ride, (ride) => ride.rider, {
     cascade: true,
-    eager: true,
+
     onDelete: 'CASCADE',
   })
   ridesTaken: Ride[];
@@ -65,7 +65,6 @@ export class Driverprofile {
   @OneToMany(() => Riderequest, (rr) => rr.assignedDriver, {
     cascade: true,
     onDelete: 'CASCADE',
-    eager: true,
   })
   assignedRequests: Riderequest[];
 

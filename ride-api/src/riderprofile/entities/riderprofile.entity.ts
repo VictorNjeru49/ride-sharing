@@ -38,11 +38,10 @@ export class Riderprofile {
 
   @OneToMany(() => Riderequest, (rr) => rr.rider, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   rideRequests: Riderequest[];
 
-  @OneToMany(() => Ride, (r) => r.rider, { eager: true, onDelete: 'CASCADE' })
+  @OneToMany(() => Ride, (r) => r.rider, { onDelete: 'CASCADE' })
   ridesTaken: Ride[];
 
   @OneToMany(() => Driverlocation, (dl) => dl.riderProfile, {

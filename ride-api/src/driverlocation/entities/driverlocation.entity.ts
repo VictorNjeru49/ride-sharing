@@ -44,7 +44,6 @@ export class Driverlocation {
   @ManyToOne(() => Driverprofile, (profile) => profile.locationHistory, {
     onDelete: 'CASCADE',
     nullable: true,
-    eager: true,
   })
   @JoinColumn({ name: 'driverProfileId' })
   driverProfile: Driverprofile;
@@ -52,7 +51,6 @@ export class Driverlocation {
   @ManyToOne(() => Riderprofile, (profile) => profile.riderHistory, {
     onDelete: 'CASCADE',
     nullable: true,
-    eager: true,
   })
   @JoinColumn({ name: 'RiderProfileeId' })
   riderProfile: Riderprofile;
@@ -61,7 +59,6 @@ export class Driverlocation {
     onDelete: 'CASCADE',
     nullable: true,
     cascade: true,
-    eager: true,
   })
   @JoinColumn({ name: 'locationId' })
   location: Location;

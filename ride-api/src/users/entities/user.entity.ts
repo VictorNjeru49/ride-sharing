@@ -80,21 +80,18 @@ export class User {
   @OneToOne(() => Riderprofile, (rp) => rp.user, {
     cascade: true,
     onDelete: 'CASCADE',
-    eager: true,
   })
   riderProfile: Riderprofile;
 
   @OneToOne(() => Driverprofile, (dp) => dp.user, {
     cascade: true,
     onDelete: 'CASCADE',
-    eager: true,
   })
   driverProfile: Driverprofile;
 
   @OneToOne(() => Admin, (admin) => admin.user, {
     cascade: true,
     onDelete: 'CASCADE',
-    eager: true,
   })
   adminProfile: Admin;
 
@@ -114,7 +111,6 @@ export class User {
   @OneToMany(() => Payment, (p) => p.user, {
     onDelete: 'CASCADE',
     nullable: true,
-    eager: true,
   })
   payments: Payment[];
 
@@ -127,49 +123,42 @@ export class User {
   @OneToMany(() => Rating, (r) => r.ratee, {
     cascade: true,
     onDelete: 'CASCADE',
-    eager: true,
   })
   ratingsReceived: Rating[];
 
   @OneToMany(() => Wallet, (wt) => wt.user, {
     onDelete: 'CASCADE',
     cascade: true,
-    eager: true,
   })
   walletTransactions: Wallet[];
 
   @OneToMany(() => Ridefeedback, (f) => f.user, {
     cascade: true,
     onDelete: 'CASCADE',
-    eager: true,
   })
   rideFeedbacks: Ridefeedback[];
 
   @OneToMany(() => Supportticket, (t) => t.user, {
     cascade: true,
     onDelete: 'CASCADE',
-    eager: true,
   })
   supportTickets: Supportticket[];
 
   @OneToMany(() => Notification, (n) => n.user, {
     cascade: true,
     onDelete: 'CASCADE',
-    eager: true,
   })
   notifications: Notification[];
 
   @OneToMany(() => Device, (d) => d.user, {
     cascade: true,
     onDelete: 'CASCADE',
-    eager: true,
   })
   devices: Device[];
 
   @OneToMany(() => Userpromousage, (u) => u.user, {
     cascade: true,
     onDelete: 'CASCADE',
-    eager: true,
   })
   promoUsages: Userpromousage[];
 
@@ -179,7 +168,6 @@ export class User {
   @OneToMany(() => Driverlocation, (driverLocation) => driverLocation.driver, {
     cascade: true,
     onDelete: 'CASCADE',
-    eager: true,
   })
   driverLocations: Driverlocation[];
   @OneToMany(() => Ridecancel, (cancel) => cancel.user, {
