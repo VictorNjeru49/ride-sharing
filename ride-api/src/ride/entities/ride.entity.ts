@@ -35,12 +35,13 @@ export class Ride {
   @ManyToOne(() => Location, (l) => l.ridesPickup, {
     nullable: true,
     onDelete: 'CASCADE',
+    eager: true,
   })
   pickupLocation: Location;
 
   @ManyToOne(() => Location, (l) => l.ridesDropoff, {
     nullable: true,
-
+    eager: true,
     onDelete: 'CASCADE',
   })
   dropoffLocation: Location;

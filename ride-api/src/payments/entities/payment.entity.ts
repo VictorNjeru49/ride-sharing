@@ -27,6 +27,7 @@ export enum PaymentStatus {
   FAILED = 'failed',
   REFUNDED = 'refunded',
   CANCELLED = 'cancelled',
+  SESSION_RETRIEVED = 'session_retrieved',
 }
 
 @Entity()

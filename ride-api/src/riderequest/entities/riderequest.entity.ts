@@ -29,14 +29,14 @@ export class Riderequest {
   @ManyToOne(() => Riderprofile, (rp) => rp.rideRequests, {
     nullable: false,
     onDelete: 'CASCADE',
-    //
+    // eager: true,
   })
   @JoinColumn({ name: 'riderId' })
   rider: Riderprofile;
 
   @ManyToOne(() => Driverprofile, (dp) => dp.assignedRequests, {
     nullable: true,
-    //
+    // eager: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'assignedDriverId' })
@@ -45,13 +45,14 @@ export class Riderequest {
   @ManyToOne(() => Location, (l) => l.requestsPickup, {
     nullable: true,
     onDelete: 'CASCADE',
+    eager: true,
   })
   @JoinColumn({ name: 'pickupLocationId' })
   pickupLocation: Location;
 
   @ManyToOne(() => Location, (l) => l.requestsDropoff, {
     nullable: true,
-
+    eager: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'dropoffLocationId' })

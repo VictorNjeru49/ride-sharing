@@ -57,6 +57,7 @@ export enum PaymentMethod {
   CASH = 'cash',
   BANK_TRANSFER = 'bank_transfer',
   STRIPE_CHECKOUT = 'stripe_checkout',
+  
 }
 
 // Define enum for payment status
@@ -66,6 +67,7 @@ export enum PaymentStatus {
   FAILED = 'failed',
   REFUNDED = 'refunded',
   CANCELLED = 'cancelled',
+  SESSION_RETRIEVED = 'session_retrieved',
 }
 export interface userTypes extends GenericsType {
   firstName: string

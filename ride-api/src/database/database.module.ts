@@ -9,13 +9,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
         const connectionString =
-          configService.getOrThrow<string>('NEON_DATABASE_URL');
+          // configService.getOrThrow<string>('NEON_DATABASE_URL');
+          configService.getOrThrow<string>('DATABASE_URL');
 
         return {
           type: 'postgres',
           url: connectionString,
           autoLoadEntities: true,
-          synchronize: configService.getOrThrow<boolean>('DB_SYNC', false),
+          synchronize: configService.getOrThrow<boolean>('DB_SYNC', true),
           logging: configService.getOrThrow<boolean>('DB_LOGGING', false),
           migrations: [__dirname + '/../migrations/**/*{.ts,.js}'],
         };
