@@ -77,7 +77,7 @@ function RouteComponent() {
           <h2 className="text-3xl font-bold mb-10 text-center">
             Pricing Plans
           </h2>
-          <div className="grid gap-8 md:grid-cols-1 sm:w-full">
+          <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-3 w-full">
             {plans.map((plan) => (
               <div
                 key={plan.title}
