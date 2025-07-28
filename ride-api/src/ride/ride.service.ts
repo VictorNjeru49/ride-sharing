@@ -27,7 +27,6 @@ export class RideService {
         payment: true,
         ratings: true,
         cancellation: true,
-        feedbacks: true,
       },
     });
   }
@@ -43,7 +42,6 @@ export class RideService {
         payment: true,
         ratings: true,
         cancellation: true,
-        feedbacks: true,
       },
     });
   }

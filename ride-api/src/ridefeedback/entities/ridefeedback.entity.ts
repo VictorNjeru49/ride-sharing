@@ -1,4 +1,4 @@
-import { Ride } from 'src/ride/entities/ride.entity';
+import { Riderequest } from 'src/riderequest/entities/riderequest.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -26,10 +26,10 @@ export class Ridefeedback {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @ManyToOne(() => Ride, (ride) => ride.feedbacks, {
+  @ManyToOne(() => Riderequest, (Riderequest) => Riderequest.feedbacks, {
     onDelete: 'CASCADE',
     eager: true,
   })
   @JoinColumn({ name: 'rideId' })
-  ride: Ride;
+  Riderequest: Riderequest;
 }

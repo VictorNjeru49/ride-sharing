@@ -68,6 +68,7 @@ export enum PaymentStatus {
   REFUNDED = 'refunded',
   CANCELLED = 'cancelled',
   SESSION_RETRIEVED = 'session_retrieved',
+  
 }
 export interface userTypes extends GenericsType {
   firstName: string
@@ -169,6 +170,8 @@ export interface Riderequest extends GenericsType {
   status: string
   preferredVehicleType?: string
   requestedAt: Date
+  feedbacks: RideFeedback[]
+
 }
 export interface Ride extends GenericsType {
   rider?: RiderProfile
@@ -184,7 +187,6 @@ export interface Ride extends GenericsType {
   payment: Payment
   ratings: Rating[]
   cancellation: Ridecancel
-  feedbacks: RideFeedback[]
 }
 export interface Payment extends GenericsType {
   ride: Ride
@@ -242,11 +244,12 @@ export interface Device extends GenericsType {
   createdAt: Date
   user: userTypes
 }
-export interface RideFeedback extends GenericsType {
+export interface RideFeedback {
+  id?: string
   feedbackText: string
   submittedAt: Date
-  user: userTypes
-  ride: Ride
+  user?: userTypes
+  Riderequest: Riderequest;
 }
 export interface UserPromoUsage extends GenericsType {
   usedAt: Date

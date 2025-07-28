@@ -3,7 +3,6 @@ import { Location } from 'src/locations/entities/location.entity';
 import { Payment } from 'src/payments/entities/payment.entity';
 import { Rating } from 'src/ratings/entities/rating.entity';
 import { Ridecancel } from 'src/ridecancel/entities/ridecancel.entity';
-import { Ridefeedback } from 'src/ridefeedback/entities/ridefeedback.entity';
 import { Riderprofile } from 'src/riderprofile/entities/riderprofile.entity';
 import {
   Entity,
@@ -83,11 +82,4 @@ export class Ride {
     onDelete: 'CASCADE',
   })
   cancellation: Ridecancel;
-
-  @OneToMany(() => Ridefeedback, (f) => f.ride, {
-    cascade: true,
-    nullable: true,
-    onDelete: 'CASCADE',
-  })
-  feedbacks: Ridefeedback[];
 }

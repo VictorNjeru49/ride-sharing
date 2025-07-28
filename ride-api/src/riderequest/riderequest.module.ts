@@ -7,6 +7,7 @@ import { Driverprofile } from 'src/driverprofile/entities/driverprofile.entity';
 import { Location } from 'src/locations/entities/location.entity';
 import { Riderprofile } from 'src/riderprofile/entities/riderprofile.entity';
 import { Riderequest } from './entities/riderequest.entity';
+import { Ridefeedback } from 'src/ridefeedback/entities/ridefeedback.entity';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { Riderequest } from './entities/riderequest.entity';
       Driverprofile,
       Location,
       Riderprofile,
+      Ridefeedback,
     ]),
   ],
   controllers: [RiderequestController],

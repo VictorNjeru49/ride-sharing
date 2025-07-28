@@ -24,6 +24,7 @@ export class RiderequestService {
         assignedDriver: true,
         pickupLocation: true,
         dropoffLocation: true,
+        feedbacks: true,
       },
     });
   }
@@ -36,6 +37,7 @@ export class RiderequestService {
         assignedDriver: { user: true },
         pickupLocation: true,
         dropoffLocation: true,
+        feedbacks: true,
       },
     });
   }

@@ -14,7 +14,6 @@ import {
   updateRideRequest,
 } from '@/api/UserApi'
 import { Textarea } from '@/components/ui/textarea'
-import { Select } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import MapDialog from '@/components/locations'
 import { ClipLoader } from 'react-spinners'
@@ -28,10 +27,12 @@ import {
 import {
   RideCancelBy,
   type Ridecancel,
+  type RideFeedback,
   type Riderequest,
   type userTypes,
 } from '@/types/alltypes'
 import { toast } from 'sonner'
+import { TrackRideDialog } from '@/components/userform'
 
 export const Route = createFileRoute('/user/')({
   component: RouteComponent,
@@ -55,17 +56,26 @@ export function CompleteRideDialog({
   const [comment, setComment] = useState('')
 
   const queryClient = useQueryClient()
-
+  useEffect(() => {
+    if (!open) {
+      setFeedbackText('')
+      setRatingScore(undefined)
+      setComment('')
+    }
+  }, [open])
   const completeMutation = useMutation({
     mutationFn: async () => {
-      if (!rideRequest || !user) throw new Error('Missing ride or user')
+       if (!rideRequest) throw new Error('Missing ride request')
+       if (!user) throw new Error('Missing user')
       await updateRideRequest(rideRequest.id, { status: 'completed' })
 
-      await createRideFeedback({
+      const payload: RideFeedback = {
         feedbackText,
         submittedAt: new Date(),
         user,
-      })
+        Riderequest: rideRequest,
+      }
+      await createRideFeedback(payload)
 
       await createRating({
         rater: user ? user : undefined,
@@ -88,6 +98,7 @@ export function CompleteRideDialog({
   })
 
   const handleSubmit = () => {
+    if (completeMutation.isPending) return // guard
     if (!feedbackText.trim()) {
       toast.error('Please enter feedback text')
       return
@@ -123,17 +134,20 @@ export function CompleteRideDialog({
 
           <div>
             <Label htmlFor="ratingScore">Rating</Label>
-            <Select
-              value={ratingScore?.toString() || ''}
-              onValueChange={(value: string) => setRatingScore(Number(value))}
-            >
-              <option value="">Select rating</option>
-              {[1, 2, 3, 4, 5].map((score) => (
-                <option key={score} value={score.toString()}>
-                  {score} Star{score > 1 ? 's' : ''}
-                </option>
+            <div className="flex items-center space-x-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Button
+                  key={star}
+                  variant="ghost"
+                  className={
+                    ratingScore && ratingScore >= star ? 'text-yellow-500' : ''
+                  }
+                  onClick={() => setRatingScore(star)}
+                >
+                  {star} <Star className="ml-1 w-4 h-4" />
+                </Button>
               ))}
-            </Select>
+            </div>
           </div>
 
           <div>
@@ -295,14 +309,14 @@ function RouteComponent() {
   const [viewAllOpen, setViewAllOpen] = useState(false)
   const [viewAllRides, setViewAllRides] = useState<Riderequest[]>([])
   const [viewAllTitle, setViewAllTitle] = useState('')
-   const [completeDialogOpen, setCompleteDialogOpen] = useState(false)
-   const [selectedRideRequest, setSelectedRideRequest] =
-     useState<Riderequest | null>(null)
+  const [completeDialogOpen, setCompleteDialogOpen] = useState(false)
+  const [selectedRideRequest, setSelectedRideRequest] =
+    useState<Riderequest | null>(null)
 
-   const openCompleteDialog = (rideRequest: Riderequest) => {
-     setSelectedRideRequest(rideRequest)
-     setCompleteDialogOpen(true)
-   }
+  const openCompleteDialog = (rideRequest: Riderequest) => {
+    setSelectedRideRequest(rideRequest)
+    setCompleteDialogOpen(true)
+  }
 
   // -------------------------------------------------------------------------
   // Location states
@@ -355,6 +369,13 @@ function RouteComponent() {
   const [pickerMode, setPickerMode] = useState<'pickup' | 'destination'>(
     'pickup',
   )
+  const [trackDialogOpen, setTrackDialogOpen] = useState(false)
+  const [trackRide, setTrackRide] = useState<Riderequest | null>(null)
+
+  const openTrackRideDialog = (ride: Riderequest) => {
+    setTrackRide(ride)
+    setTrackDialogOpen(true)
+  }
 
   // -------------------------------------------------------------------------
   // Reverse‑geocode helper
@@ -455,7 +476,6 @@ function RouteComponent() {
     }
   }, [pickupLocation, destinationLocation])
 
-
   // -------------------------------------------------------------------------
   // Navigation helper
   // -------------------------------------------------------------------------
@@ -515,6 +535,18 @@ function RouteComponent() {
           Fetching your current location...
         </div>
       )}
+      <TrackRideDialog
+        open={trackDialogOpen}
+        onClose={() => setTrackDialogOpen(false)}
+        ride={trackRide}
+        user={user}
+        onConfirm={() => {
+          setTrackDialogOpen(false)
+          if (trackRide) {
+            openCompleteDialog(trackRide)
+          }
+        }}
+      />
 
       <CancelDialog
         open={cancelOpen}
@@ -523,6 +555,13 @@ function RouteComponent() {
           setCancelTarget(null)
         }}
         onConfirm={handleCancelRide}
+      />
+      {/* Complete Ride Feedback Dialog */}
+      <CompleteRideDialog
+        open={completeDialogOpen}
+        onClose={() => setCompleteDialogOpen(false)}
+        rideRequest={selectedRideRequest}
+        user={user}
       />
 
       {/* MapDialog */}
@@ -802,10 +841,11 @@ function RouteComponent() {
                   <div className="flex gap-2 mt-3">
                     <button
                       className="px-4 py-2 bg-yellow-400 text-yellow-900 rounded hover:bg-yellow-500"
-                      onClick={() => alert('Tracking coming soon')}
+                      onClick={() => openTrackRideDialog(activeRequest)}
                     >
                       Track Ride
                     </button>
+
                     <button
                       className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
                       onClick={() => openCompleteDialog(activeRequest)}
@@ -828,14 +868,6 @@ function RouteComponent() {
           </CardContent>
         </Card>
       )}
-
-      {/* Complete Ride Feedback Dialog */}
-      <CompleteRideDialog
-        open={completeDialogOpen}
-        onClose={() => setCompleteDialogOpen(false)}
-        rideRequest={selectedRideRequest}
-        user={user}
-      />
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { Driverprofile } from 'src/driverprofile/entities/driverprofile.entity';
 import { Location } from 'src/locations/entities/location.entity';
+import { Ridefeedback } from 'src/ridefeedback/entities/ridefeedback.entity';
 import { Riderprofile } from 'src/riderprofile/entities/riderprofile.entity';
 import {
   Entity,
@@ -7,6 +8,7 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -66,4 +68,10 @@ export class Riderequest {
 
   @Column('timestamp', { nullable: true })
   requestedAt: Date;
+  @OneToMany(() => Ridefeedback, (f) => f.Riderequest, {
+    cascade: true,
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  feedbacks: Ridefeedback[];
 }

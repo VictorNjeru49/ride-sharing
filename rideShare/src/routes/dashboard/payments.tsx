@@ -153,6 +153,7 @@ function RouteComponent() {
     failed: 'text-red-600',
     cancelled: 'text-gray-600',
     refunded: 'text-red-600',
+    session_retrieved: 'text-white'
   }
 
   // Open modal for new payment
