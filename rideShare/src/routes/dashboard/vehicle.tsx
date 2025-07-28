@@ -85,13 +85,13 @@ function RouteComponent() {
        setFormData({
          available: vehicle.available,
          capacity: vehicle.capacity,
-         color: vehicle.color,
-         make: vehicle.make,
-         model: vehicle.model,
-         plateNumber: vehicle.plateNumber,
-         rentalrate: Number(vehicle.rentalrate),
-         vehicleImage: vehicle.vehicleImage,
-         vehicleType: vehicle.vehicleType,
+         color:  vehicle.color,
+         make:  vehicle.make,
+         model:  vehicle.model,
+         plateNumber:  vehicle.plateNumber,
+         rentalrate: vehicle.rentalrate,
+         vehicleImage:  vehicle.vehicleImage,
+         vehicleType:  vehicle.vehicleType,
          year: vehicle.year,
        })
     } else {
@@ -108,7 +108,14 @@ function RouteComponent() {
     try {
       // Explicitly convert numeric fields to numbers before sending
 
-
+  if (
+    formData.rentalrate === null ||
+    formData.rentalrate === undefined ||
+    isNaN(Number(formData.rentalrate))
+  ) {
+    toast.error('Please enter a valid rental rate')
+    return
+  }
       const payload: Partial<Vehicle> = {
         available: formData.available,
         capacity: formData.capacity,
