@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { getUserById, updateUser } from '@/api/UserApi'
-import { UserRole, type userTypes } from '@/types/alltypes'
+import { type userTypes } from '@/types/alltypes'
 import { authStore } from '@/app/store'
 import { RingLoader } from 'react-spinners'
 

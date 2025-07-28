@@ -309,23 +309,4 @@ export interface globalDataType {
   }
   avatar?: userTypes
 }
-export interface VehicleSpecification {
-  engine: string
-  transmission: 'Automatic' | 'Manual'
-  fuelType: 'Gasoline' | 'Diesel' | 'Electric'
-  mileage: number
-  color: string
-  condition: 'New' | 'Used'
-}
-export interface Vehicles extends VehicleSpecification {
-  id: string
-  name: string
-  brand: string
-  model: string
-  year: number
-  price: number
-  category: string
-  image: string
-  description: string
-  features: string[]
-}
+

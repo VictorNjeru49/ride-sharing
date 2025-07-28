@@ -1,22 +1,41 @@
 import { useState } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import FAQComponent from '@/components/support'
 import { UserRole } from '@/types/alltypes'
-
-export const Route = createFileRoute('/driver/support')({
-  component: RouteComponent,
-})
 
 type FAQ = {
   question: string
   answer: string
 }
 
-const faqList: FAQ[] = [
+// type UserRole = 'RIDER' | 'DRIVER'
+
+const faqListRider: FAQ[] = [
+  {
+    question: 'How do I book a ride?',
+    answer:
+      'Open the app, set your pickup and destination, and click on "Book Ride".',
+  },
+  {
+    question: 'How do I cancel a ride?',
+    answer:
+      'Go to your active ride screen and click the "Cancel Ride" button. Cancellation fees may apply.',
+  },
+  {
+    question: 'How can I pay for a ride?',
+    answer:
+      'We accept mobile money, credit/debit cards, and cash. You can set your default method in payment settings.',
+  },
+  {
+    question: 'What if my driver is late?',
+    answer:
+      'You can contact the driver via the app. If the delay is unreasonable, cancel and rebook at no extra charge.',
+  },
+]
+
+const faqListDriver: FAQ[] = [
   {
     question: 'How do I update my vehicle information?',
     answer:
@@ -39,12 +58,24 @@ const faqList: FAQ[] = [
   },
 ]
 
-function RouteComponent() {
+interface FAQProps {
+  userRole: UserRole
+}
+
+function FAQComponent({ userRole }: FAQProps) {
+  const faqList = userRole === UserRole.DRIVER ? faqListDriver : faqListRider
+
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
   const [query, setQuery] = useState('')
   const [filtered, setFiltered] = useState<FAQ[]>(faqList)
 
   const handleSearch = () => {
+    if (query.trim() === '') {
+      setFiltered(faqList)
+      setExpandedIndex(null)
+      return
+    }
+
     const results = faqList.filter((faq) =>
       faq.question.toLowerCase().includes(query.toLowerCase()),
     )
@@ -52,28 +83,35 @@ function RouteComponent() {
     setExpandedIndex(null)
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch()
+    }
+  }
+
   return (
-    <>
-    <FAQComponent userRole={UserRole.DRIVER} />
+    <div className="p-6 max-w-3xl mx-auto space-y-6">
+      <h1 className="text-3xl font-bold text-center">
+        {userRole === UserRole.DRIVER
+          ? 'Driver Support FAQ'
+          : 'User Support FAQ'}
+      </h1>
 
-      <div className="p-6 space-y-6 max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-center">Driver Support FAQ</h1>
+      <div className="flex gap-2 items-center">
+        <Input
+          placeholder="Ask a question…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+        <Button onClick={handleSearch}>Ask Bot</Button>
+      </div>
 
-        <div className="flex  gap-2 items-center">
-          <Input
-            placeholder="Ask a question..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <Button onClick={handleSearch}>Ask Bot</Button>
+      {filtered.length === 0 ? (
+        <div className="text-center text-gray-500 mt-4">
+          No matching questions found.
         </div>
-
-        {filtered.length === 0 && (
-          <div className="flex flex-wrap text-gray-500 text-center mt-4">
-            No results found. Try a different question.
-          </div>
-        )}
-
+      ) : (
         <div className="space-y-3">
           {filtered.map((faq, index) => (
             <Card key={index} className="border border-gray-200 shadow-sm">
@@ -84,7 +122,7 @@ function RouteComponent() {
                     setExpandedIndex(expandedIndex === index ? null : index)
                   }
                 >
-                  <p className="font-medium text-base">{faq.question}</p>
+                  <p className="font-medium">{faq.question}</p>
                   {expandedIndex === index ? (
                     <ChevronUp className="w-5 h-5 text-gray-600" />
                   ) : (
@@ -92,13 +130,17 @@ function RouteComponent() {
                   )}
                 </div>
                 {expandedIndex === index && (
-                  <p className="mt-2 text-sm text-gray-700">{faq.answer}</p>
+                  <p className="mt-2 text-sm text-gray-700 dark:text-white">
+                    {faq.answer}
+                  </p>
                 )}
               </CardContent>
             </Card>
           ))}
         </div>
-      </div>
-    </>
+      )}
+    </div>
   )
 }
+
+export default FAQComponent

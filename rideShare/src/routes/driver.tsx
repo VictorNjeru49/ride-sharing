@@ -5,19 +5,19 @@ import { UserRole } from '@/types/alltypes'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/driver')({
-  //  beforeLoad: ({ location }) => {
-  //     const { isVerified } = authStore.state
-  //          console.log('isVerfied', isVerified)
-  //          console.log('user logged‑in?', isLoggedIn())
-  //          if (!isVerified || !isLoggedIn()) {
-  //       throw redirect({
-  //         to: '/login',
-  //         search: {
-  //           redirect: location.href,
-  //         },
-  //       })
-  //     }
-  //   },
+   beforeLoad: ({ location }) => {
+      const { isVerified } = authStore.state
+           console.log('isVerfied', isVerified)
+           console.log('user logged‑in?', isLoggedIn())
+           if (!isVerified || !isLoggedIn()) {
+        throw redirect({
+          to: '/login',
+          search: {
+            redirect: location.href,
+          },
+        })
+      }
+    },
   component: RouteComponent,
 })
 

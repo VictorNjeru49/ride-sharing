@@ -455,7 +455,6 @@ function RouteComponent() {
     }
   }, [pickupLocation, destinationLocation])
 
-  const rideRequest = user?.riderProfile?.rideRequests // or fetched via separate query
 
   // -------------------------------------------------------------------------
   // Navigation helper
@@ -511,6 +510,11 @@ function RouteComponent() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <h1 className="text-2xl font-bold">{userName} Dashboard</h1>
+      {loadingLocation && (
+        <div className="text-center text-sm text-gray-500 mb-2">
+          Fetching your current location...
+        </div>
+      )}
 
       <CancelDialog
         open={cancelOpen}
@@ -790,7 +794,7 @@ function RouteComponent() {
                   </p>
                   <p>
                     <strong>Requested At:</strong>{' '}
-                    {activeRequest.requestedAt          
+                    {activeRequest.requestedAt
                       ? new Date(activeRequest.requestedAt).toLocaleString()
                       : 'Not specified'}
                   </p>

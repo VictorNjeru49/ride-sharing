@@ -42,19 +42,19 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
 }
 
 export const Route = createFileRoute('/Vehicles/$VehiclesId')({
-  //  beforeLoad: ({ location }) => {
-  //     const { isVerified } = authStore.state
-  //     console.log('isVerfied', isVerified)
-  //     console.log('user logged‑in?', isLoggedIn())
-  //     if (!isVerified || !isLoggedIn()) {
-  //       throw redirect({
-  //         to: '/login',
-  //         search: {
-  //           redirect: location.href,
-  //         },
-  //       })
-  //     }
-  //   },
+   beforeLoad: ({ location }) => {
+      const { isVerified } = authStore.state
+      console.log('isVerfied', isVerified)
+      console.log('user logged‑in?', isLoggedIn())
+      if (!isVerified || !isLoggedIn()) {
+        throw redirect({
+          to: '/login',
+          search: {
+            redirect: location.href,
+          },
+        })
+      }
+    },
   component: RouteComponentWrapper,
 })
 
@@ -79,18 +79,6 @@ export interface RideInput {
   vehicle: string
 }
 
-interface RiderequestInput {
-  rider: string // rider ID
-  pickupLocation: string // location ID
-  dropoffLocation: string // location ID
-  status: string
-  preferredVehicleType: string
-}
-
-// export const createRides = async (rideData: RideInput): Promise<Ride> => {
-//   const response = await axios.post(`${API_BASE_URL}/ride`, rideData)
-//   return response.data
-// }
 
 function RouteComponent() {
   const { VehiclesId } = useParams({ from: '/Vehicles/$VehiclesId' })
@@ -204,7 +192,6 @@ function RouteComponent() {
       const fullRiderProfile = await getRiderProfileById(riderProfile)
       const fullPickupLocation = await getLocationById(pickupLocation.id)
       const fullDropoffLocation = await getLocationById(dropoffLocation.id)
-       const fullVehicle = await getVehiclesById(VehiclesId)
 
       const ride: Partial<Ride> = {
         rider: fullRiderProfile,

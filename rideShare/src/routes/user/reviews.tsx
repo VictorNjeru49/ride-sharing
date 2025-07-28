@@ -2,7 +2,7 @@ import { getUserById } from '@/api/UserApi'
 import { authStore } from '@/app/store'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { BeatLoader, RingLoader } from 'react-spinners'
+import { BeatLoader } from 'react-spinners'
 
 export const Route = createFileRoute('/user/reviews')({
   component: RouteComponent,

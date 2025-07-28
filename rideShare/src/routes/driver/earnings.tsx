@@ -36,7 +36,7 @@ function RouteComponent() {
 
   const displayName = user?.firstName ?? 'Alex'
   const earnings = user?.payments ?? []
-  const total = earnings.reduce((acc, p) => acc + p.amount, 0)
+  const total = earnings.reduce((acc, p) => acc + (p.amount ?? 0), 0)
 
   return (
     <section className="p-6 min-h-screen bg-muted/50 dark:bg-gray-900 space-y-6">
@@ -83,13 +83,13 @@ function RouteComponent() {
                   {earnings.map((p) => (
                     <TableRow key={p.id}>
                       <TableCell>
-                        {format(new Date(p.paidAt), 'dd MMM yyyy')}
+                        {format(new Date(p.paidAt ?? Date.now()), 'dd MMM yyyy')}
                       </TableCell>
                       <TableCell className="text-green-600 dark:text-green-400 font-medium">
                         ${Number(p.amount).toFixed(2)}
                       </TableCell>
                       <TableCell className="capitalize">
-                        {p.method.replace('_', ' ')}
+                        {p.method ? p.method.replace('_', ' '): 'Unknown'}
                       </TableCell>
                       <TableCell>
                         <StatusPill status={p.status} />

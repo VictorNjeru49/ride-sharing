@@ -1,4 +1,3 @@
-import React from 'react'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -15,16 +14,6 @@ interface FilterComponentProps {
   setSearchText: (value: string) => void
   setFilterBy: (value: string) => void
 }
-const filterOptions = [
-  'All',
-  'make',
-  'model',
-  'color',
-  'Plate Number',
-  'Capacity',
-  'Year',
-  'type',
-]
 
 export default function FilterComponent({
   searchText,

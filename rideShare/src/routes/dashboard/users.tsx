@@ -257,7 +257,27 @@ useEffect(() => {
           {Math.min((page + 1) * rowsPerPage, filteredData.length)} of{' '}
           {filteredData.length} entries
         </div>
-        <div className="flex gap-2 items-center">
+
+        <div className="flex gap-4 items-center">
+          <Select
+            value={String(rowsPerPage)}
+            onValueChange={(value) => {
+              setRowsPerPage(Number(value))
+              setPage(0) // Reset page to first when rows per page changes
+            }}
+          >
+            <SelectTrigger className="w-24">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {[5, 10, 20].map((num) => (
+                <SelectItem key={num} value={String(num)}>
+                  {num} per page
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
           <Button
             variant="outline"
             size="sm"

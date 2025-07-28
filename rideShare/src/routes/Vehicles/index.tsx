@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo } from 'react'
 import FilterComponent from '@/components/FilterComponent'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { useCrudOperations } from '@/hooks/crudops'
@@ -24,7 +24,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
-import { Sun, Moon, Laptop, CarTaxiFrontIcon } from 'lucide-react'
+import { Sun, Moon, CarTaxiFrontIcon } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/Vehicles/')({

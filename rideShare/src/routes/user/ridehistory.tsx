@@ -9,7 +9,7 @@ import { authStore } from '@/app/store'
 import { getUserById } from '@/api/UserApi'
 import { format } from 'date-fns'
 import { UserRole, type Ride } from '@/types/alltypes'
-import { PropagateLoader, RingLoader } from 'react-spinners'
+import { PropagateLoader } from 'react-spinners'
 
 export const Route = createFileRoute('/user/ridehistory')({
   component: RideHistoryPage,
@@ -56,14 +56,16 @@ function RideHistoryPage() {
         return false
       if (
         filters.vehicleType !== 'All Vehicle Types' &&
-        r.driver?.vehicle.vehicleType !== filters.vehicleType
+        r.driver?.vehicle?.vehicleType !== filters.vehicleType
       )
         return false
+
       if (
         filters.date &&
         format(new Date(r.createdAt), 'yyyy‑MM‑dd') !== filters.date
       )
         return false
+
       return true
     })
   }, [ridesTaken, filters])
@@ -214,10 +216,12 @@ function RideHistoryPage() {
               </p>
               <p>
                 <strong>Tip:</strong>{' '}
-                {ride.payment && ride.payment.amount > ride.fare
-                  ? `$${(ride.payment.amount - ride.fare).toFixed(2)}`
+                {ride?.payment?.amount !== undefined &&
+                ride.payment.amount > ride.fare
+                  ? `$${Number(ride.payment.amount - ride.fare).toFixed(2)}`
                   : '$0.00'}
               </p>
+
               <p>
                 <strong>Total:</strong> $
                 {(Number(ride.fare) * Number(ride.distanceKm)).toFixed(2) ??

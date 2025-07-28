@@ -10,7 +10,6 @@ import {
   Polyline,
   useMap,
 } from 'react-leaflet'
-import type { LatLngExpression } from 'leaflet'
 
 interface MapDialogProps {
   open: boolean

@@ -1,8 +1,8 @@
-import React, { useMemo, useState } from 'react'
-import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { useMemo, useState } from 'react'
+import { useRouter } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getRides, getRideCancelById } from '@/api/UserApi'
-import type { Ride, PaymentStatus } from '@/types/alltypes'
+import type { Ride } from '@/types/alltypes'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import {
   Table,
@@ -54,7 +54,7 @@ function Trips() {
    // ---------------------------------------------------------------------------
    const { mutate: handleCancel, isPending: isCancelling } = useMutation({
      mutationFn: (rideId: string) => getRideCancelById(rideId),
-     onSuccess: (_, rideId) => {
+     onSuccess: (_) => {
        toast.success('Ride cancelled')
        queryClient.invalidateQueries({ queryKey: ['rides'] })
      },

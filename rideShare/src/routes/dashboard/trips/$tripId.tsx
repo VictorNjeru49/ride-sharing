@@ -1,7 +1,6 @@
-import React from 'react'
 import { createFileRoute, useParams, useRouter } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { getRides, getRideCancelById } from '@/api/UserApi'
+import { getRides } from '@/api/UserApi'
 import type { Ride } from '@/types/alltypes'
 import {
   Dialog,

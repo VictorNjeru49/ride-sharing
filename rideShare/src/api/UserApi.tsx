@@ -19,6 +19,7 @@ import type {
   Location,
   Wallet,
 } from '@/types/alltypes'
+import { UserRole } from '@/types/alltypes'
 import axios from 'axios'
 import { API_BASE_URL } from './BaseUrl'
 
@@ -49,6 +50,40 @@ export const fetchBotReply = async (userMessage: string): Promise<string>  => {
   }
 }
 
+export const fetchUserBotReply = async (
+  userMessage: string,
+  role: UserRole = UserRole.RIDER,
+): Promise<string> => {
+  try {
+    // Map role to endpoint path
+    let endpoint = `${API_BASE_URL}/chatbot`
+    switch (role) {
+      case UserRole.DRIVER:
+        endpoint += '/driver'
+        break
+      case UserRole.ADMIN:
+        endpoint += '/admin'
+        break
+      case UserRole.RIDER:
+      default:
+        endpoint += '/user'
+        break
+    }
+
+    const response = await axios.post<{ reply: string }>(
+      endpoint,
+      { message: userMessage, role },
+      {
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
+
+    return response.data.reply
+  } catch (error) {
+    console.error('fetchBotReply error:', error)
+    return 'Sorry, something went wrong. Please try again later.'
+  }
+}
 
 
 

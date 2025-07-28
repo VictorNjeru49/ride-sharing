@@ -1,6 +1,6 @@
 // store.ts
 import { Store } from '@tanstack/store'
-import { UserRole, type globalDataType, type userTypes } from '@/types/alltypes'
+import { UserRole, type globalDataType } from '@/types/alltypes'
 
 const initialStorage: globalDataType = {
   isVerified: false,

@@ -20,7 +20,6 @@ import {
   PhoneCall,
   MonitorSmartphone,
   Inbox,
-  Columns4,
   ChevronLeft,
   ChevronRight,
   LocateIcon,

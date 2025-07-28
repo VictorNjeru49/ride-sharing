@@ -2,9 +2,11 @@ import Inbox from '@/components/inbox'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/driver/inbox')({
-  component: Inbox,
+  component: RouteComponent,
 })
 
 function RouteComponent() {
-  return <div>Hello "/driver/inbox"!</div>
+  return (
+    <Inbox/>
+  )
 }
