@@ -11,7 +11,7 @@ import {
   PaymentMethod,
   PaymentStatus,
 } from './entities/payment.entity';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
 import { Ride } from 'src/ride/entities/ride.entity';
@@ -175,56 +175,28 @@ export class PaymentsService {
     const paymentIntent =
       await this.stripe.paymentIntents.retrieve(paymentIntentId);
 
+    if (paymentIntent.status !== 'succeeded') {
+      throw new BadRequestException('Payment not completed');
+    }
+
     const userId = paymentIntent.metadata.user;
+
     if (!userId) {
       throw new BadRequestException('Missing metadata in payment intent');
     }
 
     const amount = paymentIntent.amount_received / 100;
 
-    if (paymentIntent.status === 'succeeded') {
-      // Delete createCheckoutSession and getSession payments for this user
-      // await this.deletePayments(userId, [
-      //   PaymentStatus.PENDING,
-      //   PaymentStatus.SESSION_RETRIEVED,
-      // ]);
+    const payment = this.paymentRepo.create({
+      amount,
+      method: PaymentMethod.STRIPE_CHECKOUT,
+      status: PaymentStatus.COMPLETED,
+      user: { id: userId },
+      currency: paymentIntent.currency,
+      stripePaymentIntentId: paymentIntent.id,
+    });
 
-      // Save only confirmPayment record with COMPLETED status
-      const payment = this.paymentRepo.create({
-        amount,
-        method: PaymentMethod.STRIPE_CHECKOUT,
-        status: PaymentStatus.COMPLETED,
-        user: { id: userId },
-        currency: paymentIntent.currency,
-        stripePaymentIntentId: paymentIntent.id,
-      });
-
-      return await this.paymentRepo.save(payment);
-    } else if (
-      ['requires_payment_method', 'canceled', 'failed'].includes(
-        paymentIntent.status,
-      )
-    ) {
-      await this.deletePayments(userId, [
-        PaymentStatus.SESSION_RETRIEVED,
-        PaymentStatus.COMPLETED,
-      ]);
-
-      const payment = this.paymentRepo.create({
-        amount,
-        method: PaymentMethod.STRIPE_CHECKOUT,
-        status: PaymentStatus.PENDING,
-        user: { id: userId },
-        currency: paymentIntent.currency,
-        stripePaymentIntentId: paymentIntent.id,
-      });
-
-      return await this.paymentRepo.save(payment);
-    } else {
-      throw new BadRequestException(
-        `Payment not completed, current status: ${paymentIntent.status}`,
-      );
-    }
+    return await this.paymentRepo.save(payment);
   }
 
   async getSession(sessionId: string) {
@@ -234,41 +206,6 @@ export class PaymentsService {
 
     if (!session.payment_intent) {
       throw new BadRequestException('payment_intent missing in session');
-    }
-
-    // Check and handle possibly null amount_total
-    if (session.amount_total === null) {
-      throw new BadRequestException('Session amount_total is null');
-    }
-    const amount = session.amount_total / 100;
-
-    // Check metadata existence and user id inside metadata
-    if (!session.metadata || !session.metadata.user) {
-      throw new BadRequestException('Session metadata or user ID missing');
-    }
-    const userId = session.metadata.user;
-
-    // Check currency is non-null
-    if (!session.currency) {
-      throw new BadRequestException('Session currency is missing');
-    }
-    const currency = session.currency;
-
-    // Check if payment record already exists for this session
-    const existingPayment = await this.paymentRepo.findOne({
-      where: { stripeCheckoutSessionId: session.id },
-    });
-
-    if (!existingPayment) {
-      const payment = this.paymentRepo.create({
-        amount,
-        method: PaymentMethod.STRIPE_CHECKOUT,
-        status: PaymentStatus.SESSION_RETRIEVED,
-        user: { id: userId },
-        currency,
-        stripeCheckoutSessionId: session.id,
-      });
-      await this.paymentRepo.save(payment);
     }
 
     return session;
@@ -289,9 +226,6 @@ export class PaymentsService {
           price_data: {
             currency: createPaymentDto.currency,
             unit_amount: amountInCents,
-            product_data: {
-              name: 'Vehicle Rental Payment',
-            },
           },
           quantity: 1,
         },
@@ -311,11 +245,8 @@ export class PaymentsService {
       expand: ['payment_intent'], // make sure paymentIntent is expanded
     });
 
-    if (!session.url) {
-      throw new Error('Stripe Checkout session URL is null');
-    }
+    console.log(session);
 
-    // Save createCheckoutSession payment record
     const payment = this.paymentRepo.create({
       amount: createPaymentDto.amount,
       method: PaymentMethod.STRIPE_CHECKOUT,
@@ -327,18 +258,14 @@ export class PaymentsService {
 
     const savedPayment = await this.paymentRepo.save(payment);
 
+    if (!session.url) {
+      throw new Error('Stripe Checkout session URL is null');
+    }
     return {
       url: session.url,
       clientSecret: session.client_secret!,
       payment: savedPayment,
     };
-  }
-
-  private async deletePayments(userId: string, statuses: PaymentStatus[]) {
-    await this.paymentRepo.delete({
-      user: { id: userId },
-      status: In(statuses),
-    });
   }
 
   async findAll(): Promise<Payment[]> {

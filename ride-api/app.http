@@ -101,8 +101,7 @@ Content-Type: application/json
   "amount": 50.00,
   "currency": "USD",
   "method": "stripe_checkout",
-  "userId": "31511632-b063-4e4a-bcad-8a24954d1987",
-  "vehicleId": "09b6e08e-abdc-44f3-b9b8-ccecbacdc611"
+  "userId": "41de12a2-4579-4e77-9e95-87870a1d668a"
 }
 
 ### Confirm a payment by Stripe Payment Intent ID
