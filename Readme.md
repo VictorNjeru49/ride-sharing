@@ -1,39 +1,39 @@
 # 🚗 Fullstack Rideshare Booking App
 
-A full-featured rideshare application where users can register as **riders** or **drivers**, request and accept rides, handle payments, and receive real-time notifications.
+A full-featured rideshare application enabling users to register as **riders** or **drivers**, book and manage rides, make secure payments, and receive AI-powered insights.
 
 Built with:
 
 - ⚙️ **NestJS** (Backend)
 - 💻 **React + TypeScript** (Frontend)
 - 🗄️ **PostgreSQL** (Database)
-- 🤖 **AI Integration** (OpenAI)
+- 🤖 **OpenAI Integration** (AI Services)
 - 💳 **Stripe** (Payments)
 
 ---
 
 ## 🌐 Technologies Used
 
-### 🧠 Backend – NestJS
+### 🧠 Backend – [NestJS](https://nestjs.com/)
 
-- **NestJS** — Scalable Node.js framework
-- **PostgreSQL** — Relational database
-- **Prisma ORM** — Database access
-- **JWT** — Authentication & authorization
-- **Bcrypt** — Secure password hashing
-- **Redis** _(optional)_ — Token management, caching
-- **Swagger** — Auto-generated API docs
-- t**Stripe API** – Payments
-- **ValidationPipe** & **Guards** — Role-based access and input validation
+- **NestJS** – A progressive Node.js framework for building efficient server-side apps
+- **PostgreSQL** – Robust, open-source relational database
+- **Prisma ORM** – Type-safe database access layer
+- **JWT Auth** – JSON Web Token-based authentication/authorization
+- **Bcrypt** – For hashing user credentials securely
+- **Redis (optional)** – Caching, rate-limiting, token storage
+- **Swagger/OpenAPI** – Auto-generated API documentation
+- **Stripe API** – For secure payment processing and payouts
+- **Guards & Pipes** – Role-based access control and request validation
 
-### 🎨 Frontend – React
+### 🎨 Frontend – [React](https://reactjs.org/)
 
-- **React + TypeScript**
-- **Tailwind CSS + ShadCN UI** — Modern UI components
-- **TanStack Router** — File-based routing
-- **TanStack Query** — Server state management
-- **Zod + React Hook Form** — Schema validation
-- **Axios** — API communication
+- **React + TypeScript** – Strongly typed, modular frontend
+- **Tailwind CSS + ShadCN UI** – Utility-first CSS and accessible UI components
+- **TanStack Router** – Modern file-based routing for React
+- **TanStack Query** – Asynchronous data fetching, caching & mutation management
+- **Zod + React Hook Form** – Form handling with schema-based validation
+- **Axios** – HTTP client for interacting with backend APIs
 
 ---
 
@@ -41,55 +41,51 @@ Built with:
 
 ### 🚘 Rider Features
 
-- ✅ Sign up / Login
-- ✅ Request a ride (select pickup/drop location)
-- ✅ See available drivers
-- ✅ Live ride tracking
-- ✅ View ride history
-- ✅ Rate drivers (AI suggestions)
-- ✅ Wallet balance, transactions & promo code usage
-
+- ✅ Register and log in as a rider
+- ✅ Search and book available rides
+- ✅ Select pickup and drop-off locations via map
+- ✅ View assigned driver profile and vehicle details
+- ✅ Real-time ride status and live location tracking
+- ✅ View past rides and trip history
+- ✅ Submit ride feedback and AI-assisted driver ratings
+- ✅ Wallet system with transaction history
+- ✅ Apply and redeem promo codes
 
 ### 🚖 Driver Features
 
-- ✅ Register/Login as a driver
-- ✅ Add/update vehicle details
-- ✅ Accept/reject rides
-- ✅ Live ride status updates
-- ✅ Ride earnings dashboard
-- ✅ View ratings & history
+- ✅ Register and log in as a driver
+- ✅ Add or update vehicle information
+- ✅ Accept, reject, and manage ride requests
+- ✅ Update ride progress in real-time (Start → In-progress → Completed)
+- ✅ View ride history and past earnings
+- ✅ Monitor ratings and feedback
 
+### ⚙️ Admin Panel
 
-### ⚙️ Admin Features
+- ✅ Manage all users, drivers, and rides
+- ✅ Create, activate, or deactivate promo codes
+- ✅ Monitor platform payments and refund requests
+- ✅ Resolve user disputes via ticket system (AI-assisted)
+- ✅ Visualize app performance, usage, and trends
 
-- ✅ View/manage users, drivers, rides
-- ✅ Issue & manage promo codes
-- ✅ View all payments & refunds
-- ✅ Resolve disputes and support tickets (AI-assisted)
-- ✅ Monitor system analytics
+### 🤖 AI Features (OpenAI)
 
-
-### 🤖 AI Integration
-
-- 🎯 Auto-resolve simple support queries (OpenAI)
-- 🧠 Suggest driver ratings based on ride behavior
-- 🛑 Detect fraud or unusual ride/payment activity
-- ✨ Smart ride summaries after completion
-
+- 🧠 Intelligent feedback analysis for ride experiences
+- ✍️ AI-generated summaries of completed rides
+- 💬 Automated support for common issues
+- 🔐 Detect anomalies in ride or payment behavior
 
 ---
 
-## 🧭 App Architecture
+## 🧭 System Architecture
 
 ```plaintext
-[React Client]
-    |
-    |  (Axios HTTP Requests)
-    ↓
-[NestJS Backend Server]
-    |
-    |  (Prisma ORM)
-    ↓
-[PostgreSQL Database]
-
-```
+┌────────────────────┐      HTTP + JSON       ┌──────────────────────┐
+│   React Frontend   ├───────────────────────▶│   NestJS API Server   │
+└────────┬───────────┘                        └────────┬─────────────┘
+         │                                                  │
+         │             Prisma ORM / REST                    │
+         ▼                                                  ▼
+   LocalStorage /                                     PostgreSQL DB
+    TanStack Query                                      (Users, Rides,
+   (for caching, sync)                                 Payments, Ratings)

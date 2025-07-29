@@ -134,7 +134,7 @@ function RouteComponent() {
     early: 0.5,
   }
   const baseRate = Number(vehicle?.rentalrate) ?? 0
-  const adjustedRate = (baseRate / 10) * timeBandFactor[timeBand]
+  const adjustedRate = (baseRate / 50) * timeBandFactor[timeBand]
   const baseCost = distanceKm * adjustedRate
   const serviceFee = 2
   const tipFee = baseCost * 0.05
