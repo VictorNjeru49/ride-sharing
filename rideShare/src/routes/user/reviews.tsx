@@ -34,7 +34,7 @@ function RouteComponent() {
         Error loading reviews.
       </div>
     )
-  if (!user || !user.ratingsReceived || user.ratingsReceived.length === 0)
+  if (!user || !user.ratingsGiven || user.ratingsGiven.length === 0)
     return (
       <div className="text-center text-gray-600 py-8">
         No reviews received yet.
@@ -47,7 +47,7 @@ function RouteComponent() {
         Reviews Received by {user.firstName || 'User'}
       </h1>
       <ul className="space-y-6 flex flex-row flex-wrap gap-3">
-        {user.ratingsReceived.map((rating: any) => (
+        {user.ratingsGiven.map((rating: any) => (
           <li
             key={rating.id}
             className="bg-white shadow-md rounded-xl p-6 border border-gray-200 dark:bg-gray-700"
@@ -69,13 +69,8 @@ function RouteComponent() {
 
             <div className="text-sm text-gray-600 space-y-1 dark:text-white">
               <div>
-                <strong>From:</strong> {rating.rater.firstName}{' '}
-                {rating.rater.lastName}
-              </div>
-              <div>
-                <strong>Ride Fare:</strong> $
-                {Number(rating.ride.fare).toFixed(2)} |{' '}
-                <strong>Distance:</strong> {rating.ride.distanceKm} km
+                <strong>From:</strong> {user.firstName ?? 'unknown'}{' '}
+                {user.lastName ?? 'unknown'}
               </div>
             </div>
           </li>

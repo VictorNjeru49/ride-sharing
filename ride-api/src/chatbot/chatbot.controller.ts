@@ -50,4 +50,13 @@ export class ChatbotController {
     );
     return { reply };
   }
+  @Public()
+  @Post('reply')
+  async roleReply(
+    @Body() body: ChatRequestDto & { role: UserRole },
+  ): Promise<ChatResponseDto> {
+    const { message, role } = body;
+    const reply = await this.chatbotService.getReply(message, role);
+    return { reply };
+  }
 }

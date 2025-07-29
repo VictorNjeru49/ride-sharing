@@ -30,20 +30,14 @@ import { API_BASE_URL } from './BaseUrl'
 // -------------------------------------------------
 
 
-export const fetchBotReply = async (userMessage: string): Promise<string>  => {
+export const fetchBotReply = async (userMessage: string): Promise<string> => {
   try {
     const response = await axios.post<{ reply: string }>(
       `${API_BASE_URL}/chatbot`,
-      {
-        message: userMessage,
-      },
-      {
-        headers: { 'Content-Type': 'application/json' },
-      },
+      { message: userMessage },
+      { headers: { 'Content-Type': 'application/json' } }
     )
-
-    const {data} = await response
-    return data.reply
+    return response.data.reply
   } catch (error) {
     console.error('fetchBotReply error:', error)
     return 'Sorry, something went wrong. Please try again later.'
@@ -55,32 +49,16 @@ export const fetchUserBotReply = async (
   role: UserRole = UserRole.RIDER,
 ): Promise<string> => {
   try {
-    // Map role to endpoint path
-    let endpoint = `${API_BASE_URL}/chatbot`
-    switch (role) {
-      case UserRole.DRIVER:
-        endpoint += '/driver'
-        break
-      case UserRole.ADMIN:
-        endpoint += '/admin'
-        break
-      case UserRole.RIDER:
-      default:
-        endpoint += '/user'
-        break
-    }
-
     const response = await axios.post<{ reply: string }>(
-      endpoint,
-      { message: userMessage, role },
+      `${API_BASE_URL}/chatbot/reply`, // single endpoint
+      { message: userMessage, role }, // send role in body
       {
         headers: { 'Content-Type': 'application/json' },
       },
     )
-
     return response.data.reply
   } catch (error) {
-    console.error('fetchBotReply error:', error)
+    console.error('fetchUserBotReply error:', error)
     return 'Sorry, something went wrong. Please try again later.'
   }
 }

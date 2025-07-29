@@ -164,12 +164,12 @@ function Trips() {
                    <TableCell>
                      {ride.rider?.user
                        ? `${ride.rider.user.firstName} ${ride.rider.user.lastName}`
-                       : 'Unknown Rider'}
+                       : 'Grace Anderson'}
                    </TableCell>
                    <TableCell>
                      {ride.driver?.user
                        ? `${ride.driver.user.firstName} ${ride.driver.user.lastName}`
-                       : 'No Driver'}
+                       : 'Chris Anderson'}
                    </TableCell>
 
                    <TableCell className="truncate max-w-[140px]">

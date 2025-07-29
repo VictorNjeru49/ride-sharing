@@ -1,16 +1,37 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserRole } from 'src/users/entities/user.entity';
 import { ChatResponseDto } from './dto/chat-response.dto';
+import { Together } from 'together-ai';
 @Injectable()
 export class ChatbotService {
+  private together: Together;
+
+  constructor() {
+    this.together = new Together({
+      apiKey: process.env.TOGETHER_API_KEY,
+    });
+  }
   async getReply(message: string, role: UserRole): Promise<string> {
     if (!message || message.trim() === '') {
       throw new BadRequestException('No message provided');
     }
 
+    const prompt = this.buildPrompt(message, role);
+
+    try {
+      const response = await this.together.chat.completions.create({
+        model: 'meta-llama/Llama-Vision-Free', // or another model you want to use
+        messages: [{ role: 'user', content: prompt }],
+      });
+
+      const aiReply = response.choices?.[0]?.message?.content?.trim();
+      if (aiReply) return aiReply;
+    } catch (error) {
+      console.error('Together AI error:', error);
+      // fallback to static replies if API call fails
+    }
     const normalizedMsg = message.trim().toLowerCase();
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    // Common greetings/help/thanks
     if (normalizedMsg.includes('hello') || normalizedMsg.includes('hi')) {
       return 'Hello! How can I assist you with your ride today?';
     }
@@ -30,7 +51,7 @@ export class ChatbotService {
       case UserRole.ADMIN:
         return this.adminReply(normalizedMsg, message);
       default:
-        return `Gemini Bot says: You sent "${message}". This is a simulated response.`;
+        return `Sorry but I can't understand. you like to say 'help'`;
     }
   }
 
@@ -103,5 +124,24 @@ export class ChatbotService {
       return "You're welcome! Let me know if you need anything else.";
     }
     return `Gemini Bot says: You sent "${original}". This is a simulated response.`;
+  }
+
+  private buildPrompt(message: string, role: UserRole): string {
+    let roleContext = '';
+    switch (role) {
+      case UserRole.RIDER:
+        roleContext = 'You are a helpful assistant for riders.';
+        break;
+      case UserRole.DRIVER:
+        roleContext = 'You are a helpful assistant for drivers.';
+        break;
+      case UserRole.ADMIN:
+        roleContext =
+          'You are a helpful assistant for admins managing the ride service.';
+        break;
+      default:
+        roleContext = 'You are a helpful assistant.';
+    }
+    return `${roleContext} Answer the following user query:\n"${message}"`;
   }
 }

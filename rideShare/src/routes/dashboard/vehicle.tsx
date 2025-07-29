@@ -1,4 +1,3 @@
-// ✅ Converted to shadcn/ui
 import { useMemo, useState, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card'
@@ -12,7 +11,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Drawer } from '@/components/ui/drawer'
 import {
   Table,
   TableBody,
@@ -73,6 +71,8 @@ function RouteComponent() {
     return allData.slice(start, start + itemsPerPage)
   }, [allData, currentPage])
 
+  const totalPages = Math.ceil(allData.length / itemsPerPage)
+
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null)
   const [formData, setFormData] = useState<Partial<Omit<Vehicle, 'id'>>>({})
@@ -82,18 +82,18 @@ function RouteComponent() {
   function openDialog(vehicle?: Vehicle) {
     if (vehicle) {
       setEditingVehicle(vehicle)
-       setFormData({
-         available: vehicle.available,
-         capacity: vehicle.capacity,
-         color:  vehicle.color,
-         make:  vehicle.make,
-         model:  vehicle.model,
-         plateNumber:  vehicle.plateNumber,
-         rentalrate: vehicle.rentalrate,
-         vehicleImage:  vehicle.vehicleImage,
-         vehicleType:  vehicle.vehicleType,
-         year: vehicle.year,
-       })
+      setFormData({
+        available: vehicle.available,
+        capacity: vehicle.capacity,
+        color: vehicle.color,
+        make: vehicle.make,
+        model: vehicle.model,
+        plateNumber: vehicle.plateNumber,
+        rentalrate: vehicle.rentalrate,
+        vehicleImage: vehicle.vehicleImage,
+        vehicleType: vehicle.vehicleType,
+        year: vehicle.year,
+      })
     } else {
       setEditingVehicle(null)
       setFormData({})
@@ -104,18 +104,17 @@ function RouteComponent() {
   function onChange(field: keyof typeof formData, value: any) {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
+
   async function handleSubmit() {
     try {
-      // Explicitly convert numeric fields to numbers before sending
-
-  if (
-    formData.rentalrate === null ||
-    formData.rentalrate === undefined ||
-    isNaN(Number(formData.rentalrate))
-  ) {
-    toast.error('Please enter a valid rental rate')
-    return
-  }
+      if (
+        formData.rentalrate === null ||
+        formData.rentalrate === undefined ||
+        isNaN(Number(formData.rentalrate))
+      ) {
+        toast.error('Please enter a valid rental rate')
+        return
+      }
       const payload: Partial<Vehicle> = {
         available: formData.available,
         capacity: formData.capacity,
@@ -250,10 +249,29 @@ function RouteComponent() {
         </TableBody>
       </Table>
 
-      {/* Pagination and buttons */}
+      {/* Pagination Controls */}
+      <div className="flex justify-between items-center mt-4">
+        <Button
+          variant="outline"
+          onClick={() => setCurrentPage((p) => Math.max(p - 1, 0))}
+          disabled={currentPage === 0}
+        >
+          Previous
+        </Button>
+        <span>
+          Page {currentPage + 1} of {totalPages || 1}
+        </span>
+        <Button
+          variant="outline"
+          onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages - 1))}
+          disabled={currentPage >= totalPages - 1}
+        >
+          Next
+        </Button>
+      </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="space-y-4 overflow-y-auto">
+        <DialogContent className="space-y-4 overflow-y-auto max-h-[70vh]">
           <DialogHeader>
             <DialogTitle>
               {editingVehicle ? 'Edit Vehicle' : 'Create Vehicle'}
@@ -329,20 +347,22 @@ function RouteComponent() {
         </DialogContent>
       </Dialog>
 
-      <Drawer open={isDeleteOpen} onClose={() => setIsDeleteOpen(false)}>
-        <div className="p-4">
-          <h2 className="text-lg font-semibold mb-2">Confirm Deletion</h2>
+      <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+        <DialogContent className="space-y-4 max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+          </DialogHeader>
           <p>This action cannot be undone.</p>
-          <div className="flex justify-end gap-2 mt-4">
+          <DialogFooter className="flex justify-end gap-2">
             <Button variant="destructive" onClick={confirmDelete}>
               Delete
             </Button>
             <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
               Cancel
             </Button>
-          </div>
-        </div>
-      </Drawer>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

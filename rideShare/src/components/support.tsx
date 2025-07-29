@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { UserRole } from '@/types/alltypes'
+import { fetchUserBotReply } from '@/api/UserApi'
 
 type FAQ = {
   question: string
@@ -57,7 +58,6 @@ const faqListDriver: FAQ[] = [
       'Yes, but frequent cancellations may affect your driver rating and incentives.',
   },
 ]
-
 interface FAQProps {
   userRole: UserRole
 }
@@ -67,25 +67,30 @@ function FAQComponent({ userRole }: FAQProps) {
 
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
   const [query, setQuery] = useState('')
-  const [filtered, setFiltered] = useState<FAQ[]>(faqList)
+  const [botReply, setBotReply] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleSearch = () => {
-    if (query.trim() === '') {
-      setFiltered(faqList)
-      setExpandedIndex(null)
-      return
-    }
-
-    const results = faqList.filter((faq) =>
-      faq.question.toLowerCase().includes(query.toLowerCase()),
-    )
-    setFiltered(results)
+  const handleAskBot = async () => {
+    if (!query.trim()) return
+    setLoading(true)
+    setError(null)
+    setBotReply(null)
     setExpandedIndex(null)
+
+    try {
+      const reply = await fetchUserBotReply(query, userRole)
+      setBotReply(reply)
+    } catch (err) {
+      setError('Failed to get response. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      handleSearch()
+      handleAskBot()
     }
   }
 
@@ -103,42 +108,68 @@ function FAQComponent({ userRole }: FAQProps) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
+          aria-label="Ask a question"
+          disabled={loading}
         />
-        <Button onClick={handleSearch}>Ask Bot</Button>
+        <Button onClick={handleAskBot} disabled={loading || !query.trim()}>
+          {loading ? 'Asking...' : 'Ask Bot'}
+        </Button>
       </div>
 
-      {filtered.length === 0 ? (
-        <div className="text-center text-gray-500 mt-4">
-          No matching questions found.
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {filtered.map((faq, index) => (
-            <Card key={index} className="border border-gray-200 shadow-sm">
-              <CardContent className="p-4">
-                <div
-                  className="flex justify-between items-center cursor-pointer"
-                  onClick={() =>
+      {error && (
+        <p className="text-red-600 mt-2" role="alert">
+          {error}
+        </p>
+      )}
+
+      {botReply && (
+        <Card className="border border-indigo-500 bg-indigo-50 shadow-md">
+          <CardContent>
+            <p className="text-indigo-900 whitespace-pre-wrap">{botReply}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Optional: Show FAQ list below */}
+      <div className="space-y-3 mt-6">
+        {faqList.map((faq, index) => (
+          <Card key={index} className="border border-gray-200 shadow-sm">
+            <CardContent className="p-4">
+              <div
+                className="flex justify-between items-center cursor-pointer"
+                onClick={() =>
+                  setExpandedIndex(expandedIndex === index ? null : index)
+                }
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
                     setExpandedIndex(expandedIndex === index ? null : index)
                   }
-                >
-                  <p className="font-medium">{faq.question}</p>
-                  {expandedIndex === index ? (
-                    <ChevronUp className="w-5 h-5 text-gray-600" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-600" />
-                  )}
-                </div>
-                {expandedIndex === index && (
-                  <p className="mt-2 text-sm text-gray-700 dark:text-white">
-                    {faq.answer}
-                  </p>
+                }}
+                role="button"
+                aria-expanded={expandedIndex === index}
+                aria-controls={`faq-answer-${index}`}
+              >
+                <p className="font-medium">{faq.question}</p>
+                {expandedIndex === index ? (
+                  <ChevronUp className="w-5 h-5 text-gray-600" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-600" />
                 )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+              </div>
+              {expandedIndex === index && (
+                <p
+                  id={`faq-answer-${index}`}
+                  className="mt-2 text-sm text-gray-700 dark:text-white"
+                >
+                  {faq.answer}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   )
 }
