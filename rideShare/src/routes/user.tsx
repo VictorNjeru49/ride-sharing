@@ -5,19 +5,19 @@ import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { isLoggedIn } from '@/app/authPersistence';
 
 export const Route = createFileRoute('/user')({
-   beforeLoad: ({ location }) => {
-      const { isVerified } = authStore.state
-      console.log('isVerfied', isVerified)
-      console.log('user logged‑in?', isLoggedIn())
-      if (!isVerified || !isLoggedIn()) {
-        throw redirect({
-          to: '/login',
-          search: {
-            redirect: location.href,
-          },
-        })
-      }
-    },
+  //  beforeLoad: ({ location }) => {
+  //     const { isVerified } = authStore.state
+  //     console.log('isVerfied', isVerified)
+  //     console.log('user logged‑in?', isLoggedIn())
+  //     if (!isVerified || !isLoggedIn()) {
+  //       throw redirect({
+  //         to: '/login',
+  //         search: {
+  //           redirect: location.href,
+  //         },
+  //       })
+  //     }
+  //   },
   component: RouteComponent,
 })
 

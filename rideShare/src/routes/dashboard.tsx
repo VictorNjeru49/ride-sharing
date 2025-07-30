@@ -5,19 +5,19 @@ import { authStore } from '@/app/store';
 import { isLoggedIn } from '@/app/authPersistence';
 
 export const Route = createFileRoute('/dashboard')({
-  beforeLoad: ({ location }) => {
-    const { isVerified } = authStore.state
-    console.log('isVerfied', isVerified)
-    console.log('user logged‑in?', isLoggedIn())
-    if (!isVerified || !isLoggedIn()) {
-      throw redirect({
-        to: '/login',
-        search: {
-          redirect: location.href,
-        },
-      })
-    }
-  },
+  // beforeLoad: ({ location }) => {
+  //   const { isVerified } = authStore.state
+  //   console.log('isVerfied', isVerified)
+  //   console.log('user logged‑in?', isLoggedIn())
+  //   if (!isVerified || !isLoggedIn()) {
+  //     throw redirect({
+  //       to: '/login',
+  //       search: {
+  //         redirect: location.href,
+  //       },
+  //     })
+  //   }
+  // },
   component: RouteComponent,
 })
 

@@ -23,6 +23,8 @@ import {
   ChevronLeft,
   ChevronRight,
   LocateIcon,
+  PersonStandingIcon,
+  ArrowBigDownIcon,
 } from 'lucide-react'
 import { Link, useRouterState, useNavigate } from '@tanstack/react-router'
 import { UserRole } from '@/types/alltypes'
@@ -49,7 +51,7 @@ function Layout({ role }: { role: UserRole }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const navigate = useNavigate()
   const logout = useLogout()
-  const [sidebarExpanded, setSidebarExpanded] = useState(false);
+  const [sidebarExpanded, setSidebarExpanded] = useState(false)
   const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>(
     {},
   )
@@ -188,14 +190,25 @@ function Layout({ role }: { role: UserRole }) {
       icon: <History className="w-4 h-4" />,
     },
     {
+      label: 'Profile',
+      icon: <UserRoundPen className="w-4 h-4" />,
+      children: [
+          {
+          name: 'About',
+          icon: <ArrowBigDownIcon className="w-4 h-4" />,
+          path: '',
+        },
+        {
+          name: 'Account',
+          icon: <PersonStandingIcon className="w-4 h-4" />,
+          path: '/user/userprofile',
+        },
+      ],
+    },
+    {
       label: 'Settings',
       icon: <Settings className="w-4 h-4" />,
       children: [
-        {
-          name: 'Profile',
-          icon: <UserRoundPen className="w-4 h-4" />,
-          path: '/user/userprofile',
-        },
         {
           name: 'Devices',
           icon: <MonitorSmartphone className="w-4 h-4" />,
@@ -343,12 +356,12 @@ function Layout({ role }: { role: UserRole }) {
             >
               {sidebarExpanded ? (
                 <>
-                <ChevronLeft className="w-6 h-6 text-gray-700 dark:text-gray-300" />
-            <div>
-            <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                🚗 RideShare
-              </span>
-            </div>
+                  <ChevronLeft className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+                  <div>
+                    <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                      🚗 RideShare
+                    </span>
+                  </div>
                 </>
               ) : (
                 <ChevronRight className="w-6 h-6 text-gray-700 dark:text-gray-300" />

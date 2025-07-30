@@ -4,6 +4,7 @@ import Header from '../components/Header'
 
 
 import type { QueryClient } from '@tanstack/react-query'
+import { Chatbot } from '@/components/AI'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -25,6 +26,7 @@ function RootComponent() {
       {!hideHeader && <Header />}
 
       <Outlet />
+      <Chatbot/>
       {/* <TanStackRouterDevtools /> */}
 
       {/* <TanStackQueryLayout /> */}

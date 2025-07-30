@@ -4,7 +4,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { UserRole } from '@/types/alltypes'
-import { fetchUserBotReply } from '@/api/UserApi'
+import { fetchUserBotReply, getUserById } from '@/api/UserApi'
+import { authStore } from '@/app/store'
+import { useQuery } from '@tanstack/react-query'
 
 type FAQ = {
   question: string
@@ -64,6 +66,14 @@ interface FAQProps {
 
 function FAQComponent({ userRole }: FAQProps) {
   const faqList = userRole === UserRole.DRIVER ? faqListDriver : faqListRider
+  const userId = authStore.state.user?.id // or pass as prop
+
+  // Fetch user data with requests based on role
+  const { data: user } = useQuery({
+    queryKey: ['user-requests', userId],
+    queryFn: () => getUserById(userId!),
+    enabled: !!userId,
+  })
 
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
   const [query, setQuery] = useState('')
@@ -77,6 +87,49 @@ function FAQComponent({ userRole }: FAQProps) {
     setError(null)
     setBotReply(null)
     setExpandedIndex(null)
+
+    const lowerQuery = query.toLowerCase()
+    if (
+      lowerQuery.includes('show my bookings') ||
+      lowerQuery.includes('my rides') ||
+      lowerQuery.includes('my requests')
+    ) {
+      // Extract bookings/requests from user data
+      if (userRole === UserRole.RIDER) {
+        const activeRequests = user?.riderProfile?.rideRequests ?? []
+        if (activeRequests.length === 0) {
+          setBotReply('You have no active ride requests.')
+        } else {
+          // Format the requests nicely
+          const formatted = activeRequests
+            .map(
+              (r: any, i: number) =>
+                `${i + 1}. Ride to ${r.destination} on ${new Date(
+                  r.requestedAt,
+                ).toLocaleDateString()}. Status: ${r.status}`,
+            )
+            .join('\n')
+          setBotReply(`Your active ride requests:\n${formatted}`)
+        }
+      } else if (userRole === UserRole.DRIVER) {
+        const assignedRequests = user?.driverProfile?.assignedRequests ?? []
+        if (assignedRequests.length === 0) {
+          setBotReply('You have no assigned ride requests.')
+        } else {
+          const formatted = assignedRequests
+            .map(
+              (r: any, i: number) =>
+                `${i + 1}. Ride for ${r.riderName} to ${r.destination} on ${new Date(
+                  r.assignedAt,
+                ).toLocaleDateString()}. Status: ${r.status}`,
+            )
+            .join('\n')
+          setBotReply(`Your assigned ride requests:\n${formatted}`)
+        }
+      }
+      setLoading(false)
+      return
+    }
 
     try {
       const reply = await fetchUserBotReply(query, userRole)
@@ -125,7 +178,7 @@ function FAQComponent({ userRole }: FAQProps) {
       {botReply && (
         <Card className="border border-indigo-500 bg-indigo-50 shadow-md">
           <CardContent>
-            <p className="text-indigo-900 whitespace-pre-wrap">{botReply}</p>
+            <p className="text-indigo-900 whitespace-pre-wrap dark:text-white dark:bg-gray-700">{botReply}</p>
           </CardContent>
         </Card>
       )}

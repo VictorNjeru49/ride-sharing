@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { getUserById } from '@/api/UserApi'
@@ -18,9 +18,18 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card'
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from '@/components/ui/drawer'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { RingLoader } from 'react-spinners'
+import { FaWhatsapp } from 'react-icons/fa'
+import { Outlet } from '@tanstack/react-router'
+import DrawerUsers from '@/components/chatuser'
 
 export const Route = createFileRoute('/driver/')({
   component: RouteComponent,
@@ -28,6 +37,7 @@ export const Route = createFileRoute('/driver/')({
 
 function RouteComponent() {
   const userId = authStore.state.user?.id
+  const [chat, setchat] = useState(false)
 
   const { data: user, isLoading } = useQuery({
     queryKey: ['driver', userId],
@@ -59,7 +69,6 @@ function RouteComponent() {
       numericRatings.reduce((acc, r) => acc + r, 0) / numericRatings.length
     return avg.toFixed(1)
   }, [user])
-
 
   if (isLoading) {
     return (
@@ -118,7 +127,11 @@ function RouteComponent() {
             Passenger: Jane Doe • 12.4 mi • ETA: 10&nbsp;mins
           </p>
           <div className="flex gap-3">
-            <Button variant="default" className="flex gap-1 items-center">
+            <Button
+              variant="default"
+              className="flex gap-1 items-center"
+              onClick={() => setchat(true)}
+            >
               Call Rider <Phone className="w-4 h-4" />
             </Button>
             <Button variant="secondary">Navigate</Button>
@@ -159,6 +172,7 @@ function RouteComponent() {
           </CardContent>
         </Card>
       </div>
+       <DrawerUsers open={chat} onOpenChange={setchat} />
     </div>
   )
 }
